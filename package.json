@@ -23,7 +23,7 @@
         {
           "id": "creator-extension",
           "title": "Creator",
-          "icon": "src/brahma.png"
+          "icon": "public/brahma.png"
         }
       ]
     },
