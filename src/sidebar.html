@@ -1,0 +1,21 @@
+<!-- sidebar.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Sidebar</title>
+</head>
+<body>
+  <h1>Welcome to my sidebar!</h1>
+  <button id="alertBtn">Send Alert</button>
+
+  <script>
+    const vscode = acquireVsCodeApi(); // Get access to the VS Code API within the webview
+    const alertBtn = document.getElementById('alertBtn');
+
+    alertBtn.addEventListener('click', () => {
+      vscode.postMessage({ command: 'alert', text: 'Hello from the sidebar!' });
+    });
+  </script>
+</body>
+</html>
+

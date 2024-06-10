@@ -12,11 +12,25 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "creator-extension.helloWorld",
-        "title": "Creator: Hello World"
-      }
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "creator-extension",
+          "title": "Creator",
+          "icon": "src/brahma.png"
+        }
+      ]
+    },
+    "views": {
+      "creator-extension": [
+        {
+          "id": "main-view",
+          "name": "Creator"
+        }
+      ]
+    },
+    "activationEvents": [
+      "onView:main-view"
     ]
   },
   "scripts": {
