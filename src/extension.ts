@@ -25,6 +25,12 @@ export function activate(context: vscode.ExtensionContext) {
 
   const provider = new SidebarProvider(context.extensionUri);
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(SidebarProvider.viewType, provider));
+
+  context.subscriptions.push(
+		vscode.commands.registerCommand('creator-extension.fromClient', async (...args) => {
+      vscode.window.showInformationMessage('Received message from the sidebar: ' + args);
+      provider.postMessage(`Hi there!`);
+		}));
 }
 
 // This method is called when your extension is deactivated
