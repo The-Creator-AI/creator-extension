@@ -15,7 +15,7 @@
     "commands": [
       {
         "command": "creator-extension.helloWorld",
-        "title": "Hello World"
+        "title": "Creator: Hello World"
       }
     ]
   },
