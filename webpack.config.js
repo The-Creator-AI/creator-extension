@@ -52,7 +52,13 @@ const extensionConfig = {
             presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript']
           }
         }
-      }
+      },
+      {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false
+        },
+      },
     ]
   },
   plugins: [

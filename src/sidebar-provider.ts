@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
+import { CreatorService } from './services/creator.service';
+import { LlmService } from './services/llm.service';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 
-    public static readonly viewType = 'colorsView';
+    public static readonly viewType = 'creatorChat';
 
     private _view?: vscode.WebviewView;
 
@@ -28,13 +30,24 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-        webviewView.webview.onDidReceiveMessage(data => {
+        webviewView.webview.onDidReceiveMessage(async (data) => {
             switch (data.type) {
-                case 'fromClient':
-                    vscode.commands.executeCommand('creator-extension.fromClient', data.value);
-                    break;
+              case 'fromClient':
+                vscode.commands.executeCommand('creator-extension.fromClient', data.value);
+                break;
+              case 'sendMessage':
+                // Call your AI API here and send the response back to the webview
+                const userMessage = data.value;
+                const creatorService = new CreatorService();
+                const llmService = new LlmService(creatorService);
+                const response = await llmService.sendPrompt([{
+                    user: 'user',
+                    message: userMessage
+                }]); // Implement this function
+                this.postMessage({ type: 'receiveMessage', value: response });
+                break;
             }
-        });
+          });
     }
 
     public postMessage(message: any) {
