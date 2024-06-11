@@ -50,6 +50,15 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
             await ChatRepository.addMessageToChat(existingChat.id, { user: 'AI', message: response });
         });
+        serverIpc?.onClientMessage(ClientToServerChannel.RequestChatHistory, async (data) => {
+            console.log({ dataOnServerSide: data });
+            const chatId = data.chatId;
+            const chat = await ChatRepository.getChatById(chatId);
+            if (!chat) {
+                return;
+            }
+            serverIpc.sendToClient(ServerToClientChannel.SendChatHistory, { chatId: chat.id, messages: chat.messages });
+        });
     }
 
     //     webviewView.webview.onDidReceiveMessage(async (data) => {

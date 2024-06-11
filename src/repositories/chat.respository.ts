@@ -49,7 +49,10 @@ export class ChatRepository {
         return (await this.getChatRepositoryData()).chats;
     }
 
-    static async getChatById(id: string): Promise<Chat | undefined> {
+    static async getChatById(id?: string): Promise<Chat | undefined> {
+        if (!id) {
+            return this.getActiveChat();
+        }
         const chats = await this.getChats();
         return chats.find((chat) => chat.id === id);
     }

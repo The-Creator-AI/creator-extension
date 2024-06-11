@@ -24,6 +24,10 @@ const App = () => {
     clientIpc.onServerMessage(ServerToClientChannel.SendMessage, ({ message }) => {
       setMessages((messages) => ([...messages, `Creator AI: ${message}`]));
     });
+    clientIpc.onServerMessage(ServerToClientChannel.SendChatHistory, ({ messages }) => {
+      setMessages(() => ([...messages.map(({ user, message }) => `${user}: ${message}`)]));
+    });
+    clientIpc.sendToServer(ClientToServerChannel.RequestChatHistory, {});
   }, []);
 
   return (
