@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
-import { CreatorService } from './services/creator.service';
-import { LlmService } from './services/llm.service';
+import { Services } from './services';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 
@@ -38,9 +37,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
               case 'sendMessage':
                 // Call your AI API here and send the response back to the webview
                 const userMessage = data.value;
-                const creatorService = new CreatorService();
-                const llmService = new LlmService(creatorService);
-                const response = await llmService.sendPrompt([{
+                const response = await Services.getLlmService().sendPrompt([{
                     user: 'user',
                     message: userMessage
                 }]); // Implement this function
