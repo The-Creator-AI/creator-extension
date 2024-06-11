@@ -1,18 +1,19 @@
 // src/sidebar/Sidebar.tsx
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-
-const vscode = acquireVsCodeApi();
+import { ClientPostMessageManager } from '../ipc/client-ipc';
+import { ClientToServerChannel, ServerToClientChannel } from '../ipc/channels.enum';
 
 const App = () => {
   const [messages, setMessages] = React.useState<string[]>([]);
   const [userInput, setUserInput] = React.useState('');
+  const clientIpc = new ClientPostMessageManager();
 
   const sendMessage = () => {
     if (userInput.trim() === '') return;
-    
+
     // Send message to extension
-    vscode.postMessage({ type: 'sendMessage', value: userInput });
+    clientIpc.send(ClientToServerChannel.SendMessage, { message: userInput });
 
     // Update local messages (for display)
     setMessages([...messages, `You: ${userInput}`]);
@@ -20,11 +21,8 @@ const App = () => {
   };
 
   React.useEffect(() => {
-    window.addEventListener('message', (event) => {
-      const message = event.data;
-      if (message.type === 'receiveMessage') {
-        setMessages([...messages, `Creator AI: ${message.value}`]);
-      }
+    clientIpc.on(ServerToClientChannel.SendMessage, ({ message }) => {
+      setMessages((messages) => ([...messages, `Creator AI: ${message}`]));
     });
   }, [messages]);
 

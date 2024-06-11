@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { Services } from './services';
 import { ChatRepository } from './repositories/chat.respository';
+import { ServerPostMessageManager } from './ipc/server-ipc';
+import { ClientToServerChannel, ServerToClientChannel } from './ipc/channels.enum';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 
@@ -29,36 +31,54 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         };
 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-
-        webviewView.webview.onDidReceiveMessage(async (data) => {
-            switch (data.type) {
-              case 'fromClient':
-                vscode.commands.executeCommand('creator-extension.fromClient', data.value);
-                break;
-              case 'sendMessage':
-                // Call your AI API here and send the response back to the webview
-                const userMessage = data.value;
-
-                // Fetch Chat History from Repository
-                let existingChat = await ChatRepository.getActiveChat();
-                await ChatRepository.addMessageToChat(existingChat.id, { user: 'user', message: userMessage });
-                existingChat = await ChatRepository.getActiveChat();
-
-                const response = await Services.getLlmService().sendPrompt(existingChat.messages);
-
-                this.postMessage({ type: 'receiveMessage', value: response });
-                await ChatRepository.addMessageToChat(existingChat.id, { user: 'AI', message: response });
-                break;
-            }
-          });
+        const serverIpc = ServerPostMessageManager.getInstance(
+            webviewView.webview.onDidReceiveMessage,
+            this._view?.webview.postMessage
+        );
+        serverIpc.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
+            console.log({ dataOnServerSide: data });  
+            // serverIpc.sendToClient(ServerToClientChannel.SendMessage, { message: data.message });
+            this._view?.webview.postMessage({
+                channel: 'serverToClient.sendMessage',
+                body: data
+            });
+        });
     }
 
-    public postMessage(message: any) {
-        if (this._view) {
-            this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-            this._view.webview.postMessage(message);
-        }
-    }
+    //     webviewView.webview.onDidReceiveMessage(async (data) => {
+    //         this._view?.webview.postMessage({
+    //             channel: 'serverToClient.sendMessage',
+    //             body: data.body
+    //         });
+    //         console.log({ dataOnServerSide: data });
+    //         switch (data.type) {
+    //           case 'fromClient':
+    //             vscode.commands.executeCommand('creator-extension.fromClient', data.value);
+    //             break;
+    //           case 'sendMessage':
+    //             // Call your AI API here and send the response back to the webview
+    //             const userMessage = data.value;
+
+    //             // Fetch Chat History from Repository
+    //             let existingChat = await ChatRepository.getActiveChat();
+    //             await ChatRepository.addMessageToChat(existingChat.id, { user: 'user', message: userMessage });
+    //             existingChat = await ChatRepository.getActiveChat();
+
+    //             const response = await Services.getLlmService().sendPrompt(existingChat.messages);
+
+    //             this.postMessage({ type: 'receiveMessage', value: response });
+    //             await ChatRepository.addMessageToChat(existingChat.id, { user: 'AI', message: response });
+    //             break;
+    //         }
+    //       });
+    // }
+
+    // public postMessage(message: any) {
+    //     if (this._view) {
+    //         this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
+    //         this._view.webview.postMessage(message);
+    //     }
+    // }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
         // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
