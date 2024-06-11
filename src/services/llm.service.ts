@@ -1,13 +1,11 @@
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, Part } from '@google/generative-ai';
 import * as openai from 'openai';
 import { CreatorService } from './creator.service';
+import { StorageService } from './storage.service';
 import * as vscode from 'vscode';
 
 
 export class LlmService {
-    private geminiApiKey: string | undefined = process.env.GEMINI_API_KEY;
-    private openaiApiKey: string | undefined = process.env.OPENAI_API_KEY;
-
     private geminiProModel: string = 'models/gemini-1.5-pro-latest'; // Default model
     private geminiFlashModel: string = 'gemini-1.5-flash-latest';
     private openaiModel: string = 'gpt-3.5-turbo';
@@ -43,9 +41,9 @@ export class LlmService {
         console.log(prompt);
 
         if (type === 'gemini') {
-            return this.sendPromptToGemini(prompt);
+            return this.sendPromptToGemini(prompt, apiKey);
         } else if (type === 'openai') {
-            return this.sendPromptToOpenAI(prompt);
+            return this.sendPromptToOpenAI(prompt, apiKey);
         } else {
             throw new Error(
                 'No API key found. Please set either GEMINI_API_KEY or OPENAI_API_KEY environment variable.',
@@ -53,14 +51,8 @@ export class LlmService {
         }
     }
 
-    private async sendPromptToGemini(prompt: string): Promise<string> {
-        if (!this.geminiApiKey) {
-            throw new Error(
-                'GEMINI_API_KEY not set in environment variables.',
-            );
-        }
-
-        const genAI = new GoogleGenerativeAI(this.geminiApiKey);
+    private async sendPromptToGemini(prompt: string, apiKey: string): Promise<string> {
+        const genAI = new GoogleGenerativeAI(apiKey);
         let debounce = 0;
         let attempts = 0;
         let responseText = '';
@@ -125,16 +117,8 @@ export class LlmService {
         return this.currentModel; // Access currentModel here
     }
 
-    private async sendPromptToOpenAI(prompt: string): Promise<string> {
-        if (!this.openaiApiKey) {
-            throw new Error(
-                'OPENAI_API_KEY not set in environment variables.',
-            );
-        }
-
-        const model = new openai.OpenAI({
-            apiKey: this.openaiApiKey,
-        });
+    private async sendPromptToOpenAI(prompt: string, apiKey: string): Promise<string> {
+        const model = new openai.OpenAI({ apiKey });
 
         this.currentModel = this.openaiModel;
         const response = await model.completions.create({
@@ -146,16 +130,11 @@ export class LlmService {
     }
 
     private async getApiKey(): Promise<any> {
-        if (this.geminiApiKey && this.openaiApiKey) {
-            console.warn(
-                'Both GEMINI_API_KEY and OPENAI_API_KEY are set. Using GEMINI_API_KEY.',
-            );
-        }
+        const type = await StorageService.get('apiKeyType');
+        const apiKey = await StorageService.get('apiKey');
 
-        if (this.geminiApiKey) {
-            return { type: 'gemini', apiKey: this.geminiApiKey };
-        } else if (this.openaiApiKey) {
-            return { type: 'openai', apiKey: this.openaiApiKey };
+        if (apiKey) {
+            return { type, apiKey };
         } else {
             await this.getApiKeyFromUser();
             return await this.getApiKey();
@@ -178,10 +157,9 @@ export class LlmService {
                 password: true, // Mask the input for security
             });
             console.log({ apiKeyInput, apiChoice });
-            if (apiChoice.value === 'gemini') {
-                this.geminiApiKey = apiKeyInput;
-            } else if (apiChoice.value === 'openai') {
-                this.openaiApiKey = apiKeyInput;
+            if (apiKeyInput) {
+                StorageService.set('apiKey', apiKeyInput);
+                StorageService.set('apiKeyType', apiChoice.value);
             }
         }
     }

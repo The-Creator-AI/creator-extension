@@ -12,6 +12,21 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Creator Extension",
+      "properties": {
+        "creatorExtension.apiKey": {
+          "type": "string",
+          "description": "API key for AI service (Gemini or OpenAI)",
+          "default": ""
+        },
+        "creatorExtension.apiKeyType": {
+          "type": "string",
+          "description": "API key type for AI service (Gemini or OpenAI)",
+          "default": ""
+        }
+      }
+    },
     "commands": [
       {
         "command": "creator-extension.helloWorld",
