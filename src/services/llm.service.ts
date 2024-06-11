@@ -1,8 +1,8 @@
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, Part } from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 import * as openai from 'openai';
-import { CreatorService } from './creator.service';
-import { StorageService } from './storage.service';
 import * as vscode from 'vscode';
+import { LlmRepository } from '../repositories/llm.repository';
+import { CreatorService } from './creator.service';
 
 
 export class LlmService {
@@ -130,10 +130,10 @@ export class LlmService {
     }
 
     private async getApiKey(): Promise<any> {
-        const type = await StorageService.get('apiKeyType');
-        const apiKey = await StorageService.get('apiKey');
+        const apiKeys = await LlmRepository.getLLMApiKeys();
+        const [type, apiKey] = Object.entries(apiKeys)[0] || [];
 
-        if (apiKey) {
+        if (apiKey && type) {
             return { type, apiKey };
         } else {
             await this.getApiKeyFromUser();
@@ -158,8 +158,7 @@ export class LlmService {
             });
             console.log({ apiKeyInput, apiChoice });
             if (apiKeyInput) {
-                StorageService.set('apiKey', apiKeyInput);
-                StorageService.set('apiKeyType', apiChoice.value);
+                await LlmRepository.setLLMApiKey(apiChoice.value, apiKeyInput);
             }
         }
     }
