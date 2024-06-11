@@ -33,15 +33,22 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
         const serverIpc = ServerPostMessageManager.getInstance(
             webviewView.webview.onDidReceiveMessage,
-            this._view?.webview.postMessage
+            (data: any) => webviewView.webview.postMessage(data)
         );
-        serverIpc.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
+        serverIpc?.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
             console.log({ dataOnServerSide: data });  
-            // serverIpc.sendToClient(ServerToClientChannel.SendMessage, { message: data.message });
-            this._view?.webview.postMessage({
-                channel: 'serverToClient.sendMessage',
-                body: data
-            });
+            const userMessage = data.message;
+
+            // Fetch Chat History from Repository
+            let existingChat = await ChatRepository.getActiveChat();
+            await ChatRepository.addMessageToChat(existingChat.id, { user: 'user', message: userMessage });
+            existingChat = await ChatRepository.getActiveChat();
+
+            const response = await Services.getLlmService().sendPrompt(existingChat.messages);
+
+            serverIpc.sendToClient(ServerToClientChannel.SendMessage, { message: response });
+
+            await ChatRepository.addMessageToChat(existingChat.id, { user: 'AI', message: response });
         });
     }
 

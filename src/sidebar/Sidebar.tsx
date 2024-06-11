@@ -7,13 +7,13 @@ import { ClientToServerChannel, ServerToClientChannel } from '../ipc/channels.en
 const App = () => {
   const [messages, setMessages] = React.useState<string[]>([]);
   const [userInput, setUserInput] = React.useState('');
-  const clientIpc = new ClientPostMessageManager();
+  const clientIpc = ClientPostMessageManager.getInstance();
 
   const sendMessage = () => {
     if (userInput.trim() === '') return;
 
     // Send message to extension
-    clientIpc.send(ClientToServerChannel.SendMessage, { message: userInput });
+    clientIpc.sendToServer(ClientToServerChannel.SendMessage, { message: userInput });
 
     // Update local messages (for display)
     setMessages([...messages, `You: ${userInput}`]);
@@ -21,10 +21,10 @@ const App = () => {
   };
 
   React.useEffect(() => {
-    clientIpc.on(ServerToClientChannel.SendMessage, ({ message }) => {
+    clientIpc.onServerMessage(ServerToClientChannel.SendMessage, ({ message }) => {
       setMessages((messages) => ([...messages, `Creator AI: ${message}`]));
     });
-  }, [messages]);
+  }, []);
 
   return (
     <div>

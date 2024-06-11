@@ -2,7 +2,7 @@ import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
 import { ChannelBody } from "./channels.type";
 
 export class ServerPostMessageManager {
-    private static _instance: ServerPostMessageManager;
+    private static _instance?: ServerPostMessageManager;
     private _listeners: {
         channel: ClientToServerChannel,
         callback: (body: ChannelBody<ClientToServerChannel>) => void
@@ -24,7 +24,7 @@ export class ServerPostMessageManager {
     static getInstance(
         onMessage?: (data: any) => void,
         sendMessage?: (message: any) => void
-    ): ServerPostMessageManager {
+    ) {
         if (onMessage && sendMessage) {
             ServerPostMessageManager._instance = new ServerPostMessageManager(onMessage, sendMessage);
         }
