@@ -3,6 +3,7 @@ import * as openai from 'openai';
 import * as vscode from 'vscode';
 import { LlmRepository } from '../repositories/llm.repository';
 import { CreatorService } from './creator.service';
+import { ChatMessage } from '../repositories/chat.respository';
 
 
 export class LlmService {
@@ -15,7 +16,7 @@ export class LlmService {
     constructor(private readonly creatorService: CreatorService) { }
 
     async sendPrompt(
-        chatHistory: { user: string; message: string }[],
+        chatHistory: ChatMessage[],
         selectedFiles: string[] = [],
     ): Promise<string> {
         const { type, apiKey } = await this.getApiKey();

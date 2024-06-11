@@ -17,8 +17,11 @@
       "properties": {
         "creatorExtension.llmRepository": {
           "type": "object",
-          "description": "Configuration for LLM services",
-          "default": {}
+          "description": "Configuration for LLM services"
+        },
+        "creatorExtension.chatRepository": {
+          "type": "object",
+          "description": "Chat repository data"
         }
       }
     },

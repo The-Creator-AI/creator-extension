@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { Services } from './services';
+import { ChatRepository } from './repositories/chat.respository';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 
@@ -37,11 +38,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
               case 'sendMessage':
                 // Call your AI API here and send the response back to the webview
                 const userMessage = data.value;
-                const response = await Services.getLlmService().sendPrompt([{
-                    user: 'user',
-                    message: userMessage
-                }]); // Implement this function
+
+                // Fetch Chat History from Repository
+                let existingChat = await ChatRepository.getActiveChat();
+                await ChatRepository.addMessageToChat(existingChat.id, { user: 'user', message: userMessage });
+                existingChat = await ChatRepository.getActiveChat();
+
+                const response = await Services.getLlmService().sendPrompt(existingChat.messages);
+
                 this.postMessage({ type: 'receiveMessage', value: response });
+                await ChatRepository.addMessageToChat(existingChat.id, { user: 'AI', message: response });
                 break;
             }
           });
