@@ -24,7 +24,8 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(disposable);
 
   const provider = new SidebarProvider(context.extensionUri);
-  context.subscriptions.push(vscode.window.registerWebviewViewProvider(SidebarProvider.viewType, provider));
+  context.subscriptions.push(vscode.window.registerWebviewViewProvider(SidebarProvider.chatViewType, provider));
+  context.subscriptions.push(vscode.window.registerWebviewViewProvider(SidebarProvider.fileExplorerViewType, provider));
 }
 
 // This method is called when your extension is deactivated

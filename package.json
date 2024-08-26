@@ -9,7 +9,10 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:fileExplorer",
+    "onView:creatorChat"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
@@ -44,14 +47,16 @@
       "creator-extension": [
         {
           "type": "webview",
+          "id": "fileExplorer",
+          "name": "Creator: File Explorer"
+        },
+        {
+          "type": "webview",
           "id": "creatorChat",
           "name": "Creator: Chat"
         }
       ]
-    },
-    "activationEvents": [
-      "onView:main-view"
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

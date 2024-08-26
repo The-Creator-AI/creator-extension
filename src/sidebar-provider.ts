@@ -6,7 +6,8 @@ import { ClientToServerChannel, ServerToClientChannel } from './ipc/channels.enu
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 
-    public static readonly viewType = 'creatorChat';
+    public static readonly chatViewType = 'creatorChat';
+    public static readonly fileExplorerViewType = 'fileExplorer'; // New view type
 
     private _view?: vscode.WebviewView;
 
@@ -30,100 +31,96 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             ]
         };
 
-        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+        // Conditional rendering based on view type
+        switch (webviewView.viewType) {
+            case SidebarProvider.chatViewType:
+                webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, SidebarProvider.chatViewType);
+                break;
+            case SidebarProvider.fileExplorerViewType:
+                webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, SidebarProvider.fileExplorerViewType);
+                break;
+            default:
+                webviewView.webview.html = 'Unknown view type';
+        }
+
         const serverIpc = ServerPostMessageManager.getInstance(
             webviewView.webview.onDidReceiveMessage,
             (data: any) => webviewView.webview.postMessage(data)
         );
-        serverIpc?.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
-            console.log({ dataOnServerSide: data });  
-            const userMessage = data.message;
 
-            // Fetch Chat History from Repository
-            let existingChat = await ChatRepository.getActiveChat();
-            await ChatRepository.addMessageToChat(existingChat.id, { user: 'user', message: userMessage });
-            existingChat = await ChatRepository.getActiveChat();
+        // Handle messages for the chat view
+        if (webviewView.viewType === SidebarProvider.chatViewType) {
+            serverIpc?.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
+                console.log({ dataOnServerSide: data });
+                const userMessage = data.message;
 
-            const response = await Services.getLlmService().sendPrompt(existingChat.messages);
+                // Fetch Chat History from Repository
+                let existingChat = await ChatRepository.getActiveChat();
+                await ChatRepository.addMessageToChat(existingChat.id, { user: 'user', message: userMessage });
+                existingChat = await ChatRepository.getActiveChat();
 
-            serverIpc.sendToClient(ServerToClientChannel.SendMessage, { message: response });
+                const response = await Services.getLlmService().sendPrompt(existingChat.messages);
 
-            await ChatRepository.addMessageToChat(existingChat.id, { user: 'AI', message: response });
-        });
-        serverIpc?.onClientMessage(ClientToServerChannel.RequestChatHistory, async (data) => {
-            console.log({ dataOnServerSide: data });
-            const chatId = data.chatId;
-            const chat = await ChatRepository.getChatById(chatId);
-            if (!chat) {
-                return;
-            }
-            serverIpc.sendToClient(ServerToClientChannel.SendChatHistory, { chatId: chat.id, messages: chat.messages });
-        });
+                serverIpc.sendToClient(ServerToClientChannel.SendMessage, { message: response });
+
+                await ChatRepository.addMessageToChat(existingChat.id, { user: 'AI', message: response });
+            });
+            serverIpc?.onClientMessage(ClientToServerChannel.RequestChatHistory, async (data) => {
+                console.log({ dataOnServerSide: data });
+                const chatId = data.chatId;
+                const chat = await ChatRepository.getChatById(chatId);
+                if (!chat) {
+                    return;
+                }
+                serverIpc.sendToClient(ServerToClientChannel.SendChatHistory, { chatId: chat.id, messages: chat.messages });
+            });
+        }
+
+        // Handle messages for the file explorer view
+        if (webviewView.viewType === SidebarProvider.fileExplorerViewType) {
+            // Add logic to handle messages for the file explorer view here
+        }
     }
 
-    //     webviewView.webview.onDidReceiveMessage(async (data) => {
-    //         this._view?.webview.postMessage({
-    //             channel: 'serverToClient.sendMessage',
-    //             body: data.body
-    //         });
-    //         console.log({ dataOnServerSide: data });
-    //         switch (data.type) {
-    //           case 'fromClient':
-    //             vscode.commands.executeCommand('creator-extension.fromClient', data.value);
-    //             break;
-    //           case 'sendMessage':
-    //             // Call your AI API here and send the response back to the webview
-    //             const userMessage = data.value;
-
-    //             // Fetch Chat History from Repository
-    //             let existingChat = await ChatRepository.getActiveChat();
-    //             await ChatRepository.addMessageToChat(existingChat.id, { user: 'user', message: userMessage });
-    //             existingChat = await ChatRepository.getActiveChat();
-
-    //             const response = await Services.getLlmService().sendPrompt(existingChat.messages);
-
-    //             this.postMessage({ type: 'receiveMessage', value: response });
-    //             await ChatRepository.addMessageToChat(existingChat.id, { user: 'AI', message: response });
-    //             break;
-    //         }
-    //       });
-    // }
-
-    // public postMessage(message: any) {
-    //     if (this._view) {
-    //         this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-    //         this._view.webview.postMessage(message);
-    //     }
-    // }
-
-    private _getHtmlForWebview(webview: vscode.Webview) {
+    private _getHtmlForWebview(webview: vscode.Webview, viewType: string) {
         // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
         const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'sidebar.js'));
 
         // Use a nonce to only allow a specific script to be run.
         const nonce = getNonce();
-        // const pathToHtml = vscode.Uri.joinPath(this._extensionUri, 'src', 'sidebar.html');
-        // fs.readFileSync(pathToHtml.fsPath, 'utf8');
 
-        return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-
-				<!--
-					Use a content security policy to only allow loading styles from our extension directory,
-					and only allow scripts that have a specific nonce.
-					(See the 'webview-sample' extension sample for img-src content security policy examples)
-				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			</head>
-			<body>
-                <div id="root"></div>
-                <script nonce="${nonce}" src="${scriptUri}"></script>
-			</body>
-			</html>`;
+        // Generate HTML based on the view type
+        switch (viewType) {
+            case SidebarProvider.chatViewType:
+                return `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                </head>
+                <body>
+                    <div id="root"></div>
+                    <script nonce="${nonce}" src="${scriptUri}"></script>
+                </body>
+                </html>`;
+            case SidebarProvider.fileExplorerViewType:
+                return `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                </head>
+                <body>
+                    <h1>File Explorer</h1>
+                    <div id="file-explorer-root"></div>
+                    <script nonce="${nonce}" src="${scriptUri}"></script>
+                </body>
+                </html>`;
+            default:
+                return 'Unknown view type';
+        }
     }
 }
 
