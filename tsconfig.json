@@ -1,7 +1,8 @@
 {
 	"compilerOptions": {
-		"module": "Node16",
-		"target": "ES2022",
+		"module": "esnext",
+    	"moduleResolution": "node",
+		"target": "ES5",
 		"lib": [
 			"ES2022",
 			"DOM"
@@ -9,7 +10,7 @@
 		"jsx": "react",
 		"sourceMap": true,
 		"rootDir": "src",
-		"strict": true,   /* enable all strict type-checking options */
+		"strict": false,   /* enable all strict type-checking options */
 		"noImplicitAny": false,
 		"noImplicitReturns": false,
 		"noImplicitThis": false,
@@ -17,5 +18,7 @@
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
+		"baseUrl": "./",
+		"experimentalDecorators": true
 	}
 }

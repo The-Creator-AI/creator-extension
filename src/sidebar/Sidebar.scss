@@ -1,0 +1,78 @@
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+    .chat-history {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            /* Align items to the top */
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 4px;
+
+            &.user {
+                background-color: #e0f7fa;
+                /* Light blue for user messages */
+                border-left: 3px solid #4299e1;
+                /* Blue border for user messages */
+            }
+
+            &.bot {
+                background-color: #f5f5f5;
+                /* Light gray for bot messages */
+                border-left: 3px solid #90cdf4;
+                /* Lighter blue border for bot messages */
+            }
+
+            .message-icon {
+                margin-right: 10px;
+                /* Space between icon and message */
+                font-size: 1.2em;
+
+                &.user {
+                    color: #4299e1;
+                    /* Blue for user icon */
+                }
+
+                &.bot {
+                    color: #90cdf4;
+                    /* Lighter blue for bot icon */
+                }
+            }
+
+            .message-content {
+                flex-grow: 1;
+            }
+        }
+    }
+
+    .chat-input {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+
+        input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    }
+}

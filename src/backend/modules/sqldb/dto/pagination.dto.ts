@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
-import { transformStringToInteger } from 'src/utils/utils';
+import { transformStringToInteger } from 'src/backend/utils/utils';
 
 export class PaginationDto {
   @IsInt()
