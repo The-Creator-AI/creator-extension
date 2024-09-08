@@ -14,7 +14,7 @@ export function getChatViewHtml(
   extensionUri: vscode.Uri
 ): string {
   const scriptUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "dist", "sidebar.js")
+    vscode.Uri.joinPath(extensionUri, "dist", "chatView.js")
   );
   return `<!DOCTYPE html>
                     <html lang="en">
@@ -24,7 +24,7 @@ export function getChatViewHtml(
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     </head>
                     <body>
-                        <div id="root"></div>
+                        <div id="chat-view-root"></div>
                         <script nonce="${nonce}" src="${scriptUri}"></script>
                     </body>
                     </html>`;

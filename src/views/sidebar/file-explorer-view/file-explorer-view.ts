@@ -8,7 +8,7 @@ export function getFileExplorerViewHtml(
   extensionUri: vscode.Uri
 ): string {
   const scriptUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "dist", "sidebar.js")
+    vscode.Uri.joinPath(extensionUri, "dist", "....js")
   );
   return `<!DOCTYPE html>
                     <html lang="en">

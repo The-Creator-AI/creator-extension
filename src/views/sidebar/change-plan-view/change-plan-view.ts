@@ -1,5 +1,9 @@
 import * as vscode from "vscode";
 import { ServerPostMessageManager } from "../../../ipc/server-ipc";
+import {
+  ClientToServerChannel,
+  ServerToClientChannel,
+} from "../../../ipc/channels.enum";
 
 // Function to get HTML for change plan view
 export function getChangePlanViewHtml(
@@ -8,7 +12,7 @@ export function getChangePlanViewHtml(
   extensionUri: vscode.Uri
 ): string {
   const scriptUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "dist", "sidebar.js")
+    vscode.Uri.joinPath(extensionUri, "dist", "changePlanView.js")
   );
   return `<!DOCTYPE html>
                     <html lang="en">
@@ -18,8 +22,7 @@ export function getChangePlanViewHtml(
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     </head>
                     <body>
-                        <h1>Change Plan</h1>
-                        <div id="change-plan-root"></div>
+                        <div id="change-plan-view-root"></div>
                         <script nonce="${nonce}" src="${scriptUri}"></script>
                     </body>
                     </html>`;
@@ -29,5 +32,29 @@ export function getChangePlanViewHtml(
 export function handleChangePlanViewMessages(
   serverIpc: ServerPostMessageManager
 ) {
-  // Add logic to handle messages for the change plan view here
+  serverIpc.onClientMessage(
+    ClientToServerChannel.RequestOpenEditors,
+    async () => {
+      // Get the currently open editors from VS Code API
+      const openEditors = vscode.window.visibleTextEditors.map((editor) => ({
+        fileName: editor.document.fileName.split("/").pop() || "",
+        filePath: editor.document.fileName,
+        languageId: editor.document.languageId,
+      }));
+
+      // Send the list of open editors to the webview
+      serverIpc.sendToClient(ServerToClientChannel.SendOpenEditors, {
+        editors: openEditors,
+      });
+    }
+  );
+
+  serverIpc.onClientMessage(
+    ClientToServerChannel.SendSelectedEditor,
+    async (data) => {
+      const selectedEditor = data.editor;
+      console.log("Selected editor:", selectedEditor);
+      // You can now use the selectedEditor information in your extension logic
+    }
+  );
 }
