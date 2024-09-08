@@ -16,7 +16,7 @@ const extensionConfig = {
 
   entry: {
     extension: './src/extension.ts',
-    sidebar: './src/views/sidebar/Sidebar.tsx'
+    sidebar: './src/views/sidebar/change-plan-view/index.tsx'
   },  
   output: {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
