@@ -32,14 +32,33 @@ export function getChangePlanViewHtml(
 export function handleChangePlanViewMessages(
   serverIpc: ServerPostMessageManager
 ) {
+  // Subscribe to the onDidChangeVisibleTextEditors event
+  const visibleEditorsSubscription =
+    vscode.window.onDidChangeVisibleTextEditors((editors) => {
+      console.log("Visible editors changed:", editors);
+      // If we have a webview instance, send the updated list of editors
+      const openEditors = vscode.window.tabGroups.all
+        .flatMap((group) => group.tabs)
+        .map((tab) => ({
+          fileName: tab.label || "",
+          filePath: tab.input instanceof vscode.TabInputText || tab.input instanceof vscode.TabInputNotebook ? tab.input.uri?.path || "" : "",
+          languageId: "",
+        }));
+      serverIpc.sendToClient(ServerToClientChannel.SendOpenEditors, {
+        editors: openEditors,
+      });
+    });
+
   serverIpc.onClientMessage(
     ClientToServerChannel.RequestOpenEditors,
     async () => {
       // Get the currently open editors from VS Code API
-      const openEditors = vscode.window.visibleTextEditors.map((editor) => ({
-        fileName: editor.document.fileName.split("/").pop() || "",
-        filePath: editor.document.fileName,
-        languageId: editor.document.languageId,
+      const openEditors = vscode.window.tabGroups.all
+      .flatMap((group) => group.tabs)
+      .map((tab) => ({
+        fileName: tab.label || "",
+        filePath: tab.input instanceof vscode.TabInputText || tab.input instanceof vscode.TabInputNotebook ? tab.input.uri?.path || "" : "",
+        languageId: "",
       }));
 
       // Send the list of open editors to the webview
@@ -57,4 +76,6 @@ export function handleChangePlanViewMessages(
       // You can now use the selectedEditor information in your extension logic
     }
   );
+
+  return { visibleEditorsSubscription };
 }
