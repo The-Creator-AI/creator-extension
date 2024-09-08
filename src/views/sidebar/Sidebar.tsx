@@ -1,8 +1,8 @@
 // creator-extension/src/sidebar/Sidebar.tsx
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ClientPostMessageManager } from '../ipc/client-ipc';
-import { ClientToServerChannel, ServerToClientChannel } from '../ipc/channels.enum';
+import { ClientPostMessageManager } from '../../ipc/client-ipc';
+import { ClientToServerChannel, ServerToClientChannel } from '../../ipc/channels.enum';
 // import ReactMarkdown from 'react-markdown';
 import Markdown from 'markdown-to-jsx'
 import { FaUser, FaRobot } from 'react-icons/fa';
