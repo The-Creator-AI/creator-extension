@@ -11,7 +11,8 @@
   ],
   "activationEvents": [
     "onView:fileExplorer",
-    "onView:creatorChat"
+    "onView:creatorChat",
+    "onView:changePlan"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -47,13 +48,18 @@
       "creator-extension": [
         {
           "type": "webview",
-          "id": "fileExplorer",
+          "id": "viewType.sidebar.fileExplorer",
           "name": "Creator: File Explorer"
         },
         {
           "type": "webview",
-          "id": "creatorChat",
+          "id": "viewType.sidebar.chat",
           "name": "Creator: Chat"
+        },
+        {
+          "type": "webview",
+          "id": "viewType.sidebar.changePlan",
+          "name": "Creator: Change Plan"
         }
       ]
     }

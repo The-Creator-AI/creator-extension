@@ -7,6 +7,10 @@ import {
   handleFileExplorerViewMessages,
 } from "./file-explorer-view/file-explorer-view";
 import { VIEW_TYPES } from "../view-types";
+import {
+  getChangePlanViewHtml,
+  handleChangePlanViewMessages,
+} from "./change-plan-view/change-plan-view"; // Import the new view's functions
 
 // Main function to resolve the webview view
 export function resolveWebviewView(
@@ -47,6 +51,18 @@ export function resolveWebviewView(
         (data: any) => webviewView.webview.postMessage(data)
       );
       handleFileExplorerViewMessages(fileExplorerViewServerIpc);
+      break;
+    case VIEW_TYPES.SIDEBAR.CHANGE_PLAN: // Handle the new view type
+      webviewView.webview.html = getChangePlanViewHtml(
+        webviewView.webview,
+        nonce,
+        extensionUri
+      );
+      const changePlanViewServerIpc = ServerPostMessageManager.getInstance(
+        webviewView.webview.onDidReceiveMessage,
+        (data: any) => webviewView.webview.postMessage(data)
+      );
+      handleChangePlanViewMessages(changePlanViewServerIpc);
       break;
     default:
       webviewView.webview.html = "Unknown view type";

@@ -2,9 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { resolveWebviewView } from "./views/sidebar/sidebar-views";
-import {
-  VIEW_TYPES
-} from "./views/view-types";
+import { VIEW_TYPES } from "./views/view-types";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -41,7 +39,18 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(VIEW_TYPES.SIDEBAR.FILE_EXPLORER, {
+    vscode.window.registerWebviewViewProvider(
+      VIEW_TYPES.SIDEBAR.FILE_EXPLORER,
+      {
+        resolveWebviewView: (webviewView, _, token) =>
+          resolveWebviewView(webviewView, context, token, context.extensionUri),
+      }
+    )
+  );
+
+  // Register Change Plan view provider
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(VIEW_TYPES.SIDEBAR.CHANGE_PLAN, {
       resolveWebviewView: (webviewView, _, token) =>
         resolveWebviewView(webviewView, context, token, context.extensionUri),
     })
