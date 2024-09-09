@@ -1,4 +1,4 @@
-import { WebviewApi } from "./vscode-webview";
+import { WebviewApi } from "../vscode-webview";
 
 let vscode: WebviewApi<unknown> | null = null;
 

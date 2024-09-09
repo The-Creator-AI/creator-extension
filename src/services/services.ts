@@ -1,6 +1,6 @@
 // src/services.ts
-import { CreatorService } from './services/creator.service';
-import { LlmService } from './services/llm.service';
+import { CreatorService } from './creator.service';
+import { LlmService } from './llm.service';
 
 export class Services {
     private static _creatorService: CreatorService | undefined;

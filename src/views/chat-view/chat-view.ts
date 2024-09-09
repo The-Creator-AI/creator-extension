@@ -2,10 +2,10 @@ import * as vscode from "vscode";
 import {
     ClientToServerChannel,
     ServerToClientChannel,
-} from "../../../ipc/channels.enum";
-import { ServerPostMessageManager } from "../../../ipc/server-ipc";
-import { ChatRepository } from "../../../repositories/chat.respository";
-import { Services } from "../../../services";
+} from "../../ipc/channels.enum";
+import { ServerPostMessageManager } from "../../ipc/server-ipc";
+import { ChatRepository } from "../../repositories/chat.respository";
+import { Services } from "../../services/services";
 
 // Function to get HTML for chat view
 export function getChatViewHtml(

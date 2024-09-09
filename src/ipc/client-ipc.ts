@@ -1,4 +1,4 @@
-import getVscode from "../get-vscode-api";
+import getVscode from "./get-vscode-api";
 import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
 import { ChannelBody } from "./channels.type";
 

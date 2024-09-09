@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ClientPostMessageManager } from '../../../ipc/client-ipc';
-import { ClientToServerChannel, ServerToClientChannel } from '../../../ipc/channels.enum';
+import { ClientPostMessageManager } from '../../ipc/client-ipc';
+import { ClientToServerChannel, ServerToClientChannel } from '../../ipc/channels.enum';
 import './index.scss';
 import * as vscode from 'vscode';
 

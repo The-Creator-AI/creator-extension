@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { ServerPostMessageManager } from "../../../ipc/server-ipc";
+import { ServerPostMessageManager } from "../../ipc/server-ipc";
 
 // Function to get HTML for file explorer view
 export function getFileExplorerViewHtml(

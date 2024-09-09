@@ -39,7 +39,7 @@
       "activitybar": [
         {
           "id": "creator-extension",
-          "title": "Creator",
+          "title": "Creator AI",
           "icon": "public/brahma.png"
         }
       ]
@@ -49,17 +49,17 @@
         {
           "type": "webview",
           "id": "viewType.sidebar.fileExplorer",
-          "name": "Creator: File Explorer"
+          "name": "File Explorer"
         },
         {
           "type": "webview",
           "id": "viewType.sidebar.chat",
-          "name": "Creator: Chat"
+          "name": "Chat"
         },
         {
           "type": "webview",
           "id": "viewType.sidebar.changePlan",
-          "name": "Creator: Change Plan"
+          "name": "Change Plan"
         }
       ]
     }

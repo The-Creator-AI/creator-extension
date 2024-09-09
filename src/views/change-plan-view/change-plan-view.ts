@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import { ServerPostMessageManager } from "../../../ipc/server-ipc";
+import { ServerPostMessageManager } from "../../ipc/server-ipc";
 import {
   ClientToServerChannel,
   ServerToClientChannel,
-} from "../../../ipc/channels.enum";
+} from "../../ipc/channels.enum";
 
 // Function to get HTML for change plan view
 export function getChangePlanViewHtml(
