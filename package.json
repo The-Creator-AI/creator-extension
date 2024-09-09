@@ -32,7 +32,11 @@
     "commands": [
       {
         "command": "creator-extension.helloWorld",
-        "title": "Creator: Hello World"
+        "title": "Creator AI: Hello World"
+      },
+      {
+        "command": "creator-extension.clearChatHistory",
+        "title": "Creator AI: Clear Chat History"
       }
     ],
     "viewsContainers": {
@@ -60,6 +64,15 @@
           "type": "webview",
           "id": "viewType.sidebar.changePlan",
           "name": "Change Plan"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "creator-extension.clearChatHistory",
+          "when": "view == viewType.sidebar.chat",
+          "group": "navigation"
         }
       ]
     }
