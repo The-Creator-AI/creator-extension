@@ -69,6 +69,8 @@ const extensionConfig = {
           "css-loader",
           // Compiles Sass to CSS
           "sass-loader",
+          // PostCSS (needed for Tailwind)
+          "postcss-loader", 
         ],
       },
     ]

@@ -32,35 +32,40 @@ const App = () => {
   }, []);
 
   return (
-    <div className="sidebar-container">
+    <div className="h-full">
       {!showResponse && ( // Conditionally render input section
-        <div className="change-description-input">
+        <div className="p-4 flex flex-col grow">
           <textarea
+            className="grow p-2 border border-gray-300 rounded resize-y font-normal mb-2 min-h-[50px] max-h-[200px] overflow-hidden"
             placeholder="Describe the code changes you want to plan..."
             value={changeDescription}
             onChange={(e) => setChangeDescription(e.target.value)}
             disabled={isLoading} // Disable input when loading
           />
-          <button onClick={handleSubmit} disabled={isLoading}>
+          <button
+            className="py-2 px-4 bg-blue-500 text-white rounded cursor-pointer self-end hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            onClick={handleSubmit}
+            disabled={isLoading}
+          >
             {isLoading ? 'Generating...' : 'Submit'}
           </button>
         </div>
       )}
 
       {isLoading && (
-        <div className="loader">
-          <FaSpinner className="spinner" />
+        <div className="loader flex justify-center items-center h-[100px]">
+          <FaSpinner className="spinner text-2xl animate-spin" />
         </div>
       )}
 
       {showResponse && ( // Conditionally render response section
-        <div className="response-section">
-          <div className="response-header">
-            <button className="back-button" onClick={handleGoBack}>
+        <div className="flex flex-col p-4">
+          <div className="flex justify-start items-center mb-2">
+            <button className="text-lg cursor-pointer mr-2 hover:opacity-80" onClick={handleGoBack}>
               <FaArrowLeft /> {/* Back icon */}
             </button>
           </div>
-          <div className="response">
+          <div className="p-4 border-t border-gray-300">
             {llmResponse}
           </div>
         </div>
