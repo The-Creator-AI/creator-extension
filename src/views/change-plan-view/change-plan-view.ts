@@ -4,6 +4,7 @@ import {
   ClientToServerChannel,
   ServerToClientChannel,
 } from "../../ipc/channels.enum";
+import { Services } from "../../services/services";
 
 // Function to get HTML for change plan view
 export function getChangePlanViewHtml(
@@ -32,50 +33,17 @@ export function getChangePlanViewHtml(
 export function handleChangePlanViewMessages(
   serverIpc: ServerPostMessageManager
 ) {
-  // Subscribe to the onDidChangeVisibleTextEditors event
-  const visibleEditorsSubscription =
-    vscode.window.onDidChangeVisibleTextEditors((editors) => {
-      console.log("Visible editors changed:", editors);
-      // If we have a webview instance, send the updated list of editors
-      const openEditors = vscode.window.tabGroups.all
-        .flatMap((group) => group.tabs)
-        .map((tab) => ({
-          fileName: tab.label || "",
-          filePath: tab.input instanceof vscode.TabInputText || tab.input instanceof vscode.TabInputNotebook ? tab.input.uri?.path || "" : "",
-          languageId: "",
-        }));
-      serverIpc.sendToClient(ServerToClientChannel.SendOpenEditors, {
-        editors: openEditors,
-      });
+  serverIpc.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
+    const changeDescription = data.message;
+
+    // Optionally, you can store the change description in ChatRepository here
+
+    const response = await Services.getLlmService().sendPrompt([
+      { user: "user", message: changeDescription },
+    ]); // Assuming sendPrompt takes an array of messages
+
+    serverIpc.sendToClient(ServerToClientChannel.SendMessage, {
+      message: response,
     });
-
-  serverIpc.onClientMessage(
-    ClientToServerChannel.RequestOpenEditors,
-    async () => {
-      // Get the currently open editors from VS Code API
-      const openEditors = vscode.window.tabGroups.all
-      .flatMap((group) => group.tabs)
-      .map((tab) => ({
-        fileName: tab.label || "",
-        filePath: tab.input instanceof vscode.TabInputText || tab.input instanceof vscode.TabInputNotebook ? tab.input.uri?.path || "" : "",
-        languageId: "",
-      }));
-
-      // Send the list of open editors to the webview
-      serverIpc.sendToClient(ServerToClientChannel.SendOpenEditors, {
-        editors: openEditors,
-      });
-    }
-  );
-
-  serverIpc.onClientMessage(
-    ClientToServerChannel.SendSelectedEditor,
-    async (data) => {
-      const selectedEditor = data.editor;
-      console.log("Selected editor:", selectedEditor);
-      // You can now use the selectedEditor information in your extension logic
-    }
-  );
-
-  return { visibleEditorsSubscription };
+  });
 }

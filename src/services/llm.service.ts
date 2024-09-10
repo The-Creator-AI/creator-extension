@@ -7,7 +7,7 @@ import { ChatMessage } from '../repositories/chat.respository';
 
 
 export class LlmService {
-    private geminiProModel: string = 'models/gemini-1.5-pro-latest'; // Default model
+    private geminiProModel: string = 'gemini-1.5-pro-exp-0827'; // Default model
     private geminiFlashModel: string = 'gemini-1.5-flash-latest';
     private openaiModel: string = 'gpt-3.5-turbo';
 
@@ -20,6 +20,7 @@ export class LlmService {
         selectedFiles: string[] = [],
     ): Promise<string> {
         const { type, apiKey } = await this.getApiKey();
+        console.log({ type, apiKey, chatHistory, selectedFiles });
 
         // Read selected files content before sending the prompt
         const fileContents = this.creatorService.readSelectedFilesContent(

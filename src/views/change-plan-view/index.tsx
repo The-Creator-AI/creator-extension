@@ -1,49 +1,52 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
+import './index.scss';
 import { ClientPostMessageManager } from '../../ipc/client-ipc';
 import { ClientToServerChannel, ServerToClientChannel } from '../../ipc/channels.enum';
-import './index.scss';
-import * as vscode from 'vscode';
-
-interface EditorInfo {
-  fileName: string;
-  filePath: string;
-  languageId: string;
-}
+import { FaSpinner } from 'react-icons/fa';
 
 const App = () => {
-  const [editors, setEditors] = React.useState<EditorInfo[]>([]);
+  const [changeDescription, setChangeDescription] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [llmResponse, setLlmResponse] = React.useState('');
   const clientIpc = ClientPostMessageManager.getInstance();
 
-  React.useEffect(() => {
-    // Request open editors from extension
-    clientIpc.sendToServer(ClientToServerChannel.RequestOpenEditors, {});
+  const handleSubmit = () => {
+    setIsLoading(true);
+    clientIpc.sendToServer(ClientToServerChannel.SendMessage, { message: changeDescription });
+  };
 
-    // Listen for open editors response
-    clientIpc.onServerMessage(ServerToClientChannel.SendOpenEditors, ({ editors }) => {
-      setEditors(editors);
+  React.useEffect(() => {
+    clientIpc.onServerMessage(ServerToClientChannel.SendMessage, ({ message }) => {
+      setIsLoading(false);
+      setLlmResponse(message);
     });
   }, []);
 
-  const handleEditorClick = (editor: EditorInfo) => {
-    // Send selected editor to extension
-    clientIpc.sendToServer(ClientToServerChannel.SendSelectedEditor, { editor });
-  };
-
   return (
     <div className="sidebar-container">
-      <div className="editors-list">
-        <h3>Open Editors</h3>
-        <ul>
-          {editors.map((editor) => (
-            <li key={editor.filePath} onClick={() => handleEditorClick(editor)}>
-              <span className="file-name">{editor.fileName}</span>
-              <span className="file-path">{editor.filePath}</span>
-              {editor.languageId && <span className="language-id">({editor.languageId})</span>}
-            </li>
-          ))}
-        </ul>
+      <div className="change-description-input">
+        <textarea
+          placeholder="Describe the code changes you want to plan..."
+          value={changeDescription}
+          onChange={(e) => setChangeDescription(e.target.value)}
+        />
+        <button onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? 'Generating...' : 'Submit'}
+        </button>
       </div>
+
+      {isLoading && (
+        <div className="loader">
+          <FaSpinner className="spinner" />
+        </div>
+      )}
+
+      {llmResponse && !isLoading && (
+        <div className="response">
+          {llmResponse}
+        </div>
+      )}
     </div>
   );
 };
