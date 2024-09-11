@@ -1,33 +1,21 @@
 import * as React from 'react';
-import { ChangePlanSteps } from '../change-plan-view.types';
+import { ChangePlanSteps, ChangePlanStepsConfig } from '../change-plan-view.types';
 import '../index.scss';
 
 interface StepIndicatorsProps {
     currentStep: ChangePlanSteps;
     handleStepClick: (step: ChangePlanSteps) => void;
+    changePlanStepsConfig: ChangePlanStepsConfig;
 }
 
-const StepIndicators: React.FC<StepIndicatorsProps> = ({ currentStep, handleStepClick }) => {
-    const changePlanStepsConfig: {
-        [key in ChangePlanSteps]: {
-            indicatorText: string;
-        };
-    } = {
-        [ChangePlanSteps.ChangeInput]: {
-            indicatorText: 'Change Input',
-        },
-        [ChangePlanSteps.LlmResponse]: {
-            indicatorText: 'LLM Response',
-        },
-    };
-
-    const steps = Object.keys(ChangePlanSteps).filter(key => !isNaN(Number(key)));
+const StepIndicators: React.FC<StepIndicatorsProps> = ({ currentStep, handleStepClick, changePlanStepsConfig }) => {
+    const steps = Object.values(ChangePlanSteps) as ChangePlanSteps[];
 
     return (
         <div className="flex items-center justify-between w-full mb-4 pl-16 pr-16 pt-4 pb-8">
             {steps.map((step: any, index: number) => (
                 <React.Fragment key={step}>
-                    <div className="flex flex-col items-center" onClick={() => handleStepClick(Number(step))} data-testid={`step-indicator-${step}`}>
+                    <div className="flex flex-col items-center" onClick={() => handleStepClick(step)} data-testid={`step-indicator-${step}`}>
                         <div
                             className={`w-4 h-4 rounded-full ${currentStep === step ? 'bg-blue-500' : 'bg-gray-300'} cursor-pointer relative`}
                         >

@@ -4,13 +4,13 @@ import { FaSpinner } from 'react-icons/fa'; // Import spinner icon
 import { ClientToServerChannel, ServerToClientChannel } from '../../ipc/channels.enum';
 import { ClientPostMessageManager } from '../../ipc/client-ipc';
 import { useStore } from "../../store/useStore";
-import { ChangePlanSteps } from './change-plan-view.types';
+import { ChangePlanSteps, ChangePlanStepsConfig } from './change-plan-view.types';
 import ChangeInputStep from './components/change-input-step';
 import LlmResponseStep from './components/llm-response-step';
 import StepIndicators from './components/step-indicators';
 import './index.scss';
 import {
-  setChangePlanViewState
+  setChangePlanViewState as setState
 } from "./store/change-plan-view.logic";
 import { changePlanViewStoreStateSubject } from "./store/change-plan-view.store";
 
@@ -24,20 +24,42 @@ const App = () => {
 
   const clientIpc = ClientPostMessageManager.getInstance();
 
+  const changePlanStepsConfig: ChangePlanStepsConfig = {
+    [ChangePlanSteps.FileExplorer]: {
+      indicatorText: 'File Explorer',
+      renderStep: () => <div>File Explorer</div>,
+    },
+    [ChangePlanSteps.ChangeInput]: {
+      indicatorText: 'Change Input',
+      renderStep: () => (
+        <ChangeInputStep
+          changeDescription={changeDescription}
+          isLoading={isLoading}
+          handleChange={setState('changeDescription')}
+          handleSubmit={handleSubmit}
+        />
+      ),
+    },
+    [ChangePlanSteps.LlmResponse]: {
+      indicatorText: 'LLM Response',
+      renderStep: () => <LlmResponseStep llmResponse={llmResponse} />,
+    },
+  };
+
   const handleSubmit = () => {
-    setChangePlanViewState('isLoading')(true);
+    setState('isLoading')(true);
     clientIpc.sendToServer(ClientToServerChannel.SendMessage, { message: changeDescription });
   };
 
   const handleStepClick = (step: ChangePlanSteps) => {
-    setChangePlanViewState('currentStep')(step);
+    setState('currentStep')(step);
   };
 
   React.useEffect(() => {
     clientIpc.onServerMessage(ServerToClientChannel.SendMessage, ({ message }) => {
-      setChangePlanViewState('isLoading')(false);
-      setChangePlanViewState('llmResponse')(message);
-      setChangePlanViewState('currentStep')(ChangePlanSteps.LlmResponse);
+      setState('isLoading')(false);
+      setState('llmResponse')(message);
+      setState('currentStep')(ChangePlanSteps.LlmResponse);
     });
   }, []);
 
@@ -47,17 +69,11 @@ const App = () => {
     </div>
   );
 
+  const steps = Object.keys(ChangePlanSteps).filter(key => !isNaN(Number(key)));
   return (
     <div className="h-full">
-      <StepIndicators currentStep={currentStep} handleStepClick={handleStepClick} />
-      {currentStep === ChangePlanSteps.ChangeInput &&
-        <ChangeInputStep
-          changeDescription={changeDescription}
-          isLoading={isLoading}
-          handleChange={setChangePlanViewState('changeDescription')}
-          handleSubmit={handleSubmit}
-        />}
-      {currentStep === ChangePlanSteps.LlmResponse && <LlmResponseStep llmResponse={llmResponse} />}
+      <StepIndicators changePlanStepsConfig={changePlanStepsConfig} currentStep={currentStep} handleStepClick={handleStepClick} />
+      {changePlanStepsConfig[currentStep].renderStep()}
       {isLoading && renderLoader()}
     </div>
   );
