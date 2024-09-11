@@ -4,5 +4,5 @@ export interface ChangePlanViewStore {
   changeDescription: string;
   isLoading: boolean;
   llmResponse: string;
-  currentStep: ChangePlanSteps; 
+  currentStep: ChangePlanSteps;
 }

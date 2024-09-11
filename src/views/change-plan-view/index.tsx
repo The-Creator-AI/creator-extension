@@ -1,4 +1,3 @@
-// src/views/change-plan-view/index.tsx
 import Markdown from 'markdown-to-jsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -9,10 +8,7 @@ import { useStore } from "../../store/useStore";
 import { ChangePlanSteps } from './change-plan-view.types';
 import './index.scss';
 import {
-  setChangeDescription,
-  setCurrentStep,
-  setIsLoading,
-  setLlmResponse
+  setChangePlanViewState
 } from "./store/change-plan-view.logic";
 import { changePlanViewStoreStateSubject } from "./store/change-plan-view.store";
 
@@ -40,7 +36,7 @@ const App = () => {
             className="grow p-2 border border-gray-300 rounded resize-y font-normal mb-2 min-h-[50px] max-h-[200px] overflow-hidden"
             placeholder="Describe the code changes you want to plan..."
             value={changeDescription}
-            onChange={(e) => setChangeDescription(e.target.value)}
+            onChange={(e) => setChangePlanViewState('changeDescription')(e.target.value)}
             disabled={isLoading}
           />
           <button
@@ -66,19 +62,19 @@ const App = () => {
   };
 
   const handleSubmit = () => {
-    setIsLoading(true);
+    setChangePlanViewState('isLoading')(true);
     clientIpc.sendToServer(ClientToServerChannel.SendMessage, { message: changeDescription });
   };
 
   const handleStepClick = (step: ChangePlanSteps) => {
-    setCurrentStep(step);
+    setChangePlanViewState('currentStep')(step);
   };
 
   React.useEffect(() => {
     clientIpc.onServerMessage(ServerToClientChannel.SendMessage, ({ message }) => {
-      setIsLoading(false);
-      setLlmResponse(message);
-      setCurrentStep(ChangePlanSteps.LlmResponse);
+      setChangePlanViewState('isLoading')(false);
+      setChangePlanViewState('llmResponse')(message);
+      setChangePlanViewState('currentStep')(ChangePlanSteps.LlmResponse);
     });
   }, []);
 
@@ -114,7 +110,7 @@ const App = () => {
   return (
     <div className="h-full">
       {renderStepIndicators()}
-      {changePlanStepsConfig[currentStep].renderContent()} 
+      {changePlanStepsConfig[currentStep].renderContent()}
       {isLoading && renderLoader()}
     </div>
   );
