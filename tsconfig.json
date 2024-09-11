@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"module": "esnext",
-    	"moduleResolution": "node",
+		"moduleResolution": "node",
 		"target": "ES5",
 		"lib": [
 			"ES2022",
@@ -10,7 +10,7 @@
 		"jsx": "react",
 		"sourceMap": true,
 		"rootDir": "src",
-		"strict": false,   /* enable all strict type-checking options */
+		"strict": false, /* enable all strict type-checking options */
 		"noImplicitAny": false,
 		"noImplicitReturns": false,
 		"noImplicitThis": false,
@@ -19,6 +19,9 @@
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
 		"baseUrl": "./",
-		"experimentalDecorators": true
-	}
+		"experimentalDecorators": true,
+	},
+	"include": [
+		"src/**/*"
+	]
 }
