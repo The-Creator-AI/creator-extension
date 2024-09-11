@@ -8,24 +8,28 @@ export function getFileExplorerViewHtml(
   extensionUri: vscode.Uri
 ): string {
   const scriptUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "dist", "....js")
+    vscode.Uri.joinPath(extensionUri, "dist", "fileExplorerView.js") // Assuming your compiled JS file is named "fileExplorerView.js"
   );
+
+  // HTML for the view
   return `<!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    </head>
-                    <body>
-                        <h1>File Explorer</h1>
-                        <div id="file-explorer-root"></div>
-                        <script nonce="${nonce}" src="${scriptUri}"></script>
-                    </body>
-                    </html>`;
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>File Explorer</title>
+  </head>
+  <body>
+      <div id="file-explorer-root"></div>
+      <script nonce="${nonce}" src="${scriptUri}"></script>
+  </body>
+  </html>`;
 }
 
 // Function to handle messages for the file explorer view
-export function handleFileExplorerViewMessages(serverIpc: ServerPostMessageManager) {
+export function handleFileExplorerViewMessages(
+  serverIpc: ServerPostMessageManager
+) {
   // Add logic to handle messages for the file explorer view here
 }
