@@ -1,22 +1,29 @@
+// src/views/change-plan-view/index.tsx
+import Markdown from 'markdown-to-jsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import './index.scss';
-import { ClientPostMessageManager } from '../../ipc/client-ipc';
-import { ClientToServerChannel, ServerToClientChannel } from '../../ipc/channels.enum';
 import { FaSpinner } from 'react-icons/fa'; // Import spinner icon
-import Markdown from 'markdown-to-jsx';
-
-// Define the enum for the steps
-enum ChangePlanSteps {
-  ChangeInput,
-  LlmResponse,
-}
+import { ClientToServerChannel, ServerToClientChannel } from '../../ipc/channels.enum';
+import { ClientPostMessageManager } from '../../ipc/client-ipc';
+import { useStore } from "../../store/useStore";
+import { ChangePlanSteps } from './change-plan-view.types';
+import './index.scss';
+import {
+  setChangeDescription,
+  setCurrentStep,
+  setIsLoading,
+  setLlmResponse
+} from "./store/change-plan-view.logic";
+import { changePlanViewStoreStateSubject } from "./store/change-plan-view.store";
 
 const App = () => {
-  const [changeDescription, setChangeDescription] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [llmResponse, setLlmResponse] = React.useState('');
-  const [currentStep, setCurrentStep] = React.useState(ChangePlanSteps.ChangeInput); // Track current step using the enum
+  const {
+    changeDescription,
+    isLoading,
+    llmResponse,
+    currentStep,
+  } = useStore(changePlanViewStoreStateSubject);
+
   const clientIpc = ClientPostMessageManager.getInstance();
 
   const changePlanStepsConfig: {
@@ -71,7 +78,7 @@ const App = () => {
     clientIpc.onServerMessage(ServerToClientChannel.SendMessage, ({ message }) => {
       setIsLoading(false);
       setLlmResponse(message);
-      setCurrentStep(ChangePlanSteps.LlmResponse); // Switch to response step using the enum
+      setCurrentStep(ChangePlanSteps.LlmResponse);
     });
   }, []);
 
@@ -88,7 +95,7 @@ const App = () => {
                 className={`text-xs mt-4 whitespace-nowrap ${currentStep === step ? 'text-blue-500' : 'text-gray-500'
                   } absolute top-full left-1/2 -translate-x-1/2`}
               >
-                {changePlanStepsConfig[step]?.indicatorText} {/* Use indicator text from config */}
+                {changePlanStepsConfig[step]?.indicatorText}
               </span>
             </div>
           </div>
@@ -107,7 +114,7 @@ const App = () => {
   return (
     <div className="h-full">
       {renderStepIndicators()}
-      {changePlanStepsConfig[currentStep].renderContent()} {/* Render content based on config */}
+      {changePlanStepsConfig[currentStep].renderContent()} 
       {isLoading && renderLoader()}
     </div>
   );
