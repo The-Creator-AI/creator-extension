@@ -50,8 +50,8 @@
           &.expanded {
             .arrow {
               transform: rotate(90deg);
-              top: -2px;
-              left: -12px;
+              top: 1px;
+              left: -14px;
             }
           }
         }
@@ -71,8 +71,8 @@
 
         .arrow {
           position: absolute;
-          left: -10px;
-          top: 2px;
+          left: -12px;
+          top: 1px;
           font-size: 25px;
 
           &.down {

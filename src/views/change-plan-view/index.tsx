@@ -41,7 +41,7 @@ const App = () => {
     [ChangePlanSteps.FileExplorer]: {
       indicatorText: "Context",
       renderStep: () => (
-        <div className="p-4">
+        <div className="p-4 overflow-y-auto overflow-x-hidden">
           {/* Render FileTree for each root node */}
           {files.map((rootNode, index) => (
             <FileTree
@@ -131,13 +131,15 @@ const App = () => {
   );
 
   return (
-    <div className="h-full">
+    <div className="h-full fixed inset-0 flex flex-col justify-between">
       <StepIndicators
         changePlanStepsConfig={changePlanStepsConfig}
         currentStep={currentStep}
         handleStepClick={handleStepClick}
       />
-      {changePlanStepsConfig[currentStep].renderStep()}
+      <div className="flex flex-grow flex-col overflow-hidden">
+        {changePlanStepsConfig[currentStep].renderStep()}
+      </div>
       {isLoading && renderLoader()}
     </div>
   );

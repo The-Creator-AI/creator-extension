@@ -9,7 +9,9 @@ interface ChangeInputStepProps {
 }
 
 const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ changeDescription, isLoading, handleChange, handleSubmit }) => (
-    <div className="p-4 flex flex-col grow" data-testid="change-plan-input-step">
+    <div className="flex flex-grow flex-col">
+        <div className="p-4 flex flex-col grow"/>
+        <div className="p-4 flex flex-col" data-testid="change-plan-input-step">
         <textarea
             className="grow p-2 border border-gray-300 rounded resize-y font-normal mb-2 min-h-[50px] max-h-[200px] overflow-hidden"
             placeholder="Describe the code changes you want to plan..."
@@ -26,6 +28,7 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ changeDescription, is
         >
             {isLoading ? 'Generating...' : 'Submit'}
         </button>
+    </div>
     </div>
 );
 

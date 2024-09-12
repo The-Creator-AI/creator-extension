@@ -12,7 +12,7 @@ const StepIndicators: React.FC<StepIndicatorsProps> = ({ currentStep, handleStep
     const steps = Object.values(ChangePlanSteps) as ChangePlanSteps[];
 
     return (
-        <div className="flex items-center justify-between w-full mb-4 pl-16 pr-16 pt-4 pb-8">
+        <div className="flex items-center justify-between w-full pl-16 pr-16 pt-4 pb-12 border-b border-gray-600">
             {steps.map((step: any, index: number) => (
                 <React.Fragment key={step}>
                     <div className="flex flex-col items-center" onClick={() => handleStepClick(step)} data-testid={`step-indicator-${step}`}>
