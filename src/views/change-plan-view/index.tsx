@@ -39,7 +39,7 @@ const App = () => {
 
   const changePlanStepsConfig: ChangePlanStepsConfig = {
     [ChangePlanSteps.FileExplorer]: {
-      indicatorText: "File Explorer",
+      indicatorText: "Context",
       renderStep: () => (
         <div className="p-4">
           {/* Render FileTree for each root node */}
@@ -60,7 +60,7 @@ const App = () => {
       ),
     },
     [ChangePlanSteps.ChangeInput]: {
-      indicatorText: "Change Input",
+      indicatorText: "Request",
       renderStep: () => (
         <ChangeInputStep
           changeDescription={changeDescription}
@@ -71,7 +71,7 @@ const App = () => {
       ),
     },
     [ChangePlanSteps.LlmResponse]: {
-      indicatorText: "LLM Response",
+      indicatorText: "Plan",
       renderStep: () => <LlmResponseStep llmResponse={llmResponse} />,
     },
   };
