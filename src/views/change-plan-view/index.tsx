@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { FaSpinner } from 'react-icons/fa'; // Import spinner icon
 import { ClientToServerChannel, ServerToClientChannel } from '../../ipc/channels.enum';
@@ -13,6 +14,8 @@ import {
   setChangePlanViewState as setState
 } from "./store/change-plan-view.logic";
 import { changePlanViewStoreStateSubject } from "./store/change-plan-view.store";
+import { FileNode } from 'src/types/file-node';
+import FileTree from '../../components/file-tree/FileTree';
 
 const App = () => {
   const {
@@ -21,13 +24,29 @@ const App = () => {
     llmResponse,
     currentStep,
   } = useStore(changePlanViewStoreStateSubject);
+  const [files, setFiles] = useState<FileNode[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+  const [recentFiles, setRecentFiles] = useState<string[]>([]);
+  const [activeFile, setActiveFile] = useState<string>();
 
   const clientIpc = ClientPostMessageManager.getInstance();
 
   const changePlanStepsConfig: ChangePlanStepsConfig = {
     [ChangePlanSteps.FileExplorer]: {
       indicatorText: 'File Explorer',
-      renderStep: () => <div>File Explorer</div>,
+      renderStep: () => files.length > 0 ? (
+        <FileTree
+          data={files}
+          onFileClick={handleFileClick}
+          selectedFiles={selectedFiles}
+          recentFiles={recentFiles}
+          activeFile={activeFile}
+          updateSelectedFiles={setSelectedFiles}
+          updateRecentFiles={setRecentFiles}
+        />
+      ) : (
+        <div className="p-4 text-gray-500">Loading files...</div>
+      ),
     },
     [ChangePlanSteps.ChangeInput]: {
       indicatorText: 'Change Input',
@@ -46,6 +65,34 @@ const App = () => {
     },
   };
 
+  React.useEffect(() => {
+    clientIpc.onServerMessage(ServerToClientChannel.SendMessage, ({ message }) => {
+      setState('isLoading')(false);
+      setState('llmResponse')(message);
+      setState('currentStep')(ChangePlanSteps.LlmResponse);
+    });
+
+    // Request workspace files on component mount
+    clientIpc.sendToServer(ClientToServerChannel.RequestWorkspaceFiles, {});
+
+    // Listen for workspace files response
+    clientIpc.onServerMessage(ServerToClientChannel.SendWorkspaceFiles, ({ files }) => {
+      setFiles(files);
+    });
+  }, []);
+
+  const handleFileClick = (filePath: string) => {
+    setActiveFile(filePath);
+    // Send the selected editor path to the extension
+    clientIpc.sendToServer(ClientToServerChannel.SendSelectedEditor, {
+      editor: {
+        fileName: filePath.split('/').pop() || '',
+        filePath,
+        languageId: '', // You might need to determine the languageId here
+      },
+    });
+  };
+
   const handleSubmit = () => {
     setState('isLoading')(true);
     clientIpc.sendToServer(ClientToServerChannel.SendMessage, { message: changeDescription });
@@ -54,14 +101,6 @@ const App = () => {
   const handleStepClick = (step: ChangePlanSteps) => {
     setState('currentStep')(step);
   };
-
-  React.useEffect(() => {
-    clientIpc.onServerMessage(ServerToClientChannel.SendMessage, ({ message }) => {
-      setState('isLoading')(false);
-      setState('llmResponse')(message);
-      setState('currentStep')(ChangePlanSteps.LlmResponse);
-    });
-  }, []);
 
   const renderLoader = () => (
     <div className="loader flex justify-center items-center h-[100px]" data-testid="loader">
