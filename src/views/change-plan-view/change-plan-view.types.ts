@@ -1,7 +1,6 @@
 export enum ChangePlanSteps {
-  FileExplorer = 'FileExplorer',
-  ChangeInput = 'ChangeInput',
-  LlmResponse = 'LlmResponse',
+  Context = 'Context',
+  Plan = 'Plan',
 }
 
 export type ChangePlanStepsConfig = {

@@ -38,7 +38,7 @@ const App = () => {
   const clientIpc = ClientPostMessageManager.getInstance();
 
   const changePlanStepsConfig: ChangePlanStepsConfig = {
-    [ChangePlanSteps.FileExplorer]: {
+    [ChangePlanSteps.Context]: {
       indicatorText: "Context",
       renderStep: () => (
         <div className="p-4 overflow-y-auto overflow-x-hidden">
@@ -59,20 +59,17 @@ const App = () => {
         </div>
       ),
     },
-    [ChangePlanSteps.ChangeInput]: {
-      indicatorText: "Request",
-      renderStep: () => (
+    [ChangePlanSteps.Plan]: {
+      indicatorText: "Plan",
+      renderStep: () => <>
+        <LlmResponseStep llmResponse={llmResponse} />
         <ChangeInputStep
           changeDescription={changeDescription}
           isLoading={isLoading}
           handleChange={setState("changeDescription")}
           handleSubmit={handleSubmit}
         />
-      ),
-    },
-    [ChangePlanSteps.LlmResponse]: {
-      indicatorText: "Plan",
-      renderStep: () => <LlmResponseStep llmResponse={llmResponse} />,
+      </>,
     },
   };
 
@@ -82,7 +79,7 @@ const App = () => {
       ({ message }) => {
         setState("isLoading")(false);
         setState("llmResponse")(message);
-        setState("currentStep")(ChangePlanSteps.LlmResponse);
+        setState("currentStep")(ChangePlanSteps.Plan);
       }
     );
 
