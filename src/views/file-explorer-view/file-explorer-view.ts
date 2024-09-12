@@ -39,8 +39,10 @@ export function handleFileExplorerViewMessages(
   serverIpc.onClientMessage(
     ClientToServerChannel.RequestWorkspaceFiles,
     async (data) => {
+      const workspaceRoots =
+      vscode.workspace.workspaceFolders?.map((folder) => folder.uri) || [];
       const files = await getFilesRespectingGitignore();
-      const fileTree = createFileTree(files);
+      const fileTree = createFileTree(workspaceRoots, files);
 
       // Use the VSCode API to retrieve workspace files
       // const files = await vscode.workspace.findFiles("**/*");
@@ -64,7 +66,7 @@ export function handleFileExplorerViewMessages(
         //   // type: fileTypes[index],
         //   type: 'file'
         // })),
-        files: [fileTree]
+        files: fileTree
       });
     }
   );

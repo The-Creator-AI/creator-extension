@@ -23,7 +23,8 @@ const FileTree: React.FC<FileTreeProps> = ({
   updateSelectedFiles,
   updateRecentFiles
 }) => {
-  const [expandedNodes, setExpandedNodes] = useState<string[]>([]);
+  const rootNode = data.find((node) => !node.name.includes('/'));
+  const [expandedNodes, setExpandedNodes] = useState<string[]>([rootNode?.name || '']);
 
   useEffect(() => {
     // If selectedFiles changes, expand the corresponding nodes
