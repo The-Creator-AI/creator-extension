@@ -111,6 +111,7 @@ const App = () => {
     setState("isLoading")(true);
     clientIpc.sendToServer(ClientToServerChannel.SendMessage, {
       message: changeDescription,
+      selectedFiles: selectedFiles,
     });
   };
 

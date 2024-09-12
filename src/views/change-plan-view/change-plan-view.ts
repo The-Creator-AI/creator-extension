@@ -40,13 +40,12 @@ export function handleChangePlanViewMessages(
   let fileSystemWatcher: vscode.FileSystemWatcher | undefined;
 
   serverIpc.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
-    const changeDescription = data.message;
+    const { message: changeDescription, selectedFiles } = data;
 
-    // Optionally, you can store the change description in ChatRepository here
-
-    const response = await Services.getLlmService().sendPrompt([
-      { user: "user", message: changeDescription },
-    ]); // Assuming sendPrompt takes an array of messages
+    const response = await Services.getLlmService().sendPrompt(
+      [{ user: "user", message: changeDescription }],
+      selectedFiles
+    );
 
     serverIpc.sendToClient(ServerToClientChannel.SendMessage, {
       message: response,

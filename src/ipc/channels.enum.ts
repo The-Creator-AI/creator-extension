@@ -3,7 +3,8 @@ export enum ClientToServerChannel {
   RequestChatHistory = "clientToServer.requestChatHistory",
   RequestOpenEditors = "clientToServer.requestOpenEditors",
   SendSelectedEditor = "clientToServer.sendSelectedEditor",
-  RequestWorkspaceFiles = "clientToServer.requestWorkspaceFiles"
+  RequestWorkspaceFiles = "clientToServer.requestWorkspaceFiles",
+  SendSelectedFiles = 'send-selected-files',
 }
 
 export enum ServerToClientChannel {

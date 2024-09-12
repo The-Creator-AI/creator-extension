@@ -17,23 +17,23 @@ export class LlmService {
 
     async sendPrompt(
         chatHistory: ChatMessage[],
-        selectedFiles: string[] = [],
+        selectedFiles: string[] = []
     ): Promise<string> {
         const { type, apiKey } = await this.getApiKey();
         console.log({ type, apiKey, chatHistory, selectedFiles });
 
-        // Read selected files content before sending the prompt
+        // Read selected files content
         const fileContents = this.creatorService.readSelectedFilesContent(
-            selectedFiles,
+            selectedFiles
         );
 
         // Append file contents to prompt
         let prompt = '';
         for (const filePath in fileContents) {
             prompt += `\n\n\`\`\`
-    File: ${filePath}
-    ${fileContents[filePath]}
-    \`\`\`\n\n`;
+File: ${filePath}
+${fileContents[filePath]}
+\`\`\`\n\n`;
         }
         chatHistory.forEach((message) => {
             prompt += `${message.user}: ${message.message}\n`;
