@@ -8,31 +8,49 @@ interface GitignoreInfo {
   ig: ReturnType<typeof ignore>;
 }
 
-export function createFileTree(files: vscode.Uri[]): FileNode {
-  const root: FileNode = { name: "root", children: [] };
+export function createFileTree(
+  workspaceRoots: vscode.Uri[],
+  files: vscode.Uri[]
+): FileNode[] {
+  const rootNodes: FileNode[] = workspaceRoots.map((root) => ({
+    name: root.path.split("/").pop() || "", // Use workspace folder name as root node name
+    children: [],
+  }));
+
+  const workspaceRootPaths = workspaceRoots.map((root) => root.fsPath);
 
   for (const file of files) {
-    const parts = file.path.split("/").filter(Boolean);
-    let currentNode = root;
+    const workspaceRootIndex = workspaceRootPaths.findIndex((rootPath) =>
+      file.fsPath.startsWith(rootPath)
+    );
 
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      let child = currentNode.children?.find((c) => c.name === part);
+    if (workspaceRootIndex !== -1) {
+      const relativePath = path.relative(
+        workspaceRootPaths[workspaceRootIndex],
+        file.fsPath
+      );
+      const parts = relativePath.split(path.sep).filter(Boolean);
+      let currentNode = rootNodes[workspaceRootIndex];
 
-      if (!child) {
-        child = { name: part };
-        if (i < parts.length - 1) {
-          child.children = [];
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        let child = currentNode.children?.find((c) => c.name === part);
+
+        if (!child) {
+          child = { name: part };
+          if (i < parts.length - 1) {
+            child.children = [];
+          }
+          currentNode.children = currentNode.children || [];
+          currentNode.children.push(child);
         }
-        currentNode.children = currentNode.children || [];
-        currentNode.children.push(child);
-      }
 
-      currentNode = child;
+        currentNode = child;
+      }
     }
   }
 
-  return root;
+  return rootNodes;
 }
 
 export async function getFilesRespectingGitignore(): Promise<vscode.Uri[]> {
@@ -81,8 +99,10 @@ export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand(
     "extension.filterGitignoreFiles",
     async () => {
+      const workspaceRoots =
+        vscode.workspace.workspaceFolders?.map((folder) => folder.uri) || [];
       const files = await getFilesRespectingGitignore();
-      const fileTree = createFileTree(files);
+      const fileTree = createFileTree(workspaceRoots, files);
       vscode.window.showInformationMessage(
         `Found ${files.length} files not ignored by .gitignore`
       );

@@ -5,5 +5,5 @@ export const initialState: ChangePlanViewStore = {
   changeDescription: "",
   isLoading: false,
   llmResponse: "",
-  currentStep: ChangePlanSteps.ChangeInput,
+  currentStep: ChangePlanSteps.FileExplorer,
 };

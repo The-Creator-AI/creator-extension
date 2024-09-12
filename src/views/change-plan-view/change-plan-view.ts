@@ -5,7 +5,10 @@ import {
   ServerToClientChannel,
 } from "../../ipc/channels.enum";
 import { Services } from "../../services/services";
-import { createFileTree, getFilesRespectingGitignore } from "../../services/workspace-files.utils";
+import {
+  createFileTree,
+  getFilesRespectingGitignore,
+} from "../../services/workspace-files.utils";
 
 // Function to get HTML for change plan view
 export function getChangePlanViewHtml(
@@ -34,6 +37,8 @@ export function getChangePlanViewHtml(
 export function handleChangePlanViewMessages(
   serverIpc: ServerPostMessageManager
 ) {
+  let fileSystemWatcher: vscode.FileSystemWatcher | undefined;
+
   serverIpc.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
     const changeDescription = data.message;
 
@@ -48,36 +53,37 @@ export function handleChangePlanViewMessages(
     });
   });
 
+  async function sendWorkspaceFiles() {
+    const workspaceRoots =
+      vscode.workspace.workspaceFolders?.map((folder) => folder.uri) || [];
+    const files = await getFilesRespectingGitignore();
+    const fileTree = createFileTree(workspaceRoots, files);
+
+    serverIpc.sendToClient(ServerToClientChannel.SendWorkspaceFiles, {
+      files: fileTree,
+    });
+  }
+
   serverIpc.onClientMessage(
     ClientToServerChannel.RequestWorkspaceFiles,
-    async (data) => {
-      const files = await getFilesRespectingGitignore();
-      const fileTree = createFileTree(files);
+    async () => {
+      await sendWorkspaceFiles();
 
-      // Use the VSCode API to retrieve workspace files
-      // const files = await vscode.workspace.findFiles("**/*");
+      // Set up file system watcher if not already set
+      if (!fileSystemWatcher) {
+        fileSystemWatcher = vscode.workspace.createFileSystemWatcher("**/*");
 
-      // // Format the files into the expected response structure
-      // const formattedFiles = files.map((file) => ({
-      //   name: file.path.split("/").pop() || "", // Extract file name from path
-      //   path: file.fsPath, // Use fsPath for the actual file path
-      //   // type: vscode.workspace.fs
-      //   //   .stat(file)
-      //   //   .then((stat) => (stat.isDirectory() ? "directory" : "file")),
-      // }));
-
-      // const fileTypes = await Promise.all(
-      //   formattedFiles.map((file) => file.type)
-      // );
-      // Send the files back to the client
-      serverIpc.sendToClient(ServerToClientChannel.SendWorkspaceFiles, {
-        // files: formattedFiles.map((file, index) => ({
-        //   ...file,
-        //   // type: fileTypes[index],
-        //   type: 'file'
-        // })),
-        files: [fileTree]
-      });
+        fileSystemWatcher.onDidCreate(() => sendWorkspaceFiles());
+        fileSystemWatcher.onDidDelete(() => sendWorkspaceFiles());
+        fileSystemWatcher.onDidChange(() => sendWorkspaceFiles());
+      }
     }
   );
+
+  // Clean up function to dispose of the file system watcher
+  return () => {
+    if (fileSystemWatcher) {
+      fileSystemWatcher.dispose();
+    }
+  };
 }
