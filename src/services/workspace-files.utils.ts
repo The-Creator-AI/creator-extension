@@ -13,8 +13,9 @@ export function createFileTree(
   files: vscode.Uri[]
 ): FileNode[] {
   const rootNodes: FileNode[] = workspaceRoots.map((root) => ({
-    name: root.path.split("/").pop() || "", // Use workspace folder name as root node name
+    name: root.path.split("/").pop() || "", 
     children: [],
+    absolutePath: root.fsPath, // Add absolute path to root node
   }));
 
   const workspaceRootPaths = workspaceRoots.map((root) => root.fsPath);
@@ -37,7 +38,10 @@ export function createFileTree(
         let child = currentNode.children?.find((c) => c.name === part);
 
         if (!child) {
-          child = { name: part };
+          child = {
+            name: part,
+            absolutePath: path.join(currentNode.absolutePath || "", part), // Calculate absolute path for each part
+          };
           if (i < parts.length - 1) {
             child.children = [];
           }

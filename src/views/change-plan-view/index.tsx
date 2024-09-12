@@ -109,9 +109,40 @@ const App = () => {
 
   const handleSubmit = () => {
     setState("isLoading")(true);
+
+    // Create an array to store absolute paths of selected files
+    const absoluteSelectedFiles: string[] = [];
+
+    // Iterate through selectedFiles and find corresponding absolute paths in files
+    selectedFiles.forEach((relativePath) => {
+      let matchingNode: FileNode | undefined = undefined;
+      files.find((node) => {
+        // Iterate through files to find the matching absolute path
+        function findMatchingNode(node: FileNode) {
+          if (node.absolutePath && node.absolutePath.endsWith(relativePath)) {
+            return node;
+          }
+          if (node.children) {
+            for (const child of node.children) {
+              const matchingNode = findMatchingNode(child);
+              if (matchingNode) {
+                return matchingNode;
+              }
+            }
+          }
+          return undefined;
+        }
+        matchingNode = findMatchingNode(node);
+      });
+
+      if (matchingNode) {
+        absoluteSelectedFiles.push(matchingNode.absolutePath || "");
+      }
+    });
+
     clientIpc.sendToServer(ClientToServerChannel.SendMessage, {
       message: changeDescription,
-      selectedFiles: selectedFiles,
+      selectedFiles: absoluteSelectedFiles, // Send absolute paths
     });
   };
 
