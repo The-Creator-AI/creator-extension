@@ -1,3 +1,4 @@
+import { FileNode } from "src/types/file-node";
 import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
 
 export type ChannelBody<
@@ -35,5 +36,14 @@ export type ChannelBody<
         filePath: string;
         languageId: string;
       };
+    }
+  : T extends ClientToServerChannel.RequestWorkspaceFiles // Add new channel request type
+  ? {
+      // You can add options for filtering here if needed
+      // e.g., fileTypes: string[];
+    }
+  : T extends ServerToClientChannel.SendWorkspaceFiles // Add new channel response type
+  ? {
+      files: FileNode[];
     }
   : never;

@@ -1,0 +1,89 @@
+.file-tree {
+  font-family: sans-serif;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      position: relative;
+      padding: 0px 0;
+      margin-left: 12px;
+
+      .node {
+        position: relative;
+        cursor: pointer;
+        padding: 3px 10px;
+        display: flex;
+        align-items: center;
+        z-index: 1;
+
+        &.active {
+          &::before {
+            content: "";
+            background-color: #e0dcdc;
+            position: absolute;
+            left: -200px;
+            right: -200px;
+            top: 0px;
+            bottom: -2px;
+            z-index: -1;
+          }
+        }
+
+        &:hover {
+          &::before {
+            content: "";
+            background-color: #e4e6f1;
+            position: absolute;
+            left: -200px;
+            right: -200px;
+            top: 0px;
+            bottom: -2px;
+            z-index: -1;
+          }
+        }
+
+        &.directory {
+
+          &.expanded {
+            .arrow {
+              transform: rotate(90deg);
+              top: -2px;
+              left: -12px;
+            }
+          }
+        }
+
+        &.file {
+          font-weight: normal;
+        }
+
+        &.selected {
+        }
+
+        .name {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }        
+
+        .arrow {
+          position: absolute;
+          left: -10px;
+          top: 2px;
+          font-size: 25px;
+
+          &.down {
+            transform: rotate(90deg);
+          }
+        }
+
+        .checkbox {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
 import { ServerPostMessageManager } from "../../ipc/server-ipc";
+import {
+  ClientToServerChannel,
+  ServerToClientChannel,
+} from "../../ipc/channels.enum";
+import { createFileTree, getFilesRespectingGitignore } from "./workspace-files.utils";
 
 // Function to get HTML for file explorer view
 export function getFileExplorerViewHtml(
@@ -8,7 +13,7 @@ export function getFileExplorerViewHtml(
   extensionUri: vscode.Uri
 ): string {
   const scriptUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "dist", "fileExplorerView.js") // Assuming your compiled JS file is named "fileExplorerView.js"
+    vscode.Uri.joinPath(extensionUri, "dist", "fileExplorerView.js")
   );
 
   // HTML for the view
@@ -31,5 +36,36 @@ export function getFileExplorerViewHtml(
 export function handleFileExplorerViewMessages(
   serverIpc: ServerPostMessageManager
 ) {
-  // Add logic to handle messages for the file explorer view here
+  serverIpc.onClientMessage(
+    ClientToServerChannel.RequestWorkspaceFiles,
+    async (data) => {
+      const files = await getFilesRespectingGitignore();
+      const fileTree = createFileTree(files);
+
+      // Use the VSCode API to retrieve workspace files
+      // const files = await vscode.workspace.findFiles("**/*");
+
+      // // Format the files into the expected response structure
+      // const formattedFiles = files.map((file) => ({
+      //   name: file.path.split("/").pop() || "", // Extract file name from path
+      //   path: file.fsPath, // Use fsPath for the actual file path
+      //   // type: vscode.workspace.fs
+      //   //   .stat(file)
+      //   //   .then((stat) => (stat.isDirectory() ? "directory" : "file")),
+      // }));
+
+      // const fileTypes = await Promise.all(
+      //   formattedFiles.map((file) => file.type)
+      // );
+      // Send the files back to the client
+      serverIpc.sendToClient(ServerToClientChannel.SendWorkspaceFiles, {
+        // files: formattedFiles.map((file, index) => ({
+        //   ...file,
+        //   // type: fileTypes[index],
+        //   type: 'file'
+        // })),
+        files: [fileTree]
+      });
+    }
+  );
 }
