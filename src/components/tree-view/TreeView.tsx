@@ -44,7 +44,6 @@ const TreeView: React.FC<TreeViewProps> = ({ data, onNodeClick, renderNodeConten
               flex 
               items-center 
               ${isDirectory ? 'font-medium' : 'font-normal'}
-              hover:bg-gray-100
             `}
                     >
                         {isDirectory && (
