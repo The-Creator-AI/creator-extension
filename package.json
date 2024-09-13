@@ -4,7 +4,7 @@
   "description": "Coding assistant",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.89.1"
+    "vscode": "^1.90.0"
   },
   "categories": [
     "Other"
@@ -86,7 +86,8 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "vsce-package": "vsce package"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
@@ -118,7 +119,8 @@
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
     "webpack": "^5.91.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "vsce": "^2.15.0"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
