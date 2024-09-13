@@ -142,7 +142,7 @@ const App = () => {
     });
 
     clientIpc.sendToServer(ClientToServerChannel.SendMessage, {
-      message: changeDescription,
+      message: `Now let's plan the following changes - \n\n${changeDescription}`,
       selectedFiles: absoluteSelectedFiles,
       agent: 'Code Plan'
     });
