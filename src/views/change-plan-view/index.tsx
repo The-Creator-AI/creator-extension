@@ -22,6 +22,7 @@ import {
 } from "./store/change-plan-view.store";
 import { FileNode } from "src/types/file-node";
 import FileTree from "../../components/file-tree/FileTree";
+import { addRemovePathInSelectedFiles } from "../../components/file-tree/FileTree.utils";
 
 const App = () => {
   const {
@@ -95,14 +96,6 @@ const App = () => {
         setFiles(files);
       }
     );
-
-    // Listen for selected files from opened tabs
-    clientIpc.onServerMessage(
-      ServerToClientChannel.SendSelectedFiles,
-      ({ selectedFiles: openedTabs }) => {
-        updateSelectedFiles(openedTabs);
-      }
-    );
   }, []);
 
   const handleFileClick = (filePath: string) => {
@@ -119,11 +112,10 @@ const App = () => {
 
   const handleSubmit = () => {
     setState("isLoading")(true);
-
     // Create an array to store absolute paths of selected files
     const absoluteSelectedFiles: string[] = [];
 
-    // Iterate through selectedFiles and find corresponding absolute paths in files
+    // Iterate through updatedSelectedFiles and find corresponding absolute paths in files
     selectedFiles.forEach((relativePath) => {
       let matchingNode: FileNode | undefined = undefined;
       files.find((node) => {
@@ -168,27 +160,6 @@ const App = () => {
       <FaSpinner className="spinner text-2xl animate-spin" />
     </div>
   );
-
-  /**
-   * Updates selectedFiles state based on opened tabs and ancestor checks.
-   */
-  const updateSelectedFiles = (openedTabs: string[]) => {
-    const updatedSelectedFiles = openedTabs.reduce((acc: string[], tabPath) => {
-      // Check if any ancestor directory is already selected
-      const ancestorSelected = selectedFiles.some(
-        (selectedPath) =>
-          tabPath.startsWith(selectedPath) && tabPath !== selectedPath
-      );
-
-      if (!ancestorSelected) {
-        acc.push(tabPath);
-      }
-
-      return acc;
-    }, selectedFiles);
-
-    setState("selectedFiles")(updatedSelectedFiles);
-  };
 
   return (
     <div className="h-full fixed inset-0 flex flex-col justify-between">

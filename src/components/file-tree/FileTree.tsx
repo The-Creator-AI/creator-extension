@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MdChevronRight } from 'react-icons/md';
 import Checkbox from '../Checkbox';
 import { FileNode } from 'src/types/file-node';
-import { getFileNodeByPath, addPathToSelectedFiles } from './FileTree.utils';
+import { getFileNodeByPath, addRemovePathInSelectedFiles } from './FileTree.utils';
 
 interface FileTreeProps {
   data: FileNode[];
@@ -69,7 +69,7 @@ const FileTree: React.FC<FileTreeProps> = ({
   };
 
   const handleFileCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, path: string) => {
-    updateSelectedFiles(addPathToSelectedFiles(data, path, selectedFiles));
+    updateSelectedFiles(addRemovePathInSelectedFiles(data, path, selectedFiles));
   };
 
   const renderCheckbox = (path: string) => {

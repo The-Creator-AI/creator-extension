@@ -1,6 +1,6 @@
 import { FileNode } from "src/types/file-node";
 
-export const addPathToSelectedFiles = (
+export const addRemovePathInSelectedFiles = (
   files: FileNode[],
   path: string,
   selectedFiles: string[]

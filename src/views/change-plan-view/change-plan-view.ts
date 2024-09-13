@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import { ServerPostMessageManager } from "../../ipc/server-ipc";
 import {
   ClientToServerChannel,
   ServerToClientChannel,
 } from "../../ipc/channels.enum";
+import { ServerPostMessageManager } from "../../ipc/server-ipc";
 import { Services } from "../../services/services";
 import {
   createFileTree,
@@ -42,9 +42,38 @@ export function handleChangePlanViewMessages(
   serverIpc.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
     const { message: changeDescription, selectedFiles } = data;
 
+    // Get open editors and merge their paths with selectedFiles
+    const openEditors = vscode.window.tabGroups.all
+      .flatMap((group) => group.tabs)
+      .map((tab) =>
+        tab.input instanceof vscode.TabInputText ||
+        tab.input instanceof vscode.TabInputNotebook
+          ? tab.input.uri?.fsPath || ""
+          : ""
+      );
+
+    const updatedSelectedFiles = openEditors.reduce(
+      (acc: string[], tabPath) => {
+        const selectedAncestorPath = selectedFiles.find(
+          (f) => tabPath.startsWith(f) && f !== tabPath
+        );
+        if (selectedAncestorPath) {
+          return acc;
+        }
+        else {
+          return [
+            ...acc,
+            tabPath,
+          ];
+        }
+      },
+      selectedFiles
+    );
+    console.log({ updatedSelectedFiles });
+
     const response = await Services.getLlmService().sendPrompt(
       [{ user: "user", message: changeDescription }],
-      selectedFiles
+      updatedSelectedFiles
     );
 
     serverIpc.sendToClient(ServerToClientChannel.SendMessage, {
@@ -56,10 +85,10 @@ export function handleChangePlanViewMessages(
     const workspaceRoots =
       vscode.workspace.workspaceFolders?.map((folder) => folder.uri) || [];
     const files = await getFilesRespectingGitignore();
-    const fileTree = createFileTree(workspaceRoots, files);
+    const workspaceFileTree = createFileTree(workspaceRoots, files); // Update the stored file tree
 
     serverIpc.sendToClient(ServerToClientChannel.SendWorkspaceFiles, {
-      files: fileTree,
+      files: workspaceFileTree,
     });
   }
 
@@ -75,23 +104,6 @@ export function handleChangePlanViewMessages(
         fileSystemWatcher.onDidCreate(() => sendWorkspaceFiles());
         fileSystemWatcher.onDidDelete(() => sendWorkspaceFiles());
         fileSystemWatcher.onDidChange(() => sendWorkspaceFiles());
-
-        // Subscribe to tab changes (open/close)
-        vscode.window.tabGroups.onDidChangeTabs(async (event) => {
-          // const openedTabs = event.opened.map((tab) => tab.input instanceof vscode.TabInputText || tab.input instanceof vscode.TabInputNotebook ? tab.input.uri?.path || "" : "",);
-          const openEditors = vscode.window.tabGroups.all
-              .flatMap((group) => group.tabs)
-              .map((tab) => ({
-                fileName: tab.label || "",
-                filePath: tab.input instanceof vscode.TabInputText || tab.input instanceof vscode.TabInputNotebook ? tab.input.uri?.path || "" : "",
-                languageId: "",
-              }));
-
-          // Send opened tabs to the React view
-          serverIpc.sendToClient(ServerToClientChannel.SendSelectedFiles, {
-            selectedFiles: openEditors.map(editor => editor.filePath),
-          });
-        });
       }
     }
   );

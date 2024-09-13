@@ -10,13 +10,50 @@ interface GitignoreInfo {
 
 export function createFileTree(
   workspaceRoots: vscode.Uri[],
-  files: vscode.Uri[]
+  files: vscode.Uri[],
+  fromSystemRoot = false
 ): FileNode[] {
-  const rootNodes: FileNode[] = workspaceRoots.map((root) => ({
-    name: root.path.split("/").pop() || "", 
-    children: [],
-    absolutePath: root.fsPath, // Add absolute path to root node
-  }));
+  const rootNodes: FileNode[] = workspaceRoots.map((root) => {
+    if (!fromSystemRoot) {
+      return {
+        name: root.path.split("/").pop() || "",
+        children: [],
+        absolutePath: root.fsPath,
+      };
+    }
+    const parts = root.path.split("/").filter(Boolean);
+    let currentNode: FileNode = {
+      name: parts[0],
+      children: [],
+      absolutePath: "/" + parts[0],
+    };
+    let rootNode = currentNode;
+
+    for (let i = 1; i < parts.length; i++) {
+      const newNode: FileNode = {
+        name: parts[i],
+        children: [],
+        absolutePath: path.join(currentNode.absolutePath, parts[i]),
+      };
+      currentNode.children!.push(newNode);
+      currentNode = newNode;
+    }
+
+    return rootNode;
+  });
+  const leafNodes = rootNodes.map((root) => {
+    let currentNode = root;
+    while (currentNode.children && currentNode.children.length > 0) {
+      currentNode = currentNode.children[currentNode.children.length - 1];
+    }
+    console.log({ currentNode });
+    return currentNode;
+  });
+
+  console.log({
+    rootNodes,
+    leafNodes
+  })
 
   const workspaceRootPaths = workspaceRoots.map((root) => root.fsPath);
 
@@ -31,7 +68,8 @@ export function createFileTree(
         file.fsPath
       );
       const parts = relativePath.split(path.sep).filter(Boolean);
-      let currentNode = rootNodes[workspaceRootIndex];
+
+      let currentNode = leafNodes[workspaceRootIndex];
 
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
@@ -40,7 +78,7 @@ export function createFileTree(
         if (!child) {
           child = {
             name: part,
-            absolutePath: path.join(currentNode.absolutePath || "", part), // Calculate absolute path for each part
+            absolutePath: path.join(currentNode.absolutePath, part),
           };
           if (i < parts.length - 1) {
             child.children = [];
@@ -56,7 +94,6 @@ export function createFileTree(
 
   return rootNodes;
 }
-
 export async function getFilesRespectingGitignore(): Promise<vscode.Uri[]> {
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
   if (!workspaceFolder) {
