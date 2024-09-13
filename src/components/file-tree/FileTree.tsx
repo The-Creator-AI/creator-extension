@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MdChevronRight } from 'react-icons/md';
 import Checkbox from '../Checkbox';
 import { FileNode } from 'src/types/file-node';
+import { getFileNodeByPath, addPathToSelectedFiles } from './FileTree.utils';
 
 interface FileTreeProps {
   data: FileNode[];
@@ -34,7 +35,7 @@ const FileTree: React.FC<FileTreeProps> = ({
       let currentPath = '';
       pathParts.forEach((part, index) => {
         currentPath += `${currentPath ? '/' : ''}${part}`;
-        const node = getNodeByPath(currentPath);
+        const node = getFileNodeByPath(data, currentPath);
         const isLast = index === pathParts.length - 1;
         if (node && !isLast) {
           toExpand.add(currentPath);
@@ -67,64 +68,8 @@ const FileTree: React.FC<FileTreeProps> = ({
     }
   };
 
-  const getNodeByPath = (path: string): FileNode | null => {
-    const pathParts = path.split('/');
-    // let's find the node in the data
-    let node = {
-      name: '',
-      children: data,
-    } as FileNode | undefined;
-    for (const part of pathParts) {
-      if (!node) return null;
-      node = node.children?.find((child) => child.name === part);
-    }
-    return node || null;
-  };
-
   const handleFileCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, path: string) => {
-    const isSelected = !!selectedFiles?.find(f => f === path);
-    if (isSelected) {
-      // Remove this file from selectedFiles
-      updateSelectedFiles(selectedFiles?.filter(f => f !== path));
-      return;
-    }
-
-    const selectedAncestorPath = selectedFiles.find(f => path.startsWith(f) && f !== path);
-    if (selectedAncestorPath) {
-      // 1. Remove the ancestor from selectedFiles
-      // 2. Add all children of the ancestor to selectedFiles except node which is another ancestor of the selected node
-      // 3. Add all the siblings of the all the nodes between the ancestor and the selected node
-      const pathParts = path.split('/');
-      const ancestorParts = selectedAncestorPath.split('/');
-      // const ancestorNode = getNodeByPath(selectedAncestorPath);
-      // const parentNode = getNodeByPath(pathParts.slice(0, pathParts.length - 1).join('/'));
-      let siblingsAtEveryLevel = [] as string[];
-      for (let i = ancestorParts.length - 1; i < pathParts.length - 1; i++) {
-        const level = pathParts.slice(0, i + 1).join('/');
-        const levelNode = getNodeByPath(level);
-        if (levelNode) {
-          siblingsAtEveryLevel = [
-            ...siblingsAtEveryLevel,
-            ...levelNode.children?.filter(c => c.name !== pathParts[i + 1])?.map(c => `${level}/${c.name}`) || [],
-          ];
-        }
-      }
-      const newSelectedFiles = [
-        ...selectedFiles.filter(f => !f.includes(selectedAncestorPath)),
-        ...siblingsAtEveryLevel
-      ];
-      updateSelectedFiles(newSelectedFiles);
-      return;
-    }
-
-    // Remove all children and push this file into selectedFiles
-    const newSelectedFiles = isSelected
-      ? selectedFiles?.filter(f => f !== path)
-      : [
-        ...selectedFiles.filter(f => !f.includes(path)),
-        path
-      ];
-    updateSelectedFiles(newSelectedFiles);
+    updateSelectedFiles(addPathToSelectedFiles(data, path, selectedFiles));
   };
 
   const renderCheckbox = (path: string) => {
