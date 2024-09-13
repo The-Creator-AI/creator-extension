@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MdChevronRight } from 'react-icons/md';
 import Checkbox from '../Checkbox';
-import './FileTree.scss';
 import { FileNode } from 'src/types/file-node';
 
 interface FileTreeProps {
@@ -134,8 +133,9 @@ const FileTree: React.FC<FileTreeProps> = ({
     const selectedAncestors = selectedFiles?.filter(f => path.startsWith(f) && f !== path);
     return (
       <Checkbox
+        data-testid="checkbox"
         indeterminate={isPartiallySelected?.length > 0}
-        className="checkbox"
+        className="mr-2"
         checked={isSelected || !!selectedAncestors?.length}
         onChange={(_, e) => handleFileCheckboxChange(e, path)}
       />
@@ -150,46 +150,52 @@ const FileTree: React.FC<FileTreeProps> = ({
       const isSelected = selectedFiles?.includes(path);
       const isDirectory = Array.isArray(node.children);
       const isActive = activeFile === path;
-      const classes = ['node'];
 
-      if (isDirectory) {
-        classes.push('directory');
-      } else {
-        classes.push('file');
-      }
-
-      if (isExpanded) {
-        classes.push('expanded');
-      }
-
-      if (isSelected) {
-        classes.push('selected');
-      }
-
-      if (isActive) {
-        classes.push('active');
-      }
-
-      return <li key={path}>
-        <div className={classes.join(' ')} onClick={(e) => handleNodeClick(e, node, path)}>
-          {isDirectory && (
-            <span className={`arrow ${isExpanded ? 'down' : ''}`}>
-              <MdChevronRight />
-            </span>
+      return (
+        <li key={path} data-testid="list-item" className="relative px-0 py-0 ml-4">
+          <div
+            data-testid="node"
+            onClick={(e) => handleNodeClick(e, node, path)}
+            className={`
+              relative 
+              cursor-pointer 
+              px-2 py-1 
+              flex 
+              items-center
+              z-1
+              ${isActive ? 'bg-[#e0dcdc]' : ''}
+              hover:bg-[#e4e6f1]
+              ${isDirectory ? 'font-medium' : 'font-normal'}
+            `}
+          >
+            {isDirectory && (
+              <span
+                data-testid="arrow"
+                className={`
+                  absolute 
+                  left-[-12px] 
+                  top-1
+                  text-xl 
+                  ${isExpanded ? 'rotate-90' : ''}
+                `}
+              >
+                <MdChevronRight />
+              </span>
+            )}
+            {renderCheckbox(path)}
+            <div data-testid="name" className="whitespace-nowrap overflow-hidden text-ellipsis">{node.name}</div>
+          </div>
+          {isDirectory && isExpanded && (
+            <ul data-testid="child-nodes">{renderTreeNodes(node.children || [], `${path}/`)}</ul>
           )}
-          {renderCheckbox(path)}
-          <div className='name'>{node.name}</div>
-        </div>
-        {isDirectory && isExpanded && (
-          <ul>{renderTreeNodes(node.children || [], `${path}/`)}</ul>
-        )}
-      </li>;
+        </li>
+      );
     });
   };
 
   return (
-    <div className="file-tree">
-      <ul>{renderTreeNodes(data)}</ul>
+    <div data-testid="file-tree" className="font-sans">
+      <ul data-testid="root-nodes">{renderTreeNodes(data)}</ul>
     </div>
   );
 };
