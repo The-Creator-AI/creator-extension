@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { MdChevronRight } from 'react-icons/md';
-import Checkbox from '../Checkbox';
+import TreeView from '../tree-view/TreeView'; // Import the generic TreeView
 import { FileNode } from 'src/types/file-node';
 import { getFileNodeByPath, addRemovePathInSelectedFiles } from './FileTree.utils';
+import Checkbox from '../Checkbox';
+
 
 interface FileTreeProps {
   data: FileNode[];
@@ -23,8 +25,12 @@ const FileTree: React.FC<FileTreeProps> = ({
   updateSelectedFiles,
   updateRecentFiles
 }) => {
+
   const rootNode = data.find((node) => !node.name.includes('/'));
+
+  // State to manage expanded nodes
   const [expandedNodes, setExpandedNodes] = useState<string[]>([rootNode?.name || '']);
+
 
   useEffect(() => {
     // If selectedFiles changes, expand the corresponding nodes
@@ -49,6 +55,7 @@ const FileTree: React.FC<FileTreeProps> = ({
     });
   }, [selectedFiles, data]);
 
+
   const handleNodeClick = (e: React.MouseEvent<HTMLElement, MouseEvent>, node: FileNode, path: string) => {
     if ((e.target as HTMLElement)?.classList?.contains('checkbox')) {
       return;
@@ -68,10 +75,6 @@ const FileTree: React.FC<FileTreeProps> = ({
     }
   };
 
-  const handleFileCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, path: string) => {
-    updateSelectedFiles(addRemovePathInSelectedFiles(data, path, selectedFiles));
-  };
-
   const renderCheckbox = (path: string) => {
     const isSelected = !!selectedFiles?.find(f => f === path);
     const isPartiallySelected = selectedFiles?.filter(f => f.includes(path) && f !== path);
@@ -87,60 +90,45 @@ const FileTree: React.FC<FileTreeProps> = ({
     );
   };
 
+  const handleFileCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, path: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    updateSelectedFiles(addRemovePathInSelectedFiles(data, path, selectedFiles));
+  };
 
-  const renderTreeNodes = (nodes: FileNode[], parentPath = '') => {
-    return nodes?.map((node) => {
-      const path = `${parentPath}${node.name}`;
-      const isExpanded = expandedNodes.includes(path);
-      const isSelected = selectedFiles?.includes(path);
-      const isDirectory = Array.isArray(node.children);
-      const isActive = activeFile === path;
+  const renderFileNodeContent = (node: FileNode, path: string) => {
+    const isDirectory = Array.isArray(node.children);
+    const isActive = activeFile === path;
 
-      return (
-        <li key={path} data-testid="list-item" className="relative px-0 py-0 ml-4">
-          <div
-            data-testid="node"
-            onClick={(e) => handleNodeClick(e, node, path)}
-            className={`
-              relative 
-              cursor-pointer 
-              px-2 py-1 
-              flex 
-              items-center
-              z-1
-              ${isActive ? 'bg-[#e0dcdc]' : ''}
-              hover:bg-[#e4e6f1]
-              ${isDirectory ? 'font-medium' : 'font-normal'}
-            `}
-          >
-            {isDirectory && (
-              <span
-                data-testid="arrow"
-                className={`
-                  absolute 
-                  left-[-12px] 
-                  top-1
-                  text-xl 
-                  ${isExpanded ? 'rotate-90' : ''}
-                `}
-              >
-                <MdChevronRight />
-              </span>
-            )}
-            {renderCheckbox(path)}
-            <div data-testid="name" className="whitespace-nowrap overflow-hidden text-ellipsis">{node.name}</div>
-          </div>
-          {isDirectory && isExpanded && (
-            <ul data-testid="child-nodes">{renderTreeNodes(node.children || [], `${path}/`)}</ul>
-          )}
-        </li>
-      );
-    });
+    return (
+      <div
+        className={`
+          relative 
+          cursor-pointer 
+          px-2 py-px
+          flex 
+          items-center
+          z-1
+          ${isActive ? 'bg-[#e0dcdc]' : ''}
+          ${isDirectory ? 'font-medium' : 'font-normal'}
+        `}
+      >
+        {renderCheckbox(path)}
+        <div className="whitespace-nowrap overflow-hidden text-ellipsis">{node.name}</div>
+      </div>
+    );
   };
 
   return (
     <div data-testid="file-tree" className="font-sans">
-      <ul data-testid="root-nodes">{renderTreeNodes(data)}</ul>
+      <TreeView 
+        data={data} 
+        onNodeClick={(node) => {
+          const path = node.absolutePath || '';
+          handleNodeClick(undefined as any, node, path);
+        }}
+        renderNodeContent={(node) => renderFileNodeContent(node, node.absolutePath || '')} 
+      />
     </div>
   );
 };
