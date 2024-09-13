@@ -29,9 +29,9 @@ const App = () => {
     isLoading,
     llmResponse,
     currentStep,
+    selectedFiles,
   } = useStore(changePlanViewStoreStateSubject);
   const [files, setFiles] = useState<FileNode[]>([]);
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [recentFiles, setRecentFiles] = useState<string[]>([]);
   const [activeFile, setActiveFile] = useState<string>();
 
@@ -51,7 +51,7 @@ const App = () => {
               selectedFiles={selectedFiles}
               recentFiles={recentFiles}
               activeFile={activeFile}
-              updateSelectedFiles={setSelectedFiles}
+              updateSelectedFiles={(files) => setState("selectedFiles")(files)}
               updateRecentFiles={setRecentFiles}
             />
           ))}
@@ -61,15 +61,17 @@ const App = () => {
     },
     [ChangePlanSteps.Plan]: {
       indicatorText: "Plan",
-      renderStep: () => <>
-        <LlmResponseStep llmResponse={llmResponse} />
-        <ChangeInputStep
-          changeDescription={changeDescription}
-          isLoading={isLoading}
-          handleChange={setState("changeDescription")}
-          handleSubmit={handleSubmit}
-        />
-      </>,
+      renderStep: () => (
+        <>
+          <LlmResponseStep llmResponse={llmResponse} />
+          <ChangeInputStep
+            changeDescription={changeDescription}
+            isLoading={isLoading}
+            handleChange={setState("changeDescription")}
+            handleSubmit={handleSubmit}
+          />
+        </>
+      ),
     },
   };
 
@@ -91,6 +93,14 @@ const App = () => {
       ServerToClientChannel.SendWorkspaceFiles,
       ({ files }) => {
         setFiles(files);
+      }
+    );
+
+    // Listen for selected files from opened tabs
+    clientIpc.onServerMessage(
+      ServerToClientChannel.SendSelectedFiles,
+      ({ selectedFiles: openedTabs }) => {
+        updateSelectedFiles(openedTabs);
       }
     );
   }, []);
@@ -158,6 +168,27 @@ const App = () => {
       <FaSpinner className="spinner text-2xl animate-spin" />
     </div>
   );
+
+  /**
+   * Updates selectedFiles state based on opened tabs and ancestor checks.
+   */
+  const updateSelectedFiles = (openedTabs: string[]) => {
+    const updatedSelectedFiles = openedTabs.reduce((acc: string[], tabPath) => {
+      // Check if any ancestor directory is already selected
+      const ancestorSelected = selectedFiles.some(
+        (selectedPath) =>
+          tabPath.startsWith(selectedPath) && tabPath !== selectedPath
+      );
+
+      if (!ancestorSelected) {
+        acc.push(tabPath);
+      }
+
+      return acc;
+    }, selectedFiles);
+
+    setState("selectedFiles")(updatedSelectedFiles);
+  };
 
   return (
     <div className="h-full fixed inset-0 flex flex-col justify-between">

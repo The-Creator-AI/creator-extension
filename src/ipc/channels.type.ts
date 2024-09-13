@@ -46,4 +46,8 @@ export type ChannelBody<
   ? {
       files: FileNode[];
     }
+  : T extends ServerToClientChannel.SendSelectedFiles // Add new channel response type for selected files
+  ? {
+      selectedFiles: string[]; 
+    }
   : never;

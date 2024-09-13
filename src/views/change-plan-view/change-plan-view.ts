@@ -75,6 +75,23 @@ export function handleChangePlanViewMessages(
         fileSystemWatcher.onDidCreate(() => sendWorkspaceFiles());
         fileSystemWatcher.onDidDelete(() => sendWorkspaceFiles());
         fileSystemWatcher.onDidChange(() => sendWorkspaceFiles());
+
+        // Subscribe to tab changes (open/close)
+        vscode.window.tabGroups.onDidChangeTabs(async (event) => {
+          // const openedTabs = event.opened.map((tab) => tab.input instanceof vscode.TabInputText || tab.input instanceof vscode.TabInputNotebook ? tab.input.uri?.path || "" : "",);
+          const openEditors = vscode.window.tabGroups.all
+              .flatMap((group) => group.tabs)
+              .map((tab) => ({
+                fileName: tab.label || "",
+                filePath: tab.input instanceof vscode.TabInputText || tab.input instanceof vscode.TabInputNotebook ? tab.input.uri?.path || "" : "",
+                languageId: "",
+              }));
+
+          // Send opened tabs to the React view
+          serverIpc.sendToClient(ServerToClientChannel.SendSelectedFiles, {
+            selectedFiles: openEditors.map(editor => editor.filePath),
+          });
+        });
       }
     }
   );

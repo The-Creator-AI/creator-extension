@@ -5,4 +5,5 @@ export interface ChangePlanViewStore {
   isLoading: boolean;
   llmResponse: string;
   currentStep: ChangePlanSteps;
+  selectedFiles: string[];
 }

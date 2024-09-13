@@ -6,4 +6,5 @@ export const initialState: ChangePlanViewStore = {
   isLoading: false,
   llmResponse: "",
   currentStep: ChangePlanSteps.Plan,
+  selectedFiles: []
 };
