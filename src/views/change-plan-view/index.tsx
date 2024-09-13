@@ -22,7 +22,6 @@ import {
 } from "./store/change-plan-view.store";
 import { FileNode } from "src/types/file-node";
 import FileTree from "../../components/file-tree/FileTree";
-import { addRemovePathInSelectedFiles } from "../../components/file-tree/FileTree.utils";
 
 const App = () => {
   const {
@@ -144,7 +143,8 @@ const App = () => {
 
     clientIpc.sendToServer(ClientToServerChannel.SendMessage, {
       message: changeDescription,
-      selectedFiles: absoluteSelectedFiles, // Send absolute paths
+      selectedFiles: absoluteSelectedFiles,
+      agent: 'Code Plan'
     });
   };
 

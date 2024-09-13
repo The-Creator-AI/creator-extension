@@ -4,7 +4,7 @@ import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
 export type ChannelBody<
   T extends ClientToServerChannel | ServerToClientChannel
 > = T extends ClientToServerChannel.SendMessage
-  ? { message: string; selectedFiles?: string[] }
+  ? { message: string; selectedFiles?: string[]; agent?: string }
   : T extends ServerToClientChannel.SendMessage
   ? { message: string }
   : T extends ClientToServerChannel.RequestChatHistory
