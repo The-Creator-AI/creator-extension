@@ -59,6 +59,12 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     };
 
 
+    const handleRequestOpenFile = (filePath: string) => {
+        clientIpc.sendToServer(ClientToServerChannel.RequestOpenFile, {
+            filePath
+        });
+    };
+
     const handleRequestFileCode = (filePath: string) => {
         clientIpc.sendToServer(ClientToServerChannel.RequestFileCode, {
             filePath,
@@ -84,7 +90,7 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                         {node.value ? <span className="ml-2 font-normal">
                             {renderDot()}
                             {node.value}
-                        </span> : node.name}
+                        </span> : <span onClick={() => handleRequestOpenFile(node.filePath)}>{node.name}</span>}
                     </div>
                 )}
             />

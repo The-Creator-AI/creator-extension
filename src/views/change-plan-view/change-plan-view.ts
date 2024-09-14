@@ -33,4 +33,23 @@ export function handleChangePlanViewMessages(
   serverIpc.onClientMessage(ClientToServerChannel.SendMessage, (data) =>
     handleSendMessage(serverIpc, data)
   );
+
+  serverIpc.onClientMessage(ClientToServerChannel.RequestOpenFile, async (data) => {
+    const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath; 
+
+    if (workspacePath && data.filePath) {
+      const fullFilePath = `${workspacePath}/${data.filePath}`; 
+      const fileUri = vscode.Uri.file(fullFilePath);
+
+      try {
+        await vscode.window.showTextDocument(fileUri);
+      } catch (error) {
+        console.error("Failed to open file:", error);
+        // Optionally, send an error message back to the client.
+      }
+    } else {
+      console.error("Workspace path or file path not available.");
+      // Optionally, send an error message back to the client.
+    }
+  });
 }

@@ -47,12 +47,16 @@ export type ChannelBody<
   ? {
       files: FileNode[];
     }
-  : T extends ClientToServerChannel.RequestFileCode // Add new channel request type
+  : T extends ClientToServerChannel.RequestOpenFile 
+  ? {
+      filePath: string;
+    }
+  : T extends ClientToServerChannel.RequestFileCode
   ? {
       filePath: string;
       chatHistory: ChatMessage[];
     }
-  : T extends ServerToClientChannel.SendFileCode // Add new channel response type
+  : T extends ServerToClientChannel.SendFileCode
   ? {
       filePath: string;
       fileContent: string;
