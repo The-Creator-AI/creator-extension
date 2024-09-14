@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { MdChevronRight } from 'react-icons/md';
+import { getExpandedNodes } from './TreeView.utils';
 
-interface TreeNode {
+export interface TreeNode {
     name: string;
     children?: TreeNode[];
     isExpanded?: boolean;
@@ -15,7 +16,7 @@ interface TreeViewProps {
 }
 
 const TreeView: React.FC<TreeViewProps> = ({ data, onNodeClick, renderNodeContent }) => {
-    const [expandedNodes, setExpandedNodes] = useState<string[]>([]);
+    const [expandedNodes, setExpandedNodes] = useState<string[]>(getExpandedNodes(data));
 
     const handleNodeClick = (node: TreeNode) => {
         if (node.children) {

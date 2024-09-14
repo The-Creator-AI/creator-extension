@@ -35,6 +35,7 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
             } else {
                 return {
                     name: item.filename?.split('/').pop() || '',
+                    isExpanded: true,
                     children: transformRecommendationsForTreeView(item.recommendations)
                 };
             }
