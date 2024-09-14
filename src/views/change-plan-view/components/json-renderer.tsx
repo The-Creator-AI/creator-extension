@@ -41,6 +41,12 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
         });
     };
 
+    const renderDot = () => {
+        return (
+            <span className="h-2 w-2 bg-gray-700 rounded-full inline-block ml-2 mr-2" />
+        );
+    };
+
     return (
         <div className="json-container p-4">
             <h3 className="text-xl font-bold mb-2">{jsonData.title}</h3>
@@ -51,7 +57,10 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                 data={transformCodePlanForTreeView(jsonData.code_plan)}
                 renderNodeContent={(node) => (
                     <div className={`${node.children ? 'font-medium' : 'font-normal'} p-2 hover:color-primary`}>
-                        {node.value ? <span className="ml-2 font-normal">{node.value}</span> : node.name}
+                        {node.value ? <span className="ml-2 font-normal">
+                            {renderDot()}
+                            {node.value}
+                        </span> : node.name}
                     </div>
                 )}
             />
