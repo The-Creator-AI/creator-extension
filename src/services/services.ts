@@ -1,22 +1,19 @@
-// src/services.ts
-import { CreatorService } from './creator.service';
-import { LlmService } from './llm.service';
+import 'reflect-metadata';
+import { ReflectiveInjector } from "injection-js";
+import { CreatorService } from "./creator.service";
+import { LlmService } from "./llm.service";
+
+const injector = ReflectiveInjector.resolveAndCreate([
+  CreatorService,
+  LlmService,
+]);
 
 export class Services {
-    private static _creatorService: CreatorService | undefined;
-    private static _llmService: LlmService | undefined;
+  static getCreatorService(): CreatorService {
+    return injector.get(CreatorService);
+  }
 
-    static getCreatorService(): CreatorService {
-        if (!this._creatorService) {
-            this._creatorService = new CreatorService();
-        }
-        return this._creatorService;
-    }
-
-    static getLlmService(): LlmService {
-        if (!this._llmService) {
-            this._llmService = new LlmService(this.getCreatorService());
-        }
-        return this._llmService;
-    }
+  static getLlmService(): LlmService {
+    return injector.get(LlmService);
+  }
 }

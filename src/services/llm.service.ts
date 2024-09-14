@@ -4,8 +4,9 @@ import * as vscode from 'vscode';
 import { LlmRepository } from '../repositories/llm.repository';
 import { CreatorService } from './creator.service';
 import { ChatMessage } from '../repositories/chat.respository';
+import { Inject, Injectable } from 'injection-js';
 
-
+@Injectable()
 export class LlmService {
     private geminiProModel: string = 'gemini-1.5-pro-exp-0827'; // Default model
     private geminiFlashModel: string = 'gemini-1.5-flash-latest';
@@ -13,7 +14,7 @@ export class LlmService {
 
     private currentModel: string = this.geminiProModel; // Track the current model being used
 
-    constructor(private readonly creatorService: CreatorService) { }
+    constructor(@Inject(CreatorService) private readonly creatorService: CreatorService) { }
 
     async sendPrompt(
         chatHistory: ChatMessage[],

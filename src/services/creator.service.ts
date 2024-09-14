@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { Injectable } from 'injection-js';
 
+@Injectable()
 export class CreatorService {
   getDirectoryStructure(dir: string, loadShallow: boolean = false, level = 0) {
     const files = fs.readdirSync(dir, { withFileTypes: true });
