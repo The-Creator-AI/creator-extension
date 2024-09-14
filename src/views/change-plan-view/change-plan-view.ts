@@ -133,18 +133,23 @@ export function handleChangePlanViewMessages(
         { user: "user", message: finalMessage },
       ]);
 
-      // 4. Write the updated content back to the file using VS Code API
+      // 4. Extract the first code block from the response
+      const codeBlockRegex = /```[\w]*\n([\s\S]*?)\n```/;
+      const match = response.match(codeBlockRegex);
+      const updatedCode = match ? match[1] : response;
+  
+      // 5. Write the updated content back to the file using VS Code API
       const encoder = new TextEncoder();
-      await vscode.workspace.fs.writeFile(fileUri, encoder.encode(response));
+      await vscode.workspace.fs.writeFile(fileUri, encoder.encode(updatedCode));
 
-      // 5. Open the file in VS Code
+      // 6. Open the file in VS Code
       const document = await vscode.workspace.openTextDocument(fileUri);
       await vscode.window.showTextDocument(document);
 
-      // 6. Show git diff using VS Code's built-in command
+      // 7. Show git diff using VS Code's built-in command
       await vscode.commands.executeCommand('git.openChange', fileUri);
 
-      // 7. Send the updated file content back to the change plan view
+      // 8. Send the updated file content back to the change plan view
       serverIpc.sendToClient(ServerToClientChannel.SendFileCode, {
         filePath,
         fileContent: response,
