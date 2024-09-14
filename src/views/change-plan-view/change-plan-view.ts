@@ -5,6 +5,7 @@ import { handleFileCodeUpdate } from "./utils/handleFileCodeUpdate";
 import { handleSendMessage } from "./utils/handleSendMessage";
 import { handleWorkspaceFilesRequest } from "./utils/handleWorkspaceFilesRequest";
 import { getViewHtml } from "../../utils/get-view-html";
+import { handleFileOpen } from "./utils/handleFileOpen";
 
 // Function to get HTML for change plan view
 export function getChangePlanViewHtml(
@@ -35,21 +36,6 @@ export function handleChangePlanViewMessages(
   );
 
   serverIpc.onClientMessage(ClientToServerChannel.RequestOpenFile, async (data) => {
-    const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath; 
-
-    if (workspacePath && data.filePath) {
-      const fullFilePath = `${workspacePath}/${data.filePath}`; 
-      const fileUri = vscode.Uri.file(fullFilePath);
-
-      try {
-        await vscode.window.showTextDocument(fileUri);
-      } catch (error) {
-        console.error("Failed to open file:", error);
-        // Optionally, send an error message back to the client.
-      }
-    } else {
-      console.error("Workspace path or file path not available.");
-      // Optionally, send an error message back to the client.
-    }
+    handleFileOpen(data);
   });
 }
