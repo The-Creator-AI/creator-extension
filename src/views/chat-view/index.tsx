@@ -16,7 +16,10 @@ const App = () => {
     if (userInput.trim() === '') return;
 
     // Send message to extension
-    clientIpc.sendToServer(ClientToServerChannel.SendMessage, { message: userInput });
+    clientIpc.sendToServer(ClientToServerChannel.SendMessage, {
+      chatHistory: [{ user: 'user', message: userInput }],
+      selectedFiles: []
+    });
 
     // Update local messages (for display)
     setMessages([...messages, { user: 'user', message: userInput }]);

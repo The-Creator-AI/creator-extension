@@ -9,7 +9,6 @@ import {
   createFileTree,
   getFilesRespectingGitignore,
 } from "../../services/workspace-files.utils";
-import { AGENTS } from "../../constants/agents.constants";
 
 // Function to get HTML for change plan view
 export function getChangePlanViewHtml(
@@ -41,7 +40,7 @@ export function handleChangePlanViewMessages(
   let fileSystemWatcher: vscode.FileSystemWatcher | undefined;
 
   serverIpc.onClientMessage(ClientToServerChannel.SendMessage, async (data) => {
-    const { message: changeDescription, selectedFiles, agent } = data;
+    const { chatHistory, selectedFiles } = data;
 
     // Get open editors and merge their paths with selectedFiles
     const openEditors = vscode.window.tabGroups.all
@@ -68,10 +67,7 @@ export function handleChangePlanViewMessages(
     );
 
     const response = await Services.getLlmService().sendPrompt(
-      [
-        ...(agent ? [{ user: "instructor", message: AGENTS[agent]?.systemInstructions }] : []),
-        { user: "user", message: changeDescription },
-      ],
+      chatHistory,
       updatedSelectedFiles
     );
 

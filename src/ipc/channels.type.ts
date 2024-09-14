@@ -1,10 +1,11 @@
 import { FileNode } from "src/types/file-node";
 import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
+import { ChatMessage } from "../repositories/chat.respository";
 
 export type ChannelBody<
   T extends ClientToServerChannel | ServerToClientChannel
 > = T extends ClientToServerChannel.SendMessage
-  ? { message: string; selectedFiles?: string[]; agent?: string }
+  ? { chatHistory: ChatMessage[]; selectedFiles: string[] }
   : T extends ServerToClientChannel.SendMessage
   ? { message: string }
   : T extends ClientToServerChannel.RequestChatHistory

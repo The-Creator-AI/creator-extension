@@ -22,6 +22,9 @@ import {
 } from "./store/change-plan-view.store";
 import { FileNode } from "src/types/file-node";
 import FileTree from "../../components/file-tree/FileTree";
+import { ChatMessage } from "../../repositories/chat.respository";
+import { AGENTS } from "../../constants/agents.constants";
+import ErrorBoundary from "../../components/ErrorBoundary";
 
 const App = () => {
   const {
@@ -34,6 +37,7 @@ const App = () => {
   const [files, setFiles] = useState<FileNode[]>([]);
   const [recentFiles, setRecentFiles] = useState<string[]>([]);
   const [activeFile, setActiveFile] = useState<string>();
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
   const clientIpc = ClientPostMessageManager.getInstance();
 
@@ -65,6 +69,7 @@ const App = () => {
         <>
           <LlmResponseStep llmResponse={llmResponse} />
           <ChangeInputStep
+            isUpdateRequest={!!(chatHistory.length > 0 && llmResponse)}
             changeDescription={changeDescription}
             isLoading={isLoading}
             handleChange={setState("changeDescription")}
@@ -81,6 +86,7 @@ const App = () => {
       ({ message }) => {
         setState("isLoading")(false);
         setState("llmResponse")(message);
+        setState("changeDescription")('');
         setState("currentStep")(ChangePlanSteps.Plan);
       }
     );
@@ -109,8 +115,7 @@ const App = () => {
     });
   };
 
-  const handleSubmit = () => {
-    setState("isLoading")(true);
+  const getSelectedFiles = () => {
     // Create an array to store absolute paths of selected files
     const absoluteSelectedFiles: string[] = [];
 
@@ -140,11 +145,28 @@ const App = () => {
         absoluteSelectedFiles.push(matchingNode.absolutePath || "");
       }
     });
+    return absoluteSelectedFiles;
+  };
+
+  const handleSubmit = () => {
+    setState("isLoading")(true);
+
+    const selectedFiles = getSelectedFiles();
+    const newChatHistory = [
+      ...(chatHistory.length < 1 || !llmResponse ?
+        [{ user: "instructor", message: AGENTS["Code Plan"]?.systemInstructions }]
+        : [
+          ...chatHistory,
+          { user: 'bot', message: llmResponse },
+          { user: "instructor", message: AGENTS["Code Plan Update"]?.systemInstructions },
+        ]),
+      { user: "user", message: changeDescription },
+    ];
+    setChatHistory(() => newChatHistory);
 
     clientIpc.sendToServer(ClientToServerChannel.SendMessage, {
-      message: `Now let's plan the following changes - \n\n${changeDescription}`,
-      selectedFiles: absoluteSelectedFiles,
-      agent: 'Code Plan'
+      chatHistory: newChatHistory,
+      selectedFiles,
     });
   };
 
@@ -179,4 +201,4 @@ const App = () => {
 const root = ReactDOM.createRoot(
   document.getElementById("change-plan-view-root")!
 );
-root.render(<App />);
+root.render(<ErrorBoundary><App /></ErrorBoundary>);

@@ -36,14 +36,11 @@ export async function handleChatViewMessages(serverIpc: ServerPostMessageManager
     ClientToServerChannel.SendMessage,
     async (data) => {
       console.log({ dataOnServerSide: data });
-      const userMessage = data.message;
+      const userMessage = data.chatHistory?.[0];
 
       // Fetch Chat History from Repository
       let existingChat = await ChatRepository.getActiveChat();
-      await ChatRepository.addMessageToChat(existingChat.id, {
-        user: "user",
-        message: userMessage,
-      });
+      await ChatRepository.addMessageToChat(existingChat.id, userMessage);
       existingChat = await ChatRepository.getActiveChat();
 
       const response = await Services.getLlmService().sendPrompt(
