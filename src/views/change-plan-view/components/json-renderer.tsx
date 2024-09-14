@@ -1,10 +1,19 @@
+// /Users/pulkitsingh/dev/The Creator AI/creator-extension/src/views/change-plan-view/components/json-renderer.tsx
+
 import * as React from "react";
 import TreeView from "../../../components/tree-view/TreeView";
+import { MdDescription } from 'react-icons/md';
+import { ClientPostMessageManager } from '../../../ipc/client-ipc';
+import { ClientToServerChannel } from '../../../ipc/channels.enum';
+import { getChangePlanViewState } from '../store/change-plan-view.store';
 
 const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     if (!jsonData) {
         return null;
     }
+
+    const clientIpc = ClientPostMessageManager.getInstance();
+    const chatHistory = getChangePlanViewState('chatHistory');
 
     const transformRecommendationsForTreeView = (recommendations: any[]): any[] => {
         return recommendations.map((recommendation, index) => {
@@ -36,6 +45,7 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                 return {
                     name: item.filename?.split('/').pop() || '',
                     isExpanded: true,
+                    filePath: item.filename,
                     children: transformRecommendationsForTreeView(item.recommendations)
                 };
             }
@@ -48,6 +58,14 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
         );
     };
 
+
+    const handleRequestFileCode = (filePath: string) => {
+        clientIpc.sendToServer(ClientToServerChannel.RequestFileCode, {
+            filePath,
+            chatHistory
+        });
+    };
+
     return (
         <div className="json-container p-4">
             <h3 className="text-xl font-bold mb-2">{jsonData.title}</h3>
@@ -57,7 +75,12 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
             <TreeView
                 data={transformCodePlanForTreeView(jsonData.code_plan)}
                 renderNodeContent={(node) => (
-                    <div className={`${node.children ? 'font-medium' : 'font-normal'} p-2 hover:color-primary`}>
+                    <div className={`${node.children ? 'font-medium' : 'font-normal'} p-2 hover:color-primary flex items-center`}>
+                        {node.filePath && <MdDescription
+                            size={18}
+                            className="mr-2 cursor-pointer hover:text-blue-500"
+                            onClick={() => handleRequestFileCode(node.filePath)}
+                        />}
                         {node.value ? <span className="ml-2 font-normal">
                             {renderDot()}
                             {node.value}

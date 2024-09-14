@@ -1,3 +1,5 @@
+// /Users/pulkitsingh/dev/The Creator AI/creator-extension/src/ipc/channels.type.ts
+
 import { FileNode } from "src/types/file-node";
 import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
 import { ChatMessage } from "../repositories/chat.respository";
@@ -38,13 +40,23 @@ export type ChannelBody<
         languageId: string;
       };
     }
-  : T extends ClientToServerChannel.RequestWorkspaceFiles // Add new channel request type
+  : T extends ClientToServerChannel.RequestWorkspaceFiles
   ? {
       // You can add options for filtering here if needed
       // e.g., fileTypes: string[];
     }
-  : T extends ServerToClientChannel.SendWorkspaceFiles // Add new channel response type
+  : T extends ServerToClientChannel.SendWorkspaceFiles
   ? {
       files: FileNode[];
+    }
+  : T extends ClientToServerChannel.RequestFileCode // Add new channel request type
+  ? {
+      filePath: string;
+      chatHistory: ChatMessage[];
+    }
+  : T extends ServerToClientChannel.SendFileCode // Add new channel response type
+  ? {
+      filePath: string;
+      fileContent: string;
     }
   : never;

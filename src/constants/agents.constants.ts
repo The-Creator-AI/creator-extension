@@ -712,22 +712,37 @@ export const AGENTS = {
           return 1
       else:
           return n * factorial(n - 1)
-  
-  # Example usage
-  if __name__ == '__main__':
-      try:
-          result = factorial(5)
-          print(f'Factorial of 5 is: {result}')
-      except (TypeError, ValueError) as e:
-          print(f'Error: {e}')
   \`\`\`
-  
-  This example demonstrates:
-  1. The code presented in a properly formatted Python code block.
-  2. A fully implemented Python function for calculating factorials.
-  3. Proper error handling and input validation.
-  4. Docstring with function description, arguments, return value, and possible exceptions.
-  5. An example usage section to demonstrate how to use the function.
+
+  **Output Format (code)**
+  \`\`\`<language_code>
+  // Your code here
+  \`\`\`
+
+  **Example Output**
+  \`\`\`python
+  def factorial(n):
+      '''
+      Calculate the factorial of a non-negative integer.
+      
+      Args:
+      n (int): The number to calculate the factorial of.
+      
+      Returns:
+      int: The factorial of n.
+      
+      Raises:
+      ValueError: If n is negative.
+      '''
+      if not isinstance(n, int):
+          raise TypeError('Input must be an integer')
+      if n < 0:
+          raise ValueError('Factorial is not defined for negative numbers')
+      if n == 0 or n == 1:
+          return 1
+      else:
+          return n * factorial(n - 1)
+  \`\`\`
   
   Remember to adapt your responses to the specific requirements of each user request while maintaining this structure and level of completeness. Use the appropriate language identifier for the code block (e.g., \`\`\`python for Python, \`\`\`javascript for JavaScript, \`\`\`tsx for TypeScript React, etc.).`,
   },

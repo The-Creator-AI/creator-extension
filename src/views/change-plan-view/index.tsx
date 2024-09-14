@@ -1,3 +1,4 @@
+// creator-extension/src/views/change-plan-view/index.tsx
 import * as React from "react";
 import { useState, useEffect } from "react";
 import * as ReactDOM from "react-dom/client";
@@ -19,6 +20,7 @@ import "./index.scss";
 import { setChangePlanViewState as setState } from "./store/change-plan-view.logic";
 import {
   changePlanViewStoreStateSubject,
+  getChangePlanViewState,
 } from "./store/change-plan-view.store";
 import { FileNode } from "src/types/file-node";
 import FileTree from "../../components/file-tree/FileTree";
@@ -32,12 +34,11 @@ const App = () => {
     isLoading,
     llmResponse,
     currentStep,
-    selectedFiles,
+    selectedFiles
   } = useStore(changePlanViewStoreStateSubject);
   const [files, setFiles] = useState<FileNode[]>([]);
   const [recentFiles, setRecentFiles] = useState<string[]>([]);
   const [activeFile, setActiveFile] = useState<string>();
-  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
   const clientIpc = ClientPostMessageManager.getInstance();
 
@@ -69,7 +70,7 @@ const App = () => {
         <>
           <LlmResponseStep llmResponse={llmResponse} />
           <ChangeInputStep
-            isUpdateRequest={!!(chatHistory.length > 0 && llmResponse)}
+            isUpdateRequest={!!(getChangePlanViewState('chatHistory').length > 0 && llmResponse)}
             changeDescription={changeDescription}
             isLoading={isLoading}
             handleChange={setState("changeDescription")}
@@ -80,7 +81,7 @@ const App = () => {
     },
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     clientIpc.onServerMessage(
       ServerToClientChannel.SendMessage,
       ({ message }) => {
@@ -88,6 +89,10 @@ const App = () => {
         setState("llmResponse")(message);
         setState("changeDescription")('');
         setState("currentStep")(ChangePlanSteps.Plan);
+        setState("chatHistory")([
+          ...getChangePlanViewState('chatHistory'),
+          { user: 'bot', message }
+        ]);
       }
     );
 
@@ -101,10 +106,27 @@ const App = () => {
         setFiles(files);
       }
     );
+
+    // Listener for SendFileCode
+    clientIpc.onServerMessage(
+      ServerToClientChannel.SendFileCode,
+      ({ fileContent, filePath }) => {
+        if (filePath) {
+          try {
+            console.log(fileContent);
+            console.log(`File ${filePath} updated successfully.`);
+          } catch (err) {
+            console.error(`Error updating file ${filePath}:`, err);
+          }
+        }
+      }
+    );
+
   }, []);
 
   const handleFileClick = (filePath: string) => {
     setActiveFile(filePath);
+
     // Send the selected editor path to the extension
     clientIpc.sendToServer(ClientToServerChannel.SendSelectedEditor, {
       editor: {
@@ -153,16 +175,15 @@ const App = () => {
 
     const selectedFiles = getSelectedFiles();
     const newChatHistory = [
-      ...(chatHistory.length < 1 || !llmResponse ?
+      ...(getChangePlanViewState('chatHistory').length < 1 || !llmResponse ?
         [{ user: "instructor", message: AGENTS["Code Plan"]?.systemInstructions }]
         : [
-          ...chatHistory,
-          { user: 'bot', message: llmResponse },
+          ...getChangePlanViewState('chatHistory'), // Use chatHistory from store
           { user: "instructor", message: AGENTS["Code Plan Update"]?.systemInstructions },
         ]),
       { user: "user", message: changeDescription },
     ];
-    setChatHistory(() => newChatHistory);
+    setState("chatHistory")(newChatHistory); // Update chatHistory in the store
 
     clientIpc.sendToServer(ClientToServerChannel.SendMessage, {
       chatHistory: newChatHistory,

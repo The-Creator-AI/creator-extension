@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import * as fs from "fs";
 import {
   ClientToServerChannel,
   ServerToClientChannel,
@@ -9,6 +10,7 @@ import {
   createFileTree,
   getFilesRespectingGitignore,
 } from "../../services/workspace-files.utils";
+import { AGENTS } from "../../constants/agents.constants";
 
 // Function to get HTML for change plan view
 export function getChangePlanViewHtml(
@@ -100,6 +102,62 @@ export function handleChangePlanViewMessages(
         fileSystemWatcher.onDidDelete(() => sendWorkspaceFiles());
         fileSystemWatcher.onDidChange(() => sendWorkspaceFiles());
       }
+    }
+  );
+
+  serverIpc.onClientMessage(
+    ClientToServerChannel.RequestFileCode,
+    async (data) => {
+      const { filePath, chatHistory } = data;
+
+      // 1. Fetch the file code using VS Code API
+      const fileUri = vscode.Uri.file(filePath);
+      const fileContent = await vscode.workspace.fs.readFile(fileUri);
+      const fileContentString = new TextDecoder().decode(fileContent);
+
+      // 2. Append the chat history and a request for code updates to the final message
+      const finalMessage = `
+      Here's the code for the file: ${filePath}
+
+      \`\`\`
+      ${fileContentString}
+      \`\`\`
+
+      Please suggest any necessary updates or modifications to the code based on the plan above and previous conversation:
+      `;
+
+      // 3. Send the combined message to the LLM
+      const response = await Services.getLlmService().sendPrompt([
+        ...chatHistory,
+        { user: "instructor", message: AGENTS.Developer.systemInstructions },
+        { user: "user", message: finalMessage },
+      ]);
+
+      // 4. Write the updated content back to the file using VS Code API
+      const encoder = new TextEncoder();
+      await vscode.workspace.fs.writeFile(fileUri, encoder.encode(response));
+
+      // 5. Open the file in VS Code
+      const document = await vscode.workspace.openTextDocument(fileUri);
+      await vscode.window.showTextDocument(document);
+
+      // 6. Show git diff
+      const gitExtension =
+        vscode.extensions.getExtension("vscode.git")?.exports;
+      if (gitExtension) {
+        const git = gitExtension.getAPI(1);
+        const repository = git.repositories[0];
+
+        if (repository) {
+          await repository.diffWith(filePath);
+        }
+      }
+
+      // 7. Send the updated file content back to the change plan view
+      serverIpc.sendToClient(ServerToClientChannel.SendFileCode, {
+        filePath,
+        fileContent: response,
+      });
     }
   );
 
