@@ -1,4 +1,4 @@
-import { ChatRepository } from "../repositories/chat.respository";
+import { ChatRepository } from "../backend/repositories/chat.respository";
 import * as vscode from "vscode";
 
 // Define an array of commands with their corresponding callback functions

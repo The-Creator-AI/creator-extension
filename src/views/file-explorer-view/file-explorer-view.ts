@@ -4,7 +4,7 @@ import {
   ClientToServerChannel,
   ServerToClientChannel,
 } from "../../ipc/channels.enum";
-import { createFileTree, getFilesRespectingGitignore } from "../../services/workspace-files.utils";
+import { createFileTree, getFilesRespectingGitignore } from "../../backend/services/workspace-files.utils";
 
 // Function to get HTML for file explorer view
 export function getFileExplorerViewHtml(

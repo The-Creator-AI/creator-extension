@@ -1,6 +1,6 @@
 import { ServerToClientChannel } from "../../../ipc/channels.enum";
 import { ServerPostMessageManager } from "../../../ipc/server-ipc";
-import { createFileTree, getFilesRespectingGitignore } from "../../../services/workspace-files.utils";
+import { createFileTree, getFilesRespectingGitignore } from "../../../backend/services/workspace-files.utils";
 import * as vscode from "vscode";
 
 /**

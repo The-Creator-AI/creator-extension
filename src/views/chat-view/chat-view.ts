@@ -4,8 +4,8 @@ import {
     ServerToClientChannel,
 } from "../../ipc/channels.enum";
 import { ServerPostMessageManager } from "../../ipc/server-ipc";
-import { ChatRepository } from "../../repositories/chat.respository";
-import { Services } from "../../services/services";
+import { ChatRepository } from "../../backend/repositories/chat.respository";
+import { Services } from "../../backend/services/services";
 
 // Function to get HTML for chat view
 export function getChatViewHtml(

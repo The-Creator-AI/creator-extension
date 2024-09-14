@@ -1,6 +1,6 @@
 import { ServerPostMessageManager } from "../../../ipc/server-ipc";
 import { mergeOpenEditorsWithSelectedFiles } from "./mergeOpenEditorsWithSelectedFiles";
-import { Services } from "../../../services/services";
+import { Services } from "../../../backend/services/services";
 import { ServerToClientChannel } from "../../../ipc/channels.enum";
 
 /**

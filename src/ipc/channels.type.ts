@@ -2,7 +2,7 @@
 
 import { FileNode } from "src/types/file-node";
 import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
-import { ChatMessage } from "../repositories/chat.respository";
+import { ChatMessage } from "../backend/repositories/chat.respository";
 
 export type ChannelBody<
   T extends ClientToServerChannel | ServerToClientChannel

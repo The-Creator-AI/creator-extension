@@ -5,7 +5,7 @@ import { resolveFilePath } from "./resolveFilePath";
 import { extractCodeFromResponse } from "./extractCodeFromResponse";
 import { writeFileContent } from "./writeFileContent";
 import { openFileAndShowDiff } from "./openFileAndShowDiff";
-import { Services } from "../../../services/services";
+import { Services } from "../../../backend/services/services";
 import { getFileContent } from "./getFileContent";
 import { createPromptForLLM } from "./createPromptForLLM";
 import { AGENTS } from "../../../constants/agents.constants";
