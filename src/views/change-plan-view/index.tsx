@@ -2,7 +2,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import * as ReactDOM from "react-dom/client";
-import { FaSpinner } from "react-icons/fa"; // Import spinner icon
+import { FaSpinner, FaUndo } from "react-icons/fa"; // Import spinner and reset icons
 import {
   ClientToServerChannel,
   ServerToClientChannel,
@@ -17,7 +17,10 @@ import ChangeInputStep from "./components/change-input-step";
 import LlmResponseStep from "./components/llm-response-step";
 import StepIndicators from "./components/step-indicators";
 import "./index.scss";
-import { setChangePlanViewState as setState } from "./store/change-plan-view.logic";
+import {
+  resetChangePlanViewStore,
+  setChangePlanViewState as setState,
+} from "./store/change-plan-view.logic";
 import {
   changePlanViewStoreStateSubject,
   getChangePlanViewState,
@@ -34,7 +37,7 @@ const App = () => {
     isLoading,
     llmResponse,
     currentStep,
-    selectedFiles
+    selectedFiles,
   } = useStore(changePlanViewStoreStateSubject);
   const [files, setFiles] = useState<FileNode[]>([]);
   const [recentFiles, setRecentFiles] = useState<string[]>([]);
@@ -60,7 +63,9 @@ const App = () => {
               updateRecentFiles={setRecentFiles}
             />
           ))}
-          {!files.length && <div className="text-gray-500">Loading files...</div>}
+          {!files.length && (
+            <div className="text-gray-500">Loading files...</div>
+          )}
         </div>
       ),
     },
@@ -70,7 +75,9 @@ const App = () => {
         <>
           <LlmResponseStep llmResponse={llmResponse} />
           <ChangeInputStep
-            isUpdateRequest={!!(getChangePlanViewState('chatHistory').length > 0 && llmResponse)}
+            isUpdateRequest={!!(
+              getChangePlanViewState("chatHistory").length > 0 && llmResponse
+            )}
             changeDescription={changeDescription}
             isLoading={isLoading}
             handleChange={setState("changeDescription")}
@@ -87,11 +94,11 @@ const App = () => {
       ({ message }) => {
         setState("isLoading")(false);
         setState("llmResponse")(message);
-        setState("changeDescription")('');
+        setState("changeDescription")("");
         setState("currentStep")(ChangePlanSteps.Plan);
         setState("chatHistory")([
-          ...getChangePlanViewState('chatHistory'),
-          { user: 'bot', message }
+          ...getChangePlanViewState("chatHistory"),
+          { user: "bot", message },
         ]);
       }
     );
@@ -121,7 +128,6 @@ const App = () => {
         }
       }
     );
-
   }, []);
 
   const handleFileClick = (filePath: string) => {
@@ -175,11 +181,14 @@ const App = () => {
 
     const selectedFiles = getSelectedFiles();
     const newChatHistory = [
-      ...(getChangePlanViewState('chatHistory').length < 1 || !llmResponse ?
-        [{ user: "instructor", message: AGENTS["Code Plan"]?.systemInstructions }]
+      ...(getChangePlanViewState("chatHistory").length < 1 || !llmResponse
+        ? [{ user: "instructor", message: AGENTS["Code Plan"]?.systemInstructions }]
         : [
-          ...getChangePlanViewState('chatHistory'), // Use chatHistory from store
-          { user: "instructor", message: AGENTS["Code Plan Update"]?.systemInstructions },
+          ...getChangePlanViewState("chatHistory"), // Use chatHistory from store
+          {
+            user: "instructor",
+            message: AGENTS["Code Plan Update"]?.systemInstructions,
+          },
         ]),
       { user: "user", message: changeDescription },
     ];
@@ -195,6 +204,10 @@ const App = () => {
     setState("currentStep")(step);
   };
 
+  const handleReset = () => {
+    resetChangePlanViewStore(); // Call the reset function to reset the store
+  };
+
   const renderLoader = () => (
     <div
       className="loader flex justify-center items-center h-[100px]"
@@ -206,6 +219,14 @@ const App = () => {
 
   return (
     <div className="h-full fixed inset-0 flex flex-col justify-between">
+      <div className="flex justify-end p-2">
+        {/* Reset Icon */}
+        <FaUndo
+          className="text-gray-500 hover:text-blue-500 cursor-pointer"
+          onClick={handleReset}
+          data-testid="reset-icon"
+        />
+      </div>
       <StepIndicators
         changePlanStepsConfig={changePlanStepsConfig}
         currentStep={currentStep}
@@ -222,4 +243,8 @@ const App = () => {
 const root = ReactDOM.createRoot(
   document.getElementById("change-plan-view-root")!
 );
-root.render(<ErrorBoundary><App /></ErrorBoundary>);
+root.render(
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
+);
