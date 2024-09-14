@@ -25,7 +25,7 @@ import {
   changePlanViewStoreStateSubject,
   getChangePlanViewState,
 } from "./store/change-plan-view.store";
-import { FileNode } from "src/types/file-node";
+import { FileNode } from "../../types/file-node";
 import FileTree from "../../components/file-tree/FileTree";
 import { ChatMessage } from "../../backend/repositories/chat.respository";
 import { AGENTS } from "../../constants/agents.constants";

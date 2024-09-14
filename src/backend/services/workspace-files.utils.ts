@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import ignore from "ignore";
-import { FileNode } from "src/types/file-node";
+import { FileNode } from "../../types/file-node";
 
 interface GitignoreInfo {
   path: string;

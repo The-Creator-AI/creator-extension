@@ -1,5 +1,6 @@
 {
   "name": "creator-extension",
+  "publisher": "Pulkit Singh",
   "displayName": "creator-extension",
   "description": "Coding assistant",
   "version": "0.0.1",
@@ -126,10 +127,6 @@
     "@anthropic-ai/sdk": "^0.27.0",
     "@anthropic-ai/tokenizer": "^0.0.4",
     "@google/generative-ai": "^0.12.0",
-    "@nestjs/platform-express": "^10.4.1",
-    "@nestjs/platform-socket.io": "^10.4.1",
-    "@nestjs/typeorm": "^10.0.2",
-    "@nestjs/websockets": "^10.4.1",
     "@vscode/webview-ui-toolkit": "^1.4.0",
     "axios": "^1.7.5",
     "class-transformer": "^0.5.1",
@@ -143,9 +140,7 @@
     "react-icons": "^5.3.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "sqlite3": "^5.1.7",
     "tiktoken": "^1.0.16",
-    "typeorm": "^0.3.20",
     "uuid": "^10.0.0"
   }
 }

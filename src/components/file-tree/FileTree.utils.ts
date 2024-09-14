@@ -1,4 +1,4 @@
-import { FileNode } from "src/types/file-node";
+import { FileNode } from "../../types/file-node";
 
 export const addRemovePathInSelectedFiles = (
   files: FileNode[],

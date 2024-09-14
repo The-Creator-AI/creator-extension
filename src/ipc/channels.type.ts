@@ -1,6 +1,4 @@
-// /Users/pulkitsingh/dev/The Creator AI/creator-extension/src/ipc/channels.type.ts
-
-import { FileNode } from "src/types/file-node";
+import { FileNode } from "../types/file-node";
 import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
 import { ChatMessage } from "../backend/repositories/chat.respository";
 
