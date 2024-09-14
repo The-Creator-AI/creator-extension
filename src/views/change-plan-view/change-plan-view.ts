@@ -141,17 +141,8 @@ export function handleChangePlanViewMessages(
       const document = await vscode.workspace.openTextDocument(fileUri);
       await vscode.window.showTextDocument(document);
 
-      // 6. Show git diff
-      const gitExtension =
-        vscode.extensions.getExtension("vscode.git")?.exports;
-      if (gitExtension) {
-        const git = gitExtension.getAPI(1);
-        const repository = git.repositories[0];
-
-        if (repository) {
-          await repository.diffWith(filePath);
-        }
-      }
+      // 6. Show git diff using VS Code's built-in command
+      await vscode.commands.executeCommand('git.openChange', fileUri);
 
       // 7. Send the updated file content back to the change plan view
       serverIpc.sendToClient(ServerToClientChannel.SendFileCode, {

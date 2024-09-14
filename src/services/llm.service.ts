@@ -19,8 +19,8 @@ export class LlmService {
         chatHistory: ChatMessage[],
         selectedFiles: string[] = []
     ): Promise<string> {
-        const { type, apiKey } = await this.getApiKey();
-        console.log({ type, apiKey, chatHistory, selectedFiles });
+        const { type, apiKeys } = await this.getApiKey();
+        console.log({ type, apiKeys, chatHistory, selectedFiles });
 
         // Read selected files content
         const fileContents = this.creatorService.readSelectedFilesContent(
@@ -43,9 +43,9 @@ ${fileContents[filePath]}
         console.log(prompt);
 
         if (type === 'gemini') {
-            return this.sendPromptToGemini(prompt, apiKey);
+            return this.sendPromptToGemini(prompt, apiKeys);
         } else if (type === 'openai') {
-            return this.sendPromptToOpenAI(prompt, apiKey);
+            return this.sendPromptToOpenAI(prompt, apiKeys[0]); // Assuming only one OpenAI key is stored
         } else {
             throw new Error(
                 'No API key found. Please set either GEMINI_API_KEY or OPENAI_API_KEY environment variable.',
@@ -53,11 +53,11 @@ ${fileContents[filePath]}
         }
     }
 
-    private async sendPromptToGemini(prompt: string, apiKey: string): Promise<string> {
-        const genAI = new GoogleGenerativeAI(apiKey);
+    private async sendPromptToGemini(prompt: string, apiKeys: string[]): Promise<string> {
         let debounce = 0;
         let attempts = 0;
         let responseText = '';
+        let currentKeyIndex = 0; // Track the current key being used
 
         while (attempts < 3) {
             attempts++;
@@ -69,6 +69,7 @@ ${fileContents[filePath]}
             console.log(`Using model: ${this.currentModel}`);
             await new Promise((resolve) => setTimeout(resolve, debounce));
             try {
+                const genAI = new GoogleGenerativeAI(apiKeys[currentKeyIndex]);
                 const gemini = genAI.getGenerativeModel({
                     model: this.currentModel,
                 }); // Use currentModel here
@@ -98,12 +99,20 @@ ${fileContents[filePath]}
                 debounce += 5000;
                 if (
                     e.status === 429 &&
-                    this.currentModel === this.geminiProModel
+                    this.currentModel === this.geminiProModel &&
+                    currentKeyIndex < apiKeys.length - 1 // Check if there are more keys to try
                 ) {
+                    currentKeyIndex++; // Move to the next key
+                    console.log(
+                        `${this.geminiProModel} limit reached for key ${apiKeys[currentKeyIndex - 1]}, trying with key ${apiKeys[currentKeyIndex]}`,
+                    );
+                    continue;
+                } else if (e.status === 429 && this.currentModel === this.geminiProModel) {
                     this.currentModel = this.geminiFlashModel; // Update currentModel
                     console.log(
-                        `${this.geminiProModel} limit reached, trying with ${this.geminiFlashModel}`,
+                        `${this.geminiProModel} limit reached for all keys, trying with ${this.geminiFlashModel}`,
                     );
+                    currentKeyIndex = 0; // Reset key index for the Flash model
                     continue;
                 }
                 console.log(e);
@@ -133,10 +142,10 @@ ${fileContents[filePath]}
 
     private async getApiKey(): Promise<any> {
         const apiKeys = await LlmRepository.getLLMApiKeys();
-        const [type, apiKey] = Object.entries(apiKeys)[0] || [];
+        const type = Object.keys(apiKeys)[0];
 
-        if (apiKey && type) {
-            return { type, apiKey };
+        if (type && Array.isArray(apiKeys[type])) {
+            return { type, apiKeys: apiKeys[type] };
         } else {
             await this.getApiKeyFromUser();
             return await this.getApiKey();

@@ -46,14 +46,8 @@ export function createFileTree(
     while (currentNode.children && currentNode.children.length > 0) {
       currentNode = currentNode.children[currentNode.children.length - 1];
     }
-    console.log({ currentNode });
     return currentNode;
   });
-
-  console.log({
-    rootNodes,
-    leafNodes
-  })
 
   const workspaceRootPaths = workspaceRoots.map((root) => root.fsPath);
 

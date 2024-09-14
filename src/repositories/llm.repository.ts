@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 interface LlmRepositoryData {
-    apiKeys: { [key: string]: string };
+    apiKeys: { [service: string]: string[] }; // Changed: apiKeys now stores arrays of keys
 }
 
 const defaultLLMRepositoryData: LlmRepositoryData = {
@@ -31,7 +31,7 @@ export class LlmRepository {
         await this.getConfiguration().update('llmRepository', updatedLlmRepository, true);
     }
 
-    static async getLLMApiKeys(): Promise<{ [key: string]: string }> {
+    static async getLLMApiKeys(): Promise<{ [service: string]: string[] }> {
         const llmApiKeys = (await this.getLLMRepository()).apiKeys;
         if (!llmApiKeys) {
             await this.patchLLMRepository({
@@ -42,7 +42,7 @@ export class LlmRepository {
         return llmApiKeys;
     }
 
-    private static async patchLLMApiKeys(newApiKeys: { [key: string]: string }): Promise<void> {
+    private static async patchLLMApiKeys(newApiKeys: { [service: string]: string[] }): Promise<void> {
         const apiKeysExisting = await this.getLLMApiKeys();
         const apiKeys = {
             ...apiKeysExisting,
@@ -53,17 +53,23 @@ export class LlmRepository {
 
     static async getLLMApiKey(service: string): Promise<string | undefined> {
         const apiKeys = await this.getLLMApiKeys();
-        return apiKeys[service];
+        // Return the first key in the array
+        return apiKeys[service]?.[0];
     }
 
     static async setLLMApiKey(service: string, apiKey: string): Promise<void> {
-        await this.patchLLMApiKeys({ [service]: apiKey });
+        const apiKeys = await this.getLLMApiKeys();
+        if (!apiKeys[service]) {
+            apiKeys[service] = []; // Initialize the array if it doesn't exist
+        }
+        apiKeys[service].push(apiKey); // Add the new key to the array
+        await this.patchLLMApiKeys(apiKeys);
     }
 
-    static async deleteLLMApiKey(service: string): Promise<void> {
+    static async deleteLLMApiKey(service: string, apiKeyToDelete: string): Promise<void> { // Added apiKeyToDelete parameter
         const apiKeys = await this.getLLMApiKeys();
         if (apiKeys[service]) {
-            delete apiKeys[service]; 
+            apiKeys[service] = apiKeys[service].filter(key => key !== apiKeyToDelete); // Remove the key from the array
             await this.patchLLMApiKeys(apiKeys);
         }
     }

@@ -14,7 +14,6 @@ export class ClientPostMessageManager {
     this._listeners = [];
     window.addEventListener('message', (event: MessageEvent) => {
       const data = event.data;
-      console.log({ dataOnClientSide: data });
 
       this._listeners.forEach((listener) => {
         if (listener.channel === data.channel) {

@@ -35,7 +35,6 @@ export async function handleChatViewMessages(serverIpc: ServerPostMessageManager
   serverIpc?.onClientMessage(
     ClientToServerChannel.SendMessage,
     async (data) => {
-      console.log({ dataOnServerSide: data });
       const userMessage = data.chatHistory?.[0];
 
       // Fetch Chat History from Repository
@@ -60,7 +59,6 @@ export async function handleChatViewMessages(serverIpc: ServerPostMessageManager
   serverIpc?.onClientMessage(
     ClientToServerChannel.RequestChatHistory,
     async (data) => {
-      console.log({ dataOnServerSide: data });
       const chatId = data.chatId;
       const chat = await ChatRepository.getChatById(chatId);
       if (!chat) {
