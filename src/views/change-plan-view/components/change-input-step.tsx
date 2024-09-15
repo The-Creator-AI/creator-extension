@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { VSCodeTextArea } from '@vscode/webview-ui-toolkit/react';
-import '../index.scss';
+import '../ChangePlanView.scss';
 import { BsSend } from 'react-icons/bs';
 import { TextAreaResize } from '@vscode/webview-ui-toolkit';
 

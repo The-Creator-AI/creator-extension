@@ -1,11 +1,9 @@
-import {
-    getChangePlanViewHtml,
-    handleChangePlanViewMessages,
-} from "./change-plan-view/change-plan-view";
+import { getChangePlanViewHtml } from "./change-plan-view/getChangePlanViewHtml";
+import { handleChangePlanViewMessages } from "./change-plan-view/handleChangePlanViewMessages";
 import { getChatViewHtml, handleChatViewMessages } from "./chat-view/chat-view";
 import {
-    getFileExplorerViewHtml,
-    handleFileExplorerViewMessages,
+  getFileExplorerViewHtml,
+  handleFileExplorerViewMessages,
 } from "./file-explorer-view/file-explorer-view";
 import { VIEW_TYPES } from "./view-types";
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ChangePlanSteps, ChangePlanStepsConfig } from '../change-plan-view.types';
-import '../index.scss';
+import '../ChangePlanView.scss';
 
 interface StepIndicatorsProps {
     currentStep: ChangePlanSteps;

@@ -1,30 +1,16 @@
-import * as vscode from "vscode";
 import {
   ClientToServerChannel,
   ServerToClientChannel,
-} from "../../ipc/channels.enum";
-import { ServerPostMessageManager } from "../../ipc/server-ipc";
-import { getViewHtml } from "../../utils/get-view-html";
-import { handleFileCodeUpdate } from "./utils/handleFileCodeUpdate";
-import { handleFileOpen } from "./utils/handleFileOpen";
-import { handleSendMessage } from "./utils/handleSendMessage";
-import { handleWorkspaceFilesRequest } from "./utils/handleWorkspaceFilesRequest";
-import { handleActiveTabChange } from "./utils/handleActiveTabChange";
-import { handleStreamMessage } from "./utils/handleStreamMessage";
-import { Services } from "../../backend/services/services";
-import { ChangePlanViewStore } from "./store/change-plan-view.state-type";
-
-// Function to get HTML for change plan view
-export function getChangePlanViewHtml(
-  webview: vscode.Webview,
-  nonce: string,
-  extensionUri: vscode.Uri
-): string {
-  const scriptUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "dist", "changePlanView.js")
-  );
-  return getViewHtml({ webview, nonce, scriptUri: scriptUri.toString() });
-}
+} from "@/ipc/channels.enum";
+import { ServerPostMessageManager } from "@/ipc/server-ipc";
+import { handleFileCodeUpdate } from "@/views/change-plan-view/utils/handleFileCodeUpdate";
+import { handleFileOpen } from "@/views/change-plan-view/utils/handleFileOpen";
+import { handleSendMessage } from "@/views/change-plan-view/utils/handleSendMessage";
+import { handleWorkspaceFilesRequest } from "@/views/change-plan-view/utils/handleWorkspaceFilesRequest";
+import { handleActiveTabChange } from "@/views/change-plan-view/utils/handleActiveTabChange";
+import { handleStreamMessage } from "@/views/change-plan-view/utils/handleStreamMessage";
+import { Services } from "@/backend/services/services";
+import { ChangePlanViewStore } from "@/views/change-plan-view/store/change-plan-view.state-type";
 
 // Function to handle messages for the change plan view
 export function handleChangePlanViewMessages(

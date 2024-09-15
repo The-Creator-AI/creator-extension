@@ -17,7 +17,7 @@ const extensionConfig = {
   entry: {
     extension: './src/extension.ts',
     chatView: './src/views/chat-view/index.tsx',
-    changePlanView: './src/views/change-plan-view/index.tsx',
+    changePlanView: './src/views/change-plan-view/ChangePlanView.tsx',
     fileExplorerView: './src/views/file-explorer-view/index.tsx',
   },  
   output: {
@@ -32,7 +32,10 @@ const extensionConfig = {
   },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    extensions: ['.ts', '.js', '.tsx', '.jsx']
+    extensions: ['.ts', '.js', '.tsx', '.jsx'],
+    alias: {
+      "@": path.resolve(__dirname, 'src'),
+    }
   },
   module: {
     rules: [

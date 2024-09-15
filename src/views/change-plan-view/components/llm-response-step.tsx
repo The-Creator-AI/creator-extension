@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import Markdown from "markdown-to-jsx";
-import "../index.scss";
+import "../ChangePlanView.scss";
 import JsonResponse from "./json-renderer";
 import { parseJsonResponse } from "../../../utils/parse-json";
 

@@ -9,7 +9,7 @@
 		],
 		"jsx": "react",
 		"sourceMap": true,
-		"rootDir": "src",
+		"rootDir": ".",
 		"strict": false, /* enable all strict type-checking options */
 		"noImplicitAny": false,
 		"noImplicitReturns": false,
@@ -18,7 +18,10 @@
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
-		"baseUrl": "./",
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["src/*"]
+		},
 		"experimentalDecorators": true,
 		"allowSyntheticDefaultImports": true
 	},
