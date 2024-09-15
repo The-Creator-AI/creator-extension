@@ -9,10 +9,15 @@ import { initialState } from "./change-plan-view.initial-state";
 import { ChangePlanViewStore } from "./change-plan-view.state-type";
 import { changePlanViewStoreStateSubject } from "./change-plan-view.store";
 
-export const resetChangePlanViewStore = () => {
+export const setNewEmptyChangePlan = () => {
   changePlanViewStoreStateSubject._next(
-    initialState,
-    "Change Plan View : RESET"
+    {
+      ...changePlanViewStoreStateSubject.getValue(),
+      changeDescription: "",
+      llmResponse: "",
+      chatHistory: [],
+    },
+    "Change Plan View : SET NEW EMPTY CHANGE PLAN"
   );
 };
 

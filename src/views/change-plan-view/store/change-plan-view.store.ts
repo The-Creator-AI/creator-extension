@@ -5,7 +5,7 @@ import { KeyPaths, getNestedValue } from "../../../utils/key-path";
 
 type ChangePlanViewActions =
   | `Change Plan View : SET ${KeyPaths<ChangePlanViewStore>}`
-  | "Change Plan View : RESET";
+  | "Change Plan View : SET NEW EMPTY CHANGE PLAN";
 
 export const changePlanViewStoreStateSubject = new Store<
   ChangePlanViewStore,

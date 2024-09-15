@@ -13,7 +13,7 @@ import "./ChangePlanView.scss";
 import StepIndicators from "./components/step-indicators";
 import { setupChannelHandlers } from "./logic/setupChannelHandlers";
 import {
-  resetChangePlanViewStore,
+  setNewEmptyChangePlan,
   setChangePlanViewState as setState,
 } from "./store/change-plan-view.logic";
 import {
@@ -48,7 +48,7 @@ const App = () => {
   };
 
   const handleReset = () => {
-    resetChangePlanViewStore(); // Call the reset function to reset the store
+    setNewEmptyChangePlan(); // Call the reset function to reset the store
   };
 
   const renderLoader = () => (
