@@ -24,6 +24,6 @@ export async function handleSendMessage(
   );
 
   serverIpc.sendToClient(ServerToClientChannel.SendMessage, {
-    message: response,
+    message: response.response,
   });
 }

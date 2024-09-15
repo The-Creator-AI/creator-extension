@@ -26,8 +26,9 @@ export class LlmService {
 
   async sendPrompt(
     chatHistory: ChatMessage[],
-    selectedFiles: string[] = []
-  ): Promise<string> {
+    selectedFiles: string[] = [],
+    onChunk?: (chunk: string, modelType: string, modelName: string) => void
+  ): Promise<{ response: string; modelType: string; modelName: string }> {
     const { type, apiKeys } = await this.getApiKey();
     console.log({ type, apiKeys, chatHistory, selectedFiles });
 
@@ -51,9 +52,9 @@ ${fileContents[filePath]}
     console.log(prompt);
 
     if (type === "gemini") {
-      return this.sendPromptToGemini(prompt, apiKeys);
+      return this.sendPromptToGemini(prompt, apiKeys, onChunk);
     } else if (type === "openai") {
-      return this.sendPromptToOpenAI(prompt, apiKeys[0]); // Assuming only one OpenAI key is stored
+      return this.sendPromptToOpenAI(prompt, apiKeys[0], onChunk); // Assuming only one OpenAI key is stored
     } else {
       throw new Error(
         "No API key found. Please set either GEMINI_API_KEY or OPENAI_API_KEY environment variable."
@@ -63,8 +64,9 @@ ${fileContents[filePath]}
 
   private async sendPromptToGemini(
     prompt: string,
-    apiKeys: string[]
-  ): Promise<string> {
+    apiKeys: string[],
+    onChunk?: (chunk: string, modelType: string, modelName: string) => void
+  ): Promise<{ response: string; modelType: string; modelName: string }> {
     let debounce = 0;
     let attempts = 0;
     let responseText = "";
@@ -103,9 +105,16 @@ ${fileContents[filePath]}
         for await (const chunk of response.stream) {
           responseText += chunk.text();
           console.log(chunk.text());
+          if (onChunk) {
+            onChunk(chunk.text(), "gemini", this.currentModel);
+          }
         }
         debounce = 0;
-        return responseText;
+        return {
+          response: responseText,
+          modelType: "gemini",
+          modelName: this.currentModel,
+        };
       } catch (e: any) {
         debounce += 5000;
         if (
@@ -146,17 +155,32 @@ ${fileContents[filePath]}
 
   private async sendPromptToOpenAI(
     prompt: string,
-    apiKey: string
-  ): Promise<string> {
+    apiKey: string,
+    onChunk?: (chunk: string, modelType: string, modelName: string) => void
+  ): Promise<{ response: string; modelType: string; modelName: string }> {
     const model = new openai.OpenAI({ apiKey });
 
     this.currentModel = this.openaiModel;
     const response = await model.completions.create({
       model: this.openaiModel,
       prompt: prompt,
+      stream: true,
     });
 
-    return response.choices[0].text || "";
+    let responseText = "";
+    for await (const part of response) {
+      const chunk = part.choices[0]?.text || "";
+      responseText += chunk;
+      if (onChunk) {
+        onChunk(chunk, "openai", this.openaiModel);
+      }
+    }
+
+    return {
+      response: responseText,
+      modelType: "openai",
+      modelName: this.openaiModel,
+    };
   }
 
   private async getApiKey(): Promise<any> {

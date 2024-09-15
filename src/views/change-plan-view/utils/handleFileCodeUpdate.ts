@@ -59,7 +59,7 @@ export async function handleFileCodeUpdate(
       { user: "user", message: finalMessage },
     ]);
 
-    const updatedCode = extractCodeFromResponse(response);
+    const updatedCode = extractCodeFromResponse(response.response);
 
     await writeFileContent(absoluteFilePath, updatedCode);
 
@@ -67,7 +67,7 @@ export async function handleFileCodeUpdate(
 
     serverIpc.sendToClient(ServerToClientChannel.SendFileCode, {
       filePath: absoluteFilePath,
-      fileContent: response,
+      fileContent: response.response,
     });
   } catch (error) {
     vscode.window.showErrorMessage(`Error processing file: ${error}`);

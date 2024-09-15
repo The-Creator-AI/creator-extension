@@ -47,12 +47,12 @@ export async function handleChatViewMessages(serverIpc: ServerPostMessageManager
       );
 
       serverIpc.sendToClient(ServerToClientChannel.SendMessage, {
-        message: response,
+        message: response.response,
       });
 
       await ChatRepository.addMessageToChat(existingChat.id, {
         user: "AI",
-        message: response,
+        message: response.response,
       });
     }
   );
