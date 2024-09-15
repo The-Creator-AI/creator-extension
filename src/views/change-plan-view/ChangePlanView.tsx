@@ -53,7 +53,7 @@ const App = () => {
 
   const renderLoader = () => (
     <div
-      className="loader flex justify-center items-center h-[100px]"
+      className="loader fixed inset-0 flex justify-center items-center bg-opacity-50 bg-gray-500 z-50" 
       data-testid="loader"
     >
       <FaSpinner className="spinner text-2xl animate-spin" />
@@ -79,7 +79,7 @@ const App = () => {
         {/* Dropdown removed */}
         {changePlanTabs[currentTab].renderStep()}
       </div>
-      {isLoading && renderLoader()}
+      {isLoading && renderLoader()} {/* Conditionally render the loader */}
     </div>
   );
 };
