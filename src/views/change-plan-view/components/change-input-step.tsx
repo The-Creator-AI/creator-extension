@@ -24,6 +24,12 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
                 disabled={isLoading}
                 data-testid="change-description-textarea"
                 resize={TextAreaResize.vertical}
+                onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                    if (e.key === 'Enter' && !e.shiftKey) { // Check if Enter is pressed without Shift
+                        e.preventDefault(); // Prevent default form submission
+                        handleSubmit();
+                    }
+                }}
             />
             <BsSend
                 className="absolute right-7 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-blue-500"
