@@ -9,5 +9,7 @@ export const initialState: ChangePlanViewStore = {
   selectedFiles: [],
   chatHistory: [],
   activeTab: undefined,
-  changePlans: [] // Initialize changePlans with an empty array
+  changePlans: [], // Initialize changePlans with an empty array
+  commitSuggestions: [], // Add initial state for commit message suggestions
+  commitSuggestionsLoading: false // Add initial state for commit loading state
 };

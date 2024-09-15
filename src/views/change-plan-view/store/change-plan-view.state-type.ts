@@ -20,4 +20,6 @@ export interface ChangePlanViewStore {
   chatHistory: ChatMessage[];
   activeTab: string | undefined;
   changePlans: ChangePlan[];
+  commitSuggestionsLoading: boolean; // Add a boolean to indicate if commit suggestions are loading
+  commitSuggestions: string[]; // Add an array to store commit message suggestions 
 }

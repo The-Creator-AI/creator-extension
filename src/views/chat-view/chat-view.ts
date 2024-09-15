@@ -51,7 +51,7 @@ export async function handleChatViewMessages(serverIpc: ServerPostMessageManager
       });
 
       await ChatRepository.addMessageToChat(existingChat.id, {
-        user: "AI",
+        user: "bot",
         message: response.response,
       });
     }

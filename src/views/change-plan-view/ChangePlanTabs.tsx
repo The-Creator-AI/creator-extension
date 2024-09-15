@@ -9,74 +9,79 @@ import { handleSubmitPlanRequest } from '@/views/change-plan-view/logic/handleSu
 import { ClientPostMessageManager } from "@/ipc/client-ipc";
 import { FileNode } from "@/types/file-node";
 import { handleFileClick } from "./logic/handleFileClick";
+import CommitStep from "./components/commit-step/CommitStep";
 
 export const getChangePlanTabs = (
     {
-        clientIpc,
         files,
-        llmResponse,
-        changeDescription,
-        isLoading,
-        selectedFiles,
         recentFiles,
         activeFile,
         setRecentFiles,
         setActiveFile
     }: {
-        clientIpc: ClientPostMessageManager,
         files: FileNode[],
-        llmResponse: string,
-        changeDescription: string,
-        isLoading: boolean,
-        selectedFiles: string[],
         recentFiles: string[],
         activeFile: string,
         setRecentFiles: React.Dispatch<React.SetStateAction<string[]>>,
         setActiveFile: React.Dispatch<React.SetStateAction<string>>
     }
-): ChangePlanStepsConfig => ({
-    [ChangePlanSteps.Context]: {
-        indicatorText: "Context",
-        renderStep: () => (
-            <div className="p-4 overflow-y-auto overflow-x-hidden">
-                {/* Render FileTree for each root node */}
-                {files.map((rootNode, index) => (
-                    <FileTree
-                        key={index}
-                        data={[rootNode]} // Wrap the root node in an array
-                        onFileClick={(filePath) => handleFileClick({
-                            clientIpc,
-                            filePath,
-                            setActiveFile,
-                        })}
-                        selectedFiles={selectedFiles}
-                        recentFiles={recentFiles}
-                        activeFile={activeFile}
-                        updateSelectedFiles={(files) => setState("selectedFiles")(files)}
-                        updateRecentFiles={setRecentFiles}
-                    />
-                ))}
-                {!files.length && (
-                    <div className="text-gray-500">Loading files...</div>
-                )}
-            </div>
-        ),
-    },
-    [ChangePlanSteps.Plan]: {
-        indicatorText: "Plan",
-        renderStep: () => (
-            <>
-                <LlmResponseStep llmResponse={llmResponse} />
-                <ChangeInputStep
-                    isUpdateRequest={!!(
-                        getChangePlanViewState("chatHistory").length > 0 && llmResponse
+): ChangePlanStepsConfig => {
+    const clientIpc = ClientPostMessageManager.getInstance();
+    const selectedFiles = getChangePlanViewState("selectedFiles");
+    const llmResponse = getChangePlanViewState("llmResponse");
+    const changeDescription = getChangePlanViewState("changeDescription");
+    const isLoading = getChangePlanViewState("isLoading");
+
+    return {
+        [ChangePlanSteps.Context]: {
+            indicatorText: "Context",
+            renderStep: () => (
+                <div className="p-4 overflow-y-auto overflow-x-hidden">
+                    {/* Render FileTree for each root node */}
+                    {files.map((rootNode, index) => (
+                        <FileTree
+                            key={index}
+                            data={[rootNode]} // Wrap the root node in an array
+                            onFileClick={(filePath) => handleFileClick({
+                                clientIpc,
+                                filePath,
+                                setActiveFile,
+                            })}
+                            selectedFiles={selectedFiles}
+                            recentFiles={recentFiles}
+                            activeFile={activeFile}
+                            updateSelectedFiles={(files) => setState("selectedFiles")(files)}
+                            updateRecentFiles={setRecentFiles}
+                        />
+                    ))}
+                    {!files.length && (
+                        <div className="text-gray-500">Loading files...</div>
                     )}
-                    changeDescription={changeDescription}
-                    isLoading={isLoading}
-                    handleChange={setState("changeDescription")}
-                    handleSubmit={() => handleSubmitPlanRequest(clientIpc, files)}
-                />
-            </>
-        ),
-    },
-});
+                </div>
+            ),
+        },
+        [ChangePlanSteps.Plan]: {
+            indicatorText: "Plan",
+            renderStep: () => (
+                <>
+                    <LlmResponseStep llmResponse={llmResponse} />
+                    <ChangeInputStep
+                        isUpdateRequest={!!(
+                            getChangePlanViewState("chatHistory").length > 0 && llmResponse
+                        )}
+                        changeDescription={changeDescription}
+                        isLoading={isLoading}
+                        handleChange={setState("changeDescription")}
+                        handleSubmit={() => handleSubmitPlanRequest(clientIpc, files)}
+                    />
+                </>
+            ),
+        },
+        [ChangePlanSteps.Commit]: {
+            indicatorText: "Commit",
+            renderStep: () => (
+                <CommitStep />
+            )
+        }
+    };
+};

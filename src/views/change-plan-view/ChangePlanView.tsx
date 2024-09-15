@@ -1,11 +1,10 @@
+import { useStore } from "@/store/useStore";
 import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import * as ReactDOM from "react-dom/client";
 import { FaSpinner, FaUndo } from "react-icons/fa"; // Import spinner and reset icons
 import ErrorBoundary from "../../components/ErrorBoundary";
-import { ClientPostMessageManager } from "../../ipc/client-ipc";
-import { useStore } from "../../store/useStore";
 import { FileNode } from "../../types/file-node";
 import {
   ChangePlanSteps
@@ -20,30 +19,20 @@ import {
 } from "./store/change-plan-view.logic";
 import {
   changePlanViewStoreStateSubject,
-  getChangePlanViewState,
+  getChangePlanViewState
 } from "./store/change-plan-view.store";
 
 const App = () => {
   const {
-    changeDescription,
     isLoading,
-    llmResponse,
     currentStep: currentTab,
-    selectedFiles,
-    activeTab,
   } = useStore(changePlanViewStoreStateSubject);
   const [files, setFiles] = useState<FileNode[]>([]);
   const [recentFiles, setRecentFiles] = useState<string[]>([]);
   const [activeFile, setActiveFile] = useState<string>();
 
-  const clientIpc = ClientPostMessageManager.getInstance();
   const changePlanTabs = getChangePlanTabs({
-    clientIpc,
     files,
-    llmResponse,
-    changeDescription,
-    isLoading,
-    selectedFiles,
     recentFiles,
     activeFile,
     setRecentFiles,

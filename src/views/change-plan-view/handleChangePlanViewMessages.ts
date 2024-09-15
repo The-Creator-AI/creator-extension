@@ -11,6 +11,10 @@ import { handleActiveTabChange } from "@/views/change-plan-view/utils/handleActi
 import { handleStreamMessage } from "@/views/change-plan-view/utils/handleStreamMessage";
 import { Services } from "@/backend/services/services";
 import { ChangePlanViewStore } from "@/views/change-plan-view/store/change-plan-view.state-type";
+import { ChatMessage } from "@/backend/repositories/chat.respository";
+import { parseJsonResponse } from "@/utils/parse-json";
+import * as vscode from "vscode";
+import { gitCommit } from "./utils/gitCommit";
 
 // Function to handle messages for the change plan view
 export function handleChangePlanViewMessages(
@@ -64,4 +68,55 @@ export function handleChangePlanViewMessages(
   });
 
   handleActiveTabChange(serverIpc);
+
+  // Handle request for commit message suggestions
+  serverIpc.onClientMessage(
+    ClientToServerChannel.RequestCommitMessageSuggestions,
+    async ({ chatHistory }) => {
+      // Add a user message at the end of the chat history prompting for commit message suggestions in JSON format.
+      const userMessage: ChatMessage = {
+        user: "user",
+        message:
+          "Please provide commit message suggestions in JSON format. Here's an example of the expected JSON structure:" +
+          JSON.stringify({
+            suggestions: ["Add feature X", "Fix bug Y", "Update dependency Z"],
+          }),
+      };
+
+      // Send a message to the LLM service with the updated chat history.
+      const llmResponse = await Services.getLlmService().sendPrompt([
+        ...chatHistory.filter(
+          (message) => message.user === "bot" || message.user === "user"
+        ),
+        userMessage,
+      ]);
+
+      // Parse the LLM response using parseJsonResponse from parse-json.
+      const parsedResponse = parseJsonResponse(llmResponse.response);
+
+      // Extract commit message suggestions from the parsed JSON.
+      const suggestions = parsedResponse.suggestions;
+
+      // Send the suggestions to the client.
+      serverIpc.sendToClient(
+        ServerToClientChannel.SendCommitMessageSuggestions,
+        { suggestions }
+      );
+    }
+  );
+
+  // Handle commit action with the selected message
+  serverIpc.onClientMessage(
+    ClientToServerChannel.CommitStagedChanges,
+    async (message) => {
+      console.log("Committing staged changes with message:", message.message);
+      try {
+        // Use the publicly available VS Code command to commit the staged changes with the provided message
+        gitCommit(message.message);
+      } catch (error) {
+        // Handle any errors during the commit process
+        console.error("Error committing changes:", error);
+      }
+    }
+  );
 }

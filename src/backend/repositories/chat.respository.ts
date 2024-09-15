@@ -3,7 +3,7 @@ import { getContext } from "../../extension";
 import { StorageKeysEnum } from "../types/storage-keys.enum";
 
 export interface ChatMessage {
-  user: string;
+  user: 'user' | 'bot' | 'instrutor'
   message: string;
 }
 

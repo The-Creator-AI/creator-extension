@@ -80,4 +80,16 @@ export type ChannelBody<T extends ClientToServerChannel | ServerToClientChannel>
         keyPath: KeyPaths<ChangePlanViewStore>;
         value: KeyPathValue<KeyPaths<ChangePlanViewStore>, ChangePlanViewStore>;
       }
+    : T extends ClientToServerChannel.RequestCommitMessageSuggestions
+    ? {
+        chatHistory: ChatMessage[];
+      }
+    : T extends ServerToClientChannel.SendCommitMessageSuggestions
+    ? {
+        suggestions: string[];
+      }
+    : T extends ClientToServerChannel.CommitStagedChanges
+    ? {
+        message: string;
+      }
     : never;
