@@ -10,15 +10,22 @@ import { ChangePlanViewStore } from "./change-plan-view.state-type";
 import { changePlanViewStoreStateSubject } from "./change-plan-view.store";
 
 export const setNewEmptyChangePlan = () => {
+  const newValue = {
+    ...changePlanViewStoreStateSubject.getValue(),
+    changeDescription: "",
+    llmResponse: "",
+    chatHistory: [],
+  };
   changePlanViewStoreStateSubject._next(
-    {
-      ...changePlanViewStoreStateSubject.getValue(),
-      changeDescription: "",
-      llmResponse: "",
-      chatHistory: [],
-    },
+    newValue,
     "Change Plan View : SET NEW EMPTY CHANGE PLAN"
   );
+
+  const clientIpc = ClientPostMessageManager.getInstance();
+  clientIpc.sendToServer(ClientToServerChannel.PersistStore, {
+    storeName: "changePlanViewState",
+    storeState: newValue,
+  });
 };
 
 export const setChangePlanViewState =
