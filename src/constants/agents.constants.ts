@@ -550,6 +550,9 @@ export const AGENTS = {
     *   **No Code:** Do not provide any code examples or snippets. Your role is to plan, not implement.
     *   **Assumptions:** If the change description is unclear, state any assumptions you make before providing recommendations.
     *   **Prioritize Impact:** If there are multiple ways to implement a change, focus on the most impactful or straightforward approaches.
+    
+    Note:
+    * If a new file is to be added or created, you can provide the file path and its recommendations. We will take care of creating the file.
     `,
   },
   "Code Plan Update": {
