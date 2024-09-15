@@ -104,6 +104,13 @@ const App = () => {
       }
     );
 
+    clientIpc.onServerMessage(
+      ServerToClientChannel.StreamMessage,
+      ({ chunk }) => {
+        setState("llmResponse")(getChangePlanViewState('llmResponse') + chunk);
+      }
+    );
+
     // Request workspace files on component mount
     clientIpc.sendToServer(ClientToServerChannel.RequestWorkspaceFiles, {});
 
@@ -203,7 +210,7 @@ const App = () => {
     ];
     setState("chatHistory")(newChatHistory); // Update chatHistory in the store
 
-    clientIpc.sendToServer(ClientToServerChannel.SendMessage, {
+    clientIpc.sendToServer(ClientToServerChannel.SendStreamMessage, {
       chatHistory: newChatHistory,
       selectedFiles,
     });

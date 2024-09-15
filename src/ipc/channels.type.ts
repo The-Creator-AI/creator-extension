@@ -8,6 +8,10 @@ export type ChannelBody<
   ? { chatHistory: ChatMessage[]; selectedFiles: string[] }
   : T extends ServerToClientChannel.SendMessage
   ? { message: string }
+  : T extends ClientToServerChannel.SendStreamMessage
+  ? { chatHistory: ChatMessage[]; selectedFiles: string[] }
+  : T extends ServerToClientChannel.StreamMessage
+  ? { chunk: string }
   : T extends ClientToServerChannel.RequestChatHistory
   ? {
       chatId?: string;
@@ -47,7 +51,7 @@ export type ChannelBody<
   ? {
       files: FileNode[];
     }
-  : T extends ClientToServerChannel.RequestOpenFile 
+  : T extends ClientToServerChannel.RequestOpenFile
   ? {
       filePath: string;
     }

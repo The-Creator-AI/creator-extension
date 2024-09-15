@@ -30,7 +30,8 @@ export async function resolveFilePath(filePath: string): Promise<string | null> 
     return selectedFile || null;
   } else {
     vscode.window.showErrorMessage(
-      "Could not find the file. Please provide a valid file path."
+      "Could not find the file. Please provide a valid file path.",
+      filePath
     );
     return null;
   }
