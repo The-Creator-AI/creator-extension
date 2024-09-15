@@ -1,14 +1,9 @@
-// creator-extension/src/views/change-plan-view/index.tsx
 import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import * as ReactDOM from "react-dom/client";
 import { FaSpinner, FaUndo } from "react-icons/fa"; // Import spinner and reset icons
 import ErrorBoundary from "../../components/ErrorBoundary";
-import {
-  ClientToServerChannel,
-  ServerToClientChannel,
-} from "../../ipc/channels.enum";
 import { ClientPostMessageManager } from "../../ipc/client-ipc";
 import { useStore } from "../../store/useStore";
 import { FileNode } from "../../types/file-node";
@@ -18,7 +13,7 @@ import {
 import { getChangePlanTabs } from "./ChangePlanTabs";
 import "./ChangePlanView.scss";
 import StepIndicators from "./components/step-indicators";
-import { updateOrCreateChangePlan } from "./logic/updateOrCreateChangePlan";
+import { setupChannelHandlers } from "./logic/setupChannelHandlers";
 import {
   resetChangePlanViewStore,
   setChangePlanViewState as setState,
@@ -57,69 +52,7 @@ const App = () => {
 
 
   useEffect(() => {
-    clientIpc.onServerMessage(
-      ServerToClientChannel.SendMessage,
-      ({ message }) => {
-        setState("isLoading")(false);
-        setState("llmResponse")(message);
-        setState("changeDescription")("");
-        setState("currentStep")(ChangePlanSteps.Plan);
-
-        // Update chat history
-        setState("chatHistory")([
-          ...getChangePlanViewState("chatHistory"),
-          { user: "bot", message },
-        ]);
-
-        // Update or add the new change plan
-        updateOrCreateChangePlan(message);
-      }
-    );
-
-    clientIpc.onServerMessage(
-      ServerToClientChannel.StreamMessage,
-      ({ chunk }) => {
-        setState("llmResponse")(getChangePlanViewState('llmResponse') + chunk);
-      }
-    );
-
-    // Request workspace files on component mount
-    clientIpc.sendToServer(ClientToServerChannel.RequestWorkspaceFiles, {});
-
-    // Listen for workspace files response
-    clientIpc.onServerMessage(
-      ServerToClientChannel.SendWorkspaceFiles,
-      ({ files }) => {
-        setFiles(files);
-      }
-    );
-
-    // Listener for SendFileCode
-    clientIpc.onServerMessage(
-      ServerToClientChannel.SendFileCode,
-      ({ fileContent, filePath }) => {
-        if (filePath) {
-          try {
-            console.log(fileContent);
-            console.log(`File ${filePath} updated successfully.`);
-          } catch (err) {
-            console.error(`Error updating file ${filePath}:`, err);
-          }
-        }
-      }
-    );
-
-    clientIpc.onServerMessage(
-      ServerToClientChannel.SetChangePlanViewState,
-      (data) => {
-        console.log({ data });
-        setState(data.keyPath)(data.value);
-      }
-    );
-
-    clientIpc.sendToServer(ClientToServerChannel.FetchStore, {
-      storeName: "changePlanViewState",
-    });
+    setupChannelHandlers(setFiles);
   }, []);
 
   const handleStepClick = (step: ChangePlanSteps) => {
