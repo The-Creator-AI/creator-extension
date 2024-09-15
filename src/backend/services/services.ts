@@ -3,13 +3,17 @@ import "reflect-metadata";
 import { CreatorService } from "./creator.service";
 import { LlmService } from "./llm.service";
 import { SettingsRepository } from "../repositories/settings.repository";
+import { ChatRepository } from "../repositories/chat.respository";
+import { PersistentStoreRepository } from "../repositories/persistent-store.repository";
 
 export class Services {
   static injector: ReflectiveInjector;
 
   static async initialize(): Promise<void> {
     Services.injector = ReflectiveInjector.resolveAndCreate([
+      ChatRepository,
       SettingsRepository,
+      PersistentStoreRepository,
       CreatorService,
       LlmService,
     ]);
@@ -21,5 +25,9 @@ export class Services {
 
   static getLlmService(): LlmService {
     return Services.injector.get(LlmService);
+  }
+
+  static getPersistentStoreRepository(): PersistentStoreRepository {
+    return Services.injector.get(PersistentStoreRepository);
   }
 }

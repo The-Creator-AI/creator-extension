@@ -144,6 +144,10 @@ const App = () => {
         setState(data.keyPath)(data.value);
       }
     );
+
+    clientIpc.sendToServer(ClientToServerChannel.FetchStore, {
+      storeName: "changePlanViewState",
+    });
   }, []);
 
   const handleFileClick = (filePath: string) => {

@@ -11,6 +11,8 @@ import { handleSendMessage } from "./utils/handleSendMessage";
 import { handleWorkspaceFilesRequest } from "./utils/handleWorkspaceFilesRequest";
 import { handleActiveTabChange } from "./utils/handleActiveTabChange";
 import { handleStreamMessage } from "./utils/handleStreamMessage";
+import { Services } from "../../backend/services/services";
+import { ChangePlanViewStore } from "./store/change-plan-view.state-type";
 
 // Function to get HTML for change plan view
 export function getChangePlanViewHtml(
@@ -50,6 +52,29 @@ export function handleChangePlanViewMessages(
       handleFileOpen(data);
     }
   );
+
+  serverIpc.onClientMessage(ClientToServerChannel.PersistStore, (data) => {
+    const { storeName, storeState } = data;
+    if (storeName === "changePlanViewState") {
+      Services.getPersistentStoreRepository().setChangePlanViewState(
+        storeState
+      );
+    }
+  });
+
+  serverIpc.onClientMessage(ClientToServerChannel.FetchStore, (data) => {
+    const { storeName } = data;
+    if (storeName === "changePlanViewState") {
+      const storeState =
+        Services.getPersistentStoreRepository().getChangePlanViewState<ChangePlanViewStore>();
+      for (const key in storeState) {
+        serverIpc.sendToClient(ServerToClientChannel.SetChangePlanViewState, {
+          keyPath: key as keyof ChangePlanViewStore,
+          value: storeState[key],
+        });
+      }
+    }
+  });
 
   handleActiveTabChange(serverIpc);
 }

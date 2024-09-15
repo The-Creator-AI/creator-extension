@@ -6,7 +6,9 @@ export enum ClientToServerChannel {
   RequestWorkspaceFiles = "clientToServer.requestWorkspaceFiles",
   RequestFileCode = "clientToServer.requestFileCode", 
   RequestOpenFile = "clientToServer.requestOpenFile",
-  SendStreamMessage = "clientToServer.sendStreamMessage"
+  SendStreamMessage = "clientToServer.sendStreamMessage",
+  PersistStore = "clientToServer.persistStore", // Add channel for persisting store
+  FetchStore = "clientToServer.fetchStore" // Add channel for fetching store
 }
 
 export enum ServerToClientChannel {
