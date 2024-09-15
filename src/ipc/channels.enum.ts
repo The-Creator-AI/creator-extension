@@ -6,7 +6,7 @@ export enum ClientToServerChannel {
   RequestWorkspaceFiles = "clientToServer.requestWorkspaceFiles",
   RequestFileCode = "clientToServer.requestFileCode", 
   RequestOpenFile = "clientToServer.requestOpenFile",
-  SendStreamMessage = "clientToServer.sendStreamMessage" // Added channel for sending stream messages from client to server
+  SendStreamMessage = "clientToServer.sendStreamMessage"
 }
 
 export enum ServerToClientChannel {
@@ -14,7 +14,7 @@ export enum ServerToClientChannel {
   SendChatHistory = "serverToClient.sendChatHistory",
   SendOpenEditors = "serverToClient.sendOpenEditors",
   SendWorkspaceFiles = "serverToClient.sendWorkspaceFiles",
-  SendFileCode = "serverToClient.sendFileCode", 
-  SendActiveTab = "clientToServer.sendActiveTab",
-  StreamMessage = "serverToClient.streamMessage" // Added channel for sending stream messages from server to client
+  SendFileCode = "serverToClient.sendFileCode",
+  StreamMessage = "serverToClient.streamMessage",
+  SetChangePlanViewState = "clientToServer.setChangePlanViewState"
 }

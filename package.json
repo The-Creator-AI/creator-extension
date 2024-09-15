@@ -10,11 +10,7 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onView:fileExplorer",
-    "onView:creatorChat",
-    "onView:changePlan"
-  ],
+  "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {

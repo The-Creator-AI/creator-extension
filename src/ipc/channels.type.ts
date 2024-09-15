@@ -1,6 +1,8 @@
 import { FileNode } from "../types/file-node";
 import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
 import { ChatMessage } from "../backend/repositories/chat.respository";
+import { KeyPaths, KeyPathValue } from "../utils/key-path";
+import { ChangePlanViewStore } from "../views/change-plan-view/store/change-plan-view.state-type";
 
 export type ChannelBody<
   T extends ClientToServerChannel | ServerToClientChannel
@@ -65,6 +67,9 @@ export type ChannelBody<
       filePath: string;
       fileContent: string;
     }
-  : T extends ServerToClientChannel.SendActiveTab
-  ? { filePath: string }
+  : T extends ServerToClientChannel.SetChangePlanViewState
+  ? {
+      keyPath: KeyPaths<ChangePlanViewStore>;
+      value: KeyPathValue<KeyPaths<ChangePlanViewStore>, ChangePlanViewStore>;
+    }
   : never;

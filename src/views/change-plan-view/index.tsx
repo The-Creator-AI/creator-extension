@@ -137,11 +137,11 @@ const App = () => {
       }
     );
 
-    // Listens for SendActiveTabChange
     clientIpc.onServerMessage(
-      ServerToClientChannel.SendActiveTab,
-      ({ filePath }) => {
-        setState("activeTab")(filePath);
+      ServerToClientChannel.SetChangePlanViewState,
+      (data) => {
+        console.log({ data });
+        setState(data.keyPath)(data.value);
       }
     );
   }, []);
