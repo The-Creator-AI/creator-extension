@@ -9,13 +9,19 @@ import { commitStagedChanges } from '../../logic/commitStagedChanges';
 
 const CommitStep: React.FC = () => {
     const {
+        chatHistory,
         commitSuggestions,
         commitSuggestionsLoading
     } = useStore(changePlanViewStoreStateSubject);
 
     useEffect(() => {
-        setChangePlanViewState("commitSuggestionsLoading")(true);
-        requestCommitMessageSuggestions();
+        if (chatHistory.length === 0) {
+            setChangePlanViewState("commitSuggestionsLoading")(false);
+            return;
+        } else {
+            setChangePlanViewState("commitSuggestionsLoading")(true);
+            requestCommitMessageSuggestions();
+        }
         handleCommitMessageSuggestions();
     }, []);
 
@@ -34,7 +40,9 @@ const CommitStep: React.FC = () => {
 
     return (
         <div className="p-4">
-            {commitSuggestionsLoading ? (
+            {chatHistory.length === 0 ? (
+                <p className="text-gray-600">No changes to commit.</p>
+            ) : commitSuggestionsLoading ? (
                 <div className="flex flex-col items-center">
                     {renderLoader()}
                     <p className="text-gray-600">Loading commit message suggestions...</p>
