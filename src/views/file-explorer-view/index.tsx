@@ -5,7 +5,7 @@ import { ClientPostMessageManager } from '../../ipc/client-ipc';
 import { ClientToServerChannel, ServerToClientChannel } from '../../ipc/channels.enum';
 import FileTree from '../../components/file-tree/FileTree';
 import { useState, useEffect } from 'react';
-import { FileNode } from 'src/types/file-node';
+import { FileNode } from '../../types/file-node';
 
 const App = () => {
     const [files, setFiles] = useState<FileNode[]>([]);

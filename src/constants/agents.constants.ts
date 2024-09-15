@@ -553,6 +553,7 @@ export const AGENTS = {
     
     Note:
     * If a new file is to be added or created, you can provide the file path and its recommendations. We will take care of creating the file.
+    * Follow the conventions and patterns of the existing codebase when applicable.
     `,
   },
   "Code Plan Update": {
@@ -747,6 +748,10 @@ export const AGENTS = {
           return n * factorial(n - 1)
   \`\`\`
   
-  Remember to adapt your responses to the specific requirements of each user request while maintaining this structure and level of completeness. Use the appropriate language identifier for the code block (e.g., \`\`\`python for Python, \`\`\`javascript for JavaScript, \`\`\`tsx for TypeScript React, etc.).`,
+  Remember to adapt your responses to the specific requirements of each user request while maintaining this structure and level of completeness. Use the appropriate language identifier for the code block (e.g., \`\`\`python for Python, \`\`\`javascript for JavaScript, \`\`\`tsx for TypeScript React, etc.).
+  
+  Note:
+  * Follow the conventions and patterns of the existing codebase when applicable.
+  `,
   },
 };

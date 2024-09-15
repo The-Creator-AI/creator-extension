@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MdChevronRight } from 'react-icons/md';
 import TreeView from '../tree-view/TreeView'; // Import the generic TreeView
-import { FileNode } from 'src/types/file-node';
+import { FileNode } from '../../types/file-node';
 import { getFileNodeByPath, addRemovePathInSelectedFiles } from './FileTree.utils';
 import Checkbox from '../Checkbox';
 

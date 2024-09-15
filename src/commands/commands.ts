@@ -1,4 +1,5 @@
 import { ChatRepository } from "../backend/repositories/chat.respository";
+import { Services } from "../backend/services/services";
 import * as vscode from "vscode";
 
 // Define an array of commands with their corresponding callback functions
@@ -26,6 +27,13 @@ export const commands = [
         // to trigger an update in the chat view's content
         // (This would typically be done in the chat-view.ts file where you have access to the webviewView)
       }
+    },
+  },
+  {
+    commandId: "creator-extension.resetClearChangePlanViewState",
+    callback: async () => {
+      const persistentStoreRepository = Services.getPersistentStoreRepository();
+      await persistentStoreRepository.clearChangePlanViewState();
     },
   },
   // Add more commands as needed
