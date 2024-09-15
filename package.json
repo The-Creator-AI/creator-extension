@@ -38,6 +38,9 @@
       {
         "command": "creator-extension.resetClearChangePlanViewState",
         "title": "Creator AI: Clear Change Plan View State"
+      }, {
+              "command": "creator-extension.chooseChangePlan",
+        "title": "Creator AI: Choose Change Plan"
       }
     ],
     "viewsContainers": {
@@ -74,7 +77,13 @@
           "command": "creator-extension.clearChatHistory",
           "when": "view == viewType.sidebar.chat",
           "group": "navigation"
-        }
+        },
+        {
+          "command": "creator-extension.chooseChangePlan",
+          "when": "view == viewType.sidebar.changePlan",
+          "group": "navigation",
+          "title": "Choose Plan"
+         }
       ]
     }
   },

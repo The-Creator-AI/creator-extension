@@ -1,5 +1,4 @@
 import { useStore } from "@/store/useStore";
-import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import * as ReactDOM from "react-dom/client";
@@ -77,18 +76,7 @@ const App = () => {
         handleStepClick={handleStepClick}
       />
       <div className="flex flex-grow flex-col overflow-hidden">
-        <VSCodeDropdown
-          className="w-full p-2 mb-2"
-        // placeholder="Select a plan"
-        // value={selectedPlanTitle}
-        // onChange={handlePlanChange}
-        >
-          {getChangePlanViewState("changePlans").map((plan) => (
-            <VSCodeOption key={plan.planTitle} value={plan.planTitle}>
-              {plan.planTitle}
-            </VSCodeOption>
-          ))}
-        </VSCodeDropdown>
+        {/* Dropdown removed */}
         {changePlanTabs[currentTab].renderStep()}
       </div>
       {isLoading && renderLoader()}

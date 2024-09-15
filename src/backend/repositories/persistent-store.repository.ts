@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { StorageKeysEnum } from "../types/storage-keys.enum";
 import { getContext } from "../../extension";
+import {ChangePlanViewStore} from '@/views/change-plan-view/store/change-plan-view.state-type';
 
 export class PersistentStoreRepository {
   private readonly workspaceState: vscode.Memento;
@@ -9,14 +10,14 @@ export class PersistentStoreRepository {
     this.workspaceState = getContext().workspaceState;
   }
 
-  public getChangePlanViewState<T>(): T | undefined {
-    const data = this.workspaceState.get<T>(
+  public getChangePlanViewState(): ChangePlanViewStore | undefined {
+    const data = this.workspaceState.get<ChangePlanViewStore>(
       StorageKeysEnum.ChangePlanViewState
     );
     return data;
   }
 
-  public setChangePlanViewState(data: unknown): void {
+  public setChangePlanViewState(data: ChangePlanViewStore): void {
     this.workspaceState.update(StorageKeysEnum.ChangePlanViewState, data);
   }
 

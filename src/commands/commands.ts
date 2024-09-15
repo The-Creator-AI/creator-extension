@@ -1,6 +1,9 @@
+import { remoteSetChangePlanViewState } from "@/views/change-plan-view/utils/remoteSetChangePlanViewState";
 import { ChatRepository } from "../backend/repositories/chat.respository";
 import { Services } from "../backend/services/services";
 import * as vscode from "vscode";
+import { serverIPCs } from "@/views/register-views";
+import {VIEW_TYPES} from '@/views/view-types';
 
 // Define an array of commands with their corresponding callback functions
 export const commands = [
@@ -36,5 +39,32 @@ export const commands = [
       await persistentStoreRepository.clearChangePlanViewState();
     },
   },
-  // Add more commands as needed
+  {
+    commandId: "creator-extension.chooseChangePlan",
+    callback: async () => {
+      const persistentStoreRepository = Services.getPersistentStoreRepository();
+      const store = persistentStoreRepository.getChangePlanViewState();
+      const changePlans = store?.changePlans || [];
+  
+      // Show quick pick with plan titles
+      const selectedPlanTitle = await vscode.window.showQuickPick(changePlans.map(plan => {
+        return {
+          label: plan.planTitle,
+          description: plan.lastUpdatedAt.toString()
+        };
+      }));
+  
+      if (selectedPlanTitle) {
+        // Update state with selected plan
+        const selectedPlan = changePlans.find(plan => plan.planTitle === selectedPlanTitle.label);
+        if (selectedPlan) {
+          const serverIpc = serverIPCs[VIEW_TYPES.SIDEBAR.CHANGE_PLAN];
+          remoteSetChangePlanViewState(serverIpc, "changeDescription", selectedPlan.planDescription);
+          remoteSetChangePlanViewState(serverIpc, "llmResponse", selectedPlan.llmResponse);
+          remoteSetChangePlanViewState(serverIpc, "selectedFiles", selectedPlan.selectedFiles);
+          remoteSetChangePlanViewState(serverIpc, "chatHistory", selectedPlan.chatHistory);
+        }
+      }
+    }
+  },
 ];
