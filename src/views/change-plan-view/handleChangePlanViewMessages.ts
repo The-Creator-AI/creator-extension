@@ -110,12 +110,29 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.CommitStagedChanges,
     async (message) => {
       console.log("Committing staged changes with message:", message.message);
+
+      // Set commitSuggestionsLoading to true before initiating the commit
+      serverIpc.sendToClient(ServerToClientChannel.SetChangePlanViewState, {
+        keyPath: "commitSuggestionsLoading",
+        value: true,
+      });
+
       try {
         // Use the publicly available VS Code command to commit the staged changes with the provided message
-        gitCommit(message.message);
+        await gitCommit(message.message);
       } catch (error) {
         // Handle any errors during the commit process
         console.error("Error committing changes:", error);
+      } finally {
+        // Reset commit suggestions and loading state after the commit, regardless of success or failure
+        serverIpc.sendToClient(ServerToClientChannel.SetChangePlanViewState, {
+          keyPath: "commitSuggestions",
+          value: [],
+        });
+        serverIpc.sendToClient(ServerToClientChannel.SetChangePlanViewState, {
+          keyPath: "commitSuggestionsLoading",
+          value: false,
+        });
       }
     }
   );
