@@ -30,6 +30,9 @@ import FileTree from "../../components/file-tree/FileTree";
 import { ChatMessage } from "../../backend/repositories/chat.respository";
 import { AGENTS } from "../../constants/agents.constants";
 import ErrorBoundary from "../../components/ErrorBoundary";
+import { parseJsonResponse } from "../../utils/parse-json";
+import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
+import { get } from "http";
 
 const App = () => {
   const {
@@ -97,10 +100,15 @@ const App = () => {
         setState("llmResponse")(message);
         setState("changeDescription")("");
         setState("currentStep")(ChangePlanSteps.Plan);
+
+        // Update chat history
         setState("chatHistory")([
           ...getChangePlanViewState("chatHistory"),
           { user: "bot", message },
         ]);
+
+        // Update or add the new change plan
+        updateOrCreateChangePlan(message);
       }
     );
 
@@ -204,12 +212,12 @@ const App = () => {
       ...(getChangePlanViewState("chatHistory").length < 1 || !llmResponse
         ? [{ user: "instructor", message: AGENTS["Code Plan"]?.systemInstructions }]
         : [
-          ...getChangePlanViewState("chatHistory"), // Use chatHistory from store
-          {
-            user: "instructor",
-            message: AGENTS["Code Plan Update"]?.systemInstructions,
-          },
-        ]),
+            ...getChangePlanViewState("chatHistory"), // Use chatHistory from store
+            {
+              user: "instructor",
+              message: AGENTS["Code Plan Update"]?.systemInstructions,
+            },
+          ]),
       { user: "user", message: changeDescription },
     ];
     setState("chatHistory")(newChatHistory); // Update chatHistory in the store
@@ -237,6 +245,49 @@ const App = () => {
     </div>
   );
 
+  const updateOrCreateChangePlan = (llmResponse: string) => {
+    try {
+      const planJson = parseJsonResponse(llmResponse);
+      const planTitle = planJson.title;
+      const planDescription = planJson.description;
+
+      const changePlans = getChangePlanViewState("changePlans");
+      const existingPlanIndex = changePlans.findIndex(
+        (plan) => plan.planTitle === planTitle
+      );
+
+      const updatedChangePlans = [...changePlans];
+
+      if (existingPlanIndex !== -1) {
+        // Update existing plan
+        updatedChangePlans[existingPlanIndex] = {
+          ...updatedChangePlans[existingPlanIndex],
+          planDescription,
+          llmResponse,
+          planJson,
+          chatHistory: getChangePlanViewState("chatHistory"),
+          selectedFiles: getChangePlanViewState("selectedFiles"),
+          lastUpdatedAt: Date.now(),
+        };
+      } else {
+        // Create a new plan
+        updatedChangePlans.push({
+          planTitle,
+          planDescription,
+          llmResponse,
+          planJson,
+          chatHistory: getChangePlanViewState("chatHistory"),
+          selectedFiles: getChangePlanViewState("selectedFiles"),
+          lastUpdatedAt: Date.now(),
+        });
+      }
+
+      setState("changePlans")(updatedChangePlans);
+    } catch (error) {
+      console.error("Error parsing or updating change plan:", error);
+    }
+  };
+
   return (
     <div className="h-full fixed inset-0 flex flex-col justify-between">
       <div className="flex justify-end p-2">
@@ -253,6 +304,18 @@ const App = () => {
         handleStepClick={handleStepClick}
       />
       <div className="flex flex-grow flex-col overflow-hidden">
+        <VSCodeDropdown
+            className="w-full p-2 mb-2"
+            // placeholder="Select a plan"
+            // value={selectedPlanTitle}
+            // onChange={handlePlanChange}
+          >
+          {getChangePlanViewState("changePlans").map((plan) => (
+            <VSCodeOption key={plan.planTitle} value={plan.planTitle}>
+              {plan.planTitle}
+            </VSCodeOption>
+          ))}
+          </VSCodeDropdown>
         {changePlanStepsConfig[currentStep].renderStep()}
       </div>
       {isLoading && renderLoader()}

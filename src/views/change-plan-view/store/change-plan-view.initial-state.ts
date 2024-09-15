@@ -8,5 +8,6 @@ export const initialState: ChangePlanViewStore = {
   currentStep: ChangePlanSteps.Plan,
   selectedFiles: [],
   chatHistory: [],
-  activeTab: undefined
+  activeTab: undefined,
+  changePlans: [] // Initialize changePlans with an empty array
 };

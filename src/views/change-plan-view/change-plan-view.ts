@@ -67,6 +67,7 @@ export function handleChangePlanViewMessages(
     if (storeName === "changePlanViewState") {
       const storeState =
         Services.getPersistentStoreRepository().getChangePlanViewState<ChangePlanViewStore>();
+      console.log("storeState", storeState);
       for (const key in storeState) {
         serverIpc.sendToClient(ServerToClientChannel.SetChangePlanViewState, {
           keyPath: key as keyof ChangePlanViewStore,
