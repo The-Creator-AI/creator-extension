@@ -34,7 +34,7 @@ export async function handleFileOpen(
       }
     }
 
-    await vscode.window.showTextDocument(vscode.Uri.file(absoluteFilePath));
+    await vscode.window.showTextDocument(vscode.Uri.file(absoluteFilePath), { preview: false });
   } catch (error) {
     vscode.window.showErrorMessage(`Error opening file: ${error}`);
   }

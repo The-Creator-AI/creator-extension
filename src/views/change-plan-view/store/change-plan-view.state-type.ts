@@ -8,4 +8,5 @@ export interface ChangePlanViewStore {
   currentStep: ChangePlanSteps;
   selectedFiles: string[];
   chatHistory: ChatMessage[];
+  activeTab: string | undefined;
 }

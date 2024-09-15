@@ -5,7 +5,7 @@ export enum ClientToServerChannel {
   SendSelectedEditor = "clientToServer.sendSelectedEditor",
   RequestWorkspaceFiles = "clientToServer.requestWorkspaceFiles",
   RequestFileCode = "clientToServer.requestFileCode", 
-  RequestOpenFile = "clientToServer.requestOpenFile" // Add new channel for requesting to open a file
+  RequestOpenFile = "clientToServer.requestOpenFile"
 }
 
 export enum ServerToClientChannel {
@@ -14,4 +14,5 @@ export enum ServerToClientChannel {
   SendOpenEditors = "serverToClient.sendOpenEditors",
   SendWorkspaceFiles = "serverToClient.sendWorkspaceFiles",
   SendFileCode = "serverToClient.sendFileCode", 
+  SendActiveTab = "clientToServer.sendActiveTab"
 }

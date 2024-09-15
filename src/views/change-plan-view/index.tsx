@@ -38,6 +38,7 @@ const App = () => {
     llmResponse,
     currentStep,
     selectedFiles,
+    activeTab,
   } = useStore(changePlanViewStoreStateSubject);
   const [files, setFiles] = useState<FileNode[]>([]);
   const [recentFiles, setRecentFiles] = useState<string[]>([]);
@@ -126,6 +127,14 @@ const App = () => {
             console.error(`Error updating file ${filePath}:`, err);
           }
         }
+      }
+    );
+
+    // Listens for SendActiveTabChange
+    clientIpc.onServerMessage(
+      ServerToClientChannel.SendActiveTab,
+      ({ filePath }) => {
+        setState("activeTab")(filePath);
       }
     );
   }, []);

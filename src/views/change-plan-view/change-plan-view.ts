@@ -1,11 +1,14 @@
 import * as vscode from "vscode";
-import { ClientToServerChannel } from "../../ipc/channels.enum";
+import {
+  ClientToServerChannel
+} from "../../ipc/channels.enum";
 import { ServerPostMessageManager } from "../../ipc/server-ipc";
+import { getViewHtml } from "../../utils/get-view-html";
 import { handleFileCodeUpdate } from "./utils/handleFileCodeUpdate";
+import { handleFileOpen } from "./utils/handleFileOpen";
 import { handleSendMessage } from "./utils/handleSendMessage";
 import { handleWorkspaceFilesRequest } from "./utils/handleWorkspaceFilesRequest";
-import { getViewHtml } from "../../utils/get-view-html";
-import { handleFileOpen } from "./utils/handleFileOpen";
+import { handleActiveTabChange } from "./utils/handleActiveTabChange";
 
 // Function to get HTML for change plan view
 export function getChangePlanViewHtml(
@@ -35,7 +38,12 @@ export function handleChangePlanViewMessages(
     handleSendMessage(serverIpc, data)
   );
 
-  serverIpc.onClientMessage(ClientToServerChannel.RequestOpenFile, async (data) => {
-    handleFileOpen(data);
-  });
+  serverIpc.onClientMessage(
+    ClientToServerChannel.RequestOpenFile,
+    async (data) => {
+      handleFileOpen(data);
+    }
+  );
+
+  handleActiveTabChange(serverIpc);
 }

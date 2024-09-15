@@ -7,5 +7,6 @@ export const initialState: ChangePlanViewStore = {
   llmResponse: "",
   currentStep: ChangePlanSteps.Plan,
   selectedFiles: [],
-  chatHistory: []
+  chatHistory: [],
+  activeTab: undefined
 };

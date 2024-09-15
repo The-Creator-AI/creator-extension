@@ -14,6 +14,7 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
 
     const clientIpc = ClientPostMessageManager.getInstance();
     const chatHistory = getChangePlanViewState('chatHistory');
+    const activeTab = getChangePlanViewState('activeTab');
 
     const transformRecommendationsForTreeView = (recommendations: any[]): any[] => {
         return recommendations.map((recommendation, index) => {
@@ -80,8 +81,9 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
             {/* Render code plan using TreeView */}
             <TreeView
                 data={transformCodePlanForTreeView(jsonData.code_plan)}
-                renderNodeContent={(node) => (
-                    <div className={`${node.children ? 'font-medium' : 'font-normal'} p-2 hover:color-primary flex items-center`}>
+                renderNodeContent={(node) => {
+                    const isActive = node.filePath && activeTab && (node.filePath.includes(activeTab) || activeTab?.includes(node.filePath));
+                    return <div className={`${node.children ? 'font-medium' : 'font-normal'} p-2 hover:color-primary flex items-center`} >
                         {node.filePath && <MdDescription
                             size={18}
                             className="mr-2 cursor-pointer hover:text-blue-500"
@@ -90,9 +92,11 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                         {node.value ? <span className="ml-2 font-normal">
                             {renderDot()}
                             {node.value}
-                        </span> : <span onClick={() => handleRequestOpenFile(node.filePath)}>{node.name}</span>}
-                    </div>
-                )}
+                        </span>
+                            : <span onClick={() => handleRequestOpenFile(node.filePath)}
+                                className={`${isActive ? 'text-blue-600' : ''}`}> {node.name}</span>}
+                    </div>;
+                }}
             />
         </div>
     );

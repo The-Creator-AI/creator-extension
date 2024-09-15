@@ -61,4 +61,6 @@ export type ChannelBody<
       filePath: string;
       fileContent: string;
     }
+  : T extends ServerToClientChannel.SendActiveTab
+  ? { filePath: string }
   : never;
