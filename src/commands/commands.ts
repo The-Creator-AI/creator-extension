@@ -46,11 +46,14 @@ export const commands = [
       const store = persistentStoreRepository.getChangePlanViewState();
       const changePlans = store?.changePlans || [];
   
+      // Sort change plans by last updated date (descending)
+      changePlans.sort((a, b) => b.lastUpdatedAt - a.lastUpdatedAt);
+  
       // Show quick pick with plan titles
       const selectedPlanTitle = await vscode.window.showQuickPick(changePlans.map(plan => {
         return {
           label: plan.planTitle,
-          description: plan.lastUpdatedAt.toString()
+          description: new Date(plan.lastUpdatedAt).toLocaleString()
         };
       }));
   
