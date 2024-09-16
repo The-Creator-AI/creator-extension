@@ -16,7 +16,7 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
         <div className="p-4 flex flex-col grow" />
         <div className="p-4 flex flex-col relative" data-testid="change-plan-input-step">
             <AutoResizingTextarea
-                className="p-2 border border-gray-300 rounded font-normal mb-2 pr-10 text-gray-700"
+                className="p-2 border border-gray-300 rounded font-normal mb-2 pr-10"
                 placeholder={isUpdateRequest ? "Describe the changes you want to make to the plan..." : "Describe the code changes you want to plan..."}
                 value={changeDescription}
                 onChange={(e) => handleChange(e.target.value)}

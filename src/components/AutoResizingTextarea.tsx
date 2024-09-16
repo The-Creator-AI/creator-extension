@@ -33,11 +33,8 @@ const AutoResizingTextarea: React.FC<AutoResizingTextareaProps> = ({ placeholder
             placeholder={placeholder}
             value={value}
             onChange={onChange}
-            style={{
-                resize: 'none', // Disable browser resizing
-                overflow: 'hidden', // Hide scrollbar
-                boxSizing: 'border-box', // Include padding and border in the element's total width and height
-            }}
+            style={{ background: 'inherit' }}
+            className={"resize-none overflow-hidden box-border bg-inherit" + (rest.className ? ` ${rest.className}` : '')}
             {...rest}
         />
     );
