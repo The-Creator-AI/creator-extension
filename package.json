@@ -41,7 +41,13 @@
       },
       {
         "command": "creator-extension.chooseChangePlan",
-        "title": "Creator AI: Choose Change Plan"
+        "title": "Creator AI: Choose Change Plan",
+        "icon": "$(history)"
+      },
+      {
+        "command": "creator-extension.newPlan",
+        "title": "Creator AI: New Plan",
+        "icon": "$(sync)"
       }
     ],
     "viewsContainers": {
@@ -84,6 +90,12 @@
           "when": "view == viewType.sidebar.changePlan",
           "group": "navigation",
           "title": "Choose Plan"
+        },
+        {
+          "command": "creator-extension.newPlan",
+          "when": "view == viewType.sidebar.changePlan",
+          "group": "navigation",
+          "title": "New Plan"
         }
       ]
     }

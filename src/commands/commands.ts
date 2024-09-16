@@ -70,4 +70,13 @@ export const commands = [
       }
     }
   },
+  {
+    commandId: "creator-extension.newPlan",
+    callback: async () => {
+      const serverIpc = serverIPCs[VIEW_TYPES.SIDEBAR.CHANGE_PLAN];
+      remoteSetChangePlanViewState(serverIpc, "changeDescription", "");
+      remoteSetChangePlanViewState(serverIpc, "llmResponse", "");
+      remoteSetChangePlanViewState(serverIpc, "chatHistory", []);
+    },
+  },
 ];

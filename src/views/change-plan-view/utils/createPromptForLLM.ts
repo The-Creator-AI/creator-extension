@@ -9,13 +9,7 @@ export function createPromptForLLM(
   filePath: string,
   fileContent: string
 ): string {
-  return `
-  Here's the code for the file: ${filePath}
-
-  \`\`\`
-  ${fileContent}
-  \`\`\`
-
-  Please suggest any necessary updates or modifications to the code based on the plan above and previous conversation:
+  return `Based on the plan above and previous conversation, please give the updated code for the file: ${filePath}.
+  Also please make sure to give full file code in the response.
   `;
 }

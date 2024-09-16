@@ -106,6 +106,7 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
         });
 
         clientIpc.onServerMessage(ServerToClientChannel.SendFileCode, (data) => {
+            console.log({ data });
             const { filePath } = data;
             const fileChunkMap = getChangePlanViewState('fileChunkMap');
             const localFilePath = Object.keys(fileChunkMap).find((key) => key.includes(filePath) || filePath.includes(key));
