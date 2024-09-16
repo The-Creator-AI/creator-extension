@@ -52,7 +52,7 @@ const ApiKeyManagement: React.FC = () => {
           id="serviceSelect"
           value={selectedService || ''}
           onChange={(e) => setSelectedService(e.target.value as LlmServiceEnum)}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-inherit"
         >
           <option value="">Select a service</option>
           {Object.values(LlmServiceEnum).map((service) => (
@@ -70,7 +70,7 @@ const ApiKeyManagement: React.FC = () => {
           <input
             name="apiKeyInput"
             id="apiKeyInput"
-            className="focus:ring-indigo-500 focus:border-indigo-500 flex-grow block w-full min-w-0 rounded-none rounded-l-md sm:text-sm border-gray-300 p-2"
+            className="focus:ring-indigo-500 focus:border-indigo-500 flex-grow block w-full min-w-0 rounded-none rounded-l-md sm:text-sm border-gray-300 p-2 bg-inherit"
             placeholder="Enter your API key"
             value={newApiKey}
             onChange={(e) => setNewApiKey(e.target.value)}
