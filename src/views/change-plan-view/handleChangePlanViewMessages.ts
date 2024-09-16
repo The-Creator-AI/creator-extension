@@ -1,19 +1,18 @@
+import { ChatMessage } from "@/backend/repositories/chat.respository";
+import { Services } from "@/backend/services/services";
 import {
   ClientToServerChannel,
   ServerToClientChannel,
 } from "@/ipc/channels.enum";
 import { ServerPostMessageManager } from "@/ipc/server-ipc";
+import { parseJsonResponse } from "@/utils/parse-json";
+import { ChangePlanViewStore } from "@/views/change-plan-view/store/change-plan-view.state-type";
+import { handleActiveTabChange } from "@/views/change-plan-view/utils/handleActiveTabChange";
 import { handleFileCodeUpdate } from "@/views/change-plan-view/utils/handleFileCodeUpdate";
 import { handleFileOpen } from "@/views/change-plan-view/utils/handleFileOpen";
 import { handleSendMessage } from "@/views/change-plan-view/utils/handleSendMessage";
-import { handleWorkspaceFilesRequest } from "@/views/change-plan-view/utils/handleWorkspaceFilesRequest";
-import { handleActiveTabChange } from "@/views/change-plan-view/utils/handleActiveTabChange";
 import { handleStreamMessage } from "@/views/change-plan-view/utils/handleStreamMessage";
-import { Services } from "@/backend/services/services";
-import { ChangePlanViewStore } from "@/views/change-plan-view/store/change-plan-view.state-type";
-import { ChatMessage } from "@/backend/repositories/chat.respository";
-import { parseJsonResponse } from "@/utils/parse-json";
-import * as vscode from "vscode";
+import { handleWorkspaceFilesRequest } from "@/views/change-plan-view/utils/handleWorkspaceFilesRequest";
 import { gitCommit } from "./utils/gitCommit";
 
 // Function to handle messages for the change plan view
@@ -137,6 +136,61 @@ export function handleChangePlanViewMessages(
           keyPath: "commitSuggestionsLoading",
           value: false,
         });
+      }
+    }
+  );
+
+  // Handle get LLM API keys request
+  serverIpc.onClientMessage(
+    ClientToServerChannel.GetLLMApiKeys,
+    async () => {
+      try {
+        const apiKeys = await Services.getSettingsRepository()
+          .getLLMApiKeys();
+        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys });
+      } catch (error) {
+        console.error('Error getting LLM API keys:', error);
+        // Handle the error appropriately, e.g., send an error message to the client
+      }
+    }
+  );
+
+  // Handle set LLM API key request
+  serverIpc.onClientMessage(
+    ClientToServerChannel.SetLLMApiKey,
+    async ({ service, apiKey }) => {
+      try {
+        await Services.getSettingsRepository()
+          .setLLMApiKey(service, apiKey);
+
+        // After successfully setting the API key, you might want to re-fetch 
+        // the API keys and send them back to the client to update the UI.
+        const updatedApiKeys = await Services.getSettingsRepository()
+          .getLLMApiKeys();
+        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys: updatedApiKeys });
+      } catch (error) {
+        console.error('Error setting LLM API key:', error);
+        // Handle the error appropriately, e.g., send an error message to the client
+      }
+    }
+  );
+
+  // Handle delete LLM API key request
+  serverIpc.onClientMessage(
+    ClientToServerChannel.DeleteLLMApiKey,
+    async ({ service, apiKeyToDelete }) => {
+      try {
+        await Services.getSettingsRepository()
+          .deleteLLMApiKey(service, apiKeyToDelete);
+
+        // After successfully deleting the API key, you might want to re-fetch 
+        // the API keys and send them back to the client to update the UI.
+        const updatedApiKeys = await Services.getSettingsRepository()
+          .getLLMApiKeys();
+        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys: updatedApiKeys });
+      } catch (error) {
+        console.error('Error deleting LLM API key:', error);
+        // Handle the error appropriately, e.g., send an error message to the client
       }
     }
   );

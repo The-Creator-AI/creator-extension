@@ -3,6 +3,7 @@ import { ClientToServerChannel, ServerToClientChannel } from "./channels.enum";
 import { ChatMessage } from "../backend/repositories/chat.respository";
 import { KeyPaths, KeyPathValue } from "../utils/key-path";
 import { ChangePlanViewStore } from "../views/change-plan-view/store/change-plan-view.state-type";
+import { LlmServiceEnum } from "../backend/types/llm-service.enum";
 
 export type ChannelBody<T extends ClientToServerChannel | ServerToClientChannel> =
   T extends ClientToServerChannel.SendMessage
@@ -104,4 +105,12 @@ export type ChannelBody<T extends ClientToServerChannel | ServerToClientChannel>
     ? {
         message: string;
       }
+    : T extends ClientToServerChannel.GetLLMApiKeys
+    ? {}
+    : T extends ClientToServerChannel.SetLLMApiKey
+    ? { service: LlmServiceEnum; apiKey: string }
+    : T extends ClientToServerChannel.DeleteLLMApiKey
+    ? { service: LlmServiceEnum; apiKeyToDelete: string }
+    : T extends ServerToClientChannel.SendLLMApiKeys
+    ? { apiKeys: Record<LlmServiceEnum, string[]> | undefined }
     : never;

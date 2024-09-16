@@ -30,4 +30,8 @@ export class Services {
   static getPersistentStoreRepository(): PersistentStoreRepository {
     return Services.injector.get(PersistentStoreRepository);
   }
+
+  static getSettingsRepository(): SettingsRepository {
+    return Services.injector.get(SettingsRepository);
+  }
 }

@@ -10,6 +10,7 @@ import { ClientPostMessageManager } from "@/ipc/client-ipc";
 import { FileNode } from "@/types/file-node";
 import { handleFileClick } from "./logic/handleFileClick";
 import CommitStep from "./components/commit-step/CommitStep";
+import ApiKeyManagement from './components/api-key-management/ApiKeyManagement'; // Import the new ApiKeyManagement component
 
 export const getChangePlanTabs = (
     {
@@ -33,6 +34,12 @@ export const getChangePlanTabs = (
     const isLoading = getChangePlanViewState("isLoading");
 
     return {
+        [ChangePlanSteps.ApiKeyManagement]: { // Add the new API Keys tab
+            indicatorText: "API Keys",
+            renderStep: () => (
+                <ApiKeyManagement /> // Render the ApiKeyManagement component
+            )
+        },
         [ChangePlanSteps.Context]: {
             indicatorText: "Context",
             renderStep: () => (
