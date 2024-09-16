@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { VSCodeTextArea } from '@vscode/webview-ui-toolkit/react';
 import '../ChangePlanView.scss';
 import { BsSend } from 'react-icons/bs';
-import { TextAreaResize } from '@vscode/webview-ui-toolkit';
+import AutoResizingTextarea from '@/components/AutoResizingTextarea';
 
 interface ChangeInputStepProps {
     changeDescription: string;
@@ -16,20 +15,22 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
     <div className="flex flex-grow flex-col">
         <div className="p-4 flex flex-col grow" />
         <div className="p-4 flex flex-col relative" data-testid="change-plan-input-step">
-            <VSCodeTextArea
-                className="grow p-2 border border-gray-300 rounded resize-y font-normal mb-2 min-h-[50px] max-h-[200px] overflow-hidden pr-10"
+            <AutoResizingTextarea
+                className="p-2 border border-gray-300 rounded font-normal mb-2 pr-10 text-gray-700"
                 placeholder={isUpdateRequest ? "Describe the changes you want to make to the plan..." : "Describe the code changes you want to plan..."}
                 value={changeDescription}
                 onChange={(e) => handleChange(e.target.value)}
                 disabled={isLoading}
                 data-testid="change-description-textarea"
-                resize={TextAreaResize.vertical}
                 onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-                    if (e.key === 'Enter' && !e.shiftKey) { // Check if Enter is pressed without Shift
-                        e.preventDefault(); // Prevent default form submission
+                    if (e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey)) {
+                        e.preventDefault();
                         handleSubmit();
                     }
                 }}
+                minRows={2}
+                maxRows={10}
+                autoFocus
             />
             <BsSend
                 className="absolute right-7 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-blue-500"

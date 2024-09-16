@@ -143,7 +143,8 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                             <MdDescription
                                 size={18}
                                 className={`mr-2 cursor-pointer ${isLoading ? 'text-gray-400' : 'hover:text-blue-500'} `}
-                                onClick={!isLoading ? () => handleRequestFileCode(node.filePath) : undefined}
+                                // onClick={!isLoading ? () => handleRequestFileCode(node.filePath) : undefined}
+                                onClick={() => handleRequestFileCode(node.filePath)}
                             />
                             <span onClick={() => handleRequestOpenFile(node.filePath)}
                                 className={`${isActive ? 'text-blue-600' : ''}`}> {node.name}</span>
