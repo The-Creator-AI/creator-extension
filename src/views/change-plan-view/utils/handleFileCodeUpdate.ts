@@ -9,7 +9,9 @@ import { Services } from "../../../backend/services/services";
 import { getFileContent } from "./getFileContent";
 import { createPromptForLLM } from "./createPromptForLLM";
 import { AGENTS } from "../../../constants/agents.constants";
-import { ServerToClientChannel } from "../../../ipc/channels.enum";
+import {
+  ServerToClientChannel
+} from "../../../ipc/channels.enum";
 import { ServerPostMessageManager } from "../../../ipc/server-ipc";
 
 /**
@@ -19,12 +21,14 @@ import { ServerPostMessageManager } from "../../../ipc/server-ipc";
  * @param data An object containing the file path and chat history.
  */
 export async function handleFileCodeUpdate(
-    serverIpc: ServerPostMessageManager,
-    data: {
-  filePath: string;
-  chatHistory: any[];
-}) {
-  const { filePath, chatHistory } = data;
+  serverIpc: ServerPostMessageManager,
+  data: {
+    filePath: string;
+    chatHistory: any[];
+    selectedFiles: string[];
+  }
+) {
+  const { filePath, chatHistory, selectedFiles } = data;
 
   const absoluteFilePath = await resolveFilePath(filePath);
   if (!absoluteFilePath) {
@@ -57,10 +61,15 @@ export async function handleFileCodeUpdate(
       ...chatHistory,
       { user: "instructor", message: AGENTS.Developer.systemInstructions },
       { user: "user", message: finalMessage },
-    ]);
+    ], selectedFiles, (chunk: string) => {
+      serverIpc.sendToClient(ServerToClientChannel.StreamFileCode, {
+        filePath: absoluteFilePath,
+        chunk
+      });
+    });
 
+    // Send the complete code after all chunks have been sent
     const updatedCode = extractCodeFromResponse(response.response);
-
     await writeFileContent(absoluteFilePath, updatedCode);
 
     await openFileAndShowDiff(absoluteFilePath);

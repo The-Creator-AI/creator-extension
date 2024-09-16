@@ -60,11 +60,23 @@ export type ChannelBody<T extends ClientToServerChannel | ServerToClientChannel>
     ? {
         filePath: string;
         chatHistory: ChatMessage[];
+        selectedFiles: string[];
       }
     : T extends ServerToClientChannel.SendFileCode
     ? {
         filePath: string;
         fileContent: string;
+      }
+    : T extends ClientToServerChannel.RequestStreamFileCode
+    ? {
+        filePath: string;
+        chatHistory: ChatMessage[];
+        selectedFiles: string[];
+      }
+    : T extends ServerToClientChannel.StreamFileCode
+    ? {
+        filePath: string;
+        chunk: string;
       }
     : T extends ClientToServerChannel.PersistStore
     ? {

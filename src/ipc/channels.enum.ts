@@ -7,10 +7,11 @@ export enum ClientToServerChannel {
   RequestFileCode = "clientToServer.requestFileCode", 
   RequestOpenFile = "clientToServer.requestOpenFile",
   SendStreamMessage = "clientToServer.sendStreamMessage",
-  PersistStore = "clientToServer.persistStore", // Add channel for persisting store
-  FetchStore = "clientToServer.fetchStore", // Add channel for fetching store
+  PersistStore = "clientToServer.persistStore", 
+  FetchStore = "clientToServer.fetchStore", 
   RequestCommitMessageSuggestions = "clientToServer.requestCommitMessageSuggestions",
-  CommitStagedChanges = "clientToServer.commitStagedChanges"
+  CommitStagedChanges = "clientToServer.commitStagedChanges",
+  RequestStreamFileCode = "clientToServer.requestStreamFileCode" 
 }
 
 export enum ServerToClientChannel {
@@ -20,6 +21,7 @@ export enum ServerToClientChannel {
   SendWorkspaceFiles = "serverToClient.sendWorkspaceFiles",
   SendFileCode = "serverToClient.sendFileCode",
   StreamMessage = "serverToClient.streamMessage",
-  SetChangePlanViewState = "clientToServer.setChangePlanViewState",
-  SendCommitMessageSuggestions = "serverToClient.sendCommitMessageSuggestions"
+  SetChangePlanViewState = "serverToClient.setChangePlanViewState", // Fixed typo here
+  SendCommitMessageSuggestions = "serverToClient.sendCommitMessageSuggestions",
+  StreamFileCode = "serverToClient.streamFileCode" 
 }

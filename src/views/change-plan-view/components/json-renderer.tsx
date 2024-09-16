@@ -4,17 +4,25 @@ import * as React from "react";
 import TreeView from "../../../components/tree-view/TreeView";
 import { MdDescription } from 'react-icons/md';
 import { ClientPostMessageManager } from '../../../ipc/client-ipc';
-import { ClientToServerChannel } from '../../../ipc/channels.enum';
+import { ClientToServerChannel, ServerToClientChannel } from '../../../ipc/channels.enum';
 import { getChangePlanViewState } from '../store/change-plan-view.store';
+import { useState } from 'react';
+import {useStore} from '@/store/useStore';
+import {changePlanViewStoreStateSubject} from '@/views/change-plan-view/store/change-plan-view.store';
+import { setChangePlanViewState } from "../store/change-plan-view.logic";
 
 const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     if (!jsonData) {
         return null;
     }
+    const {
+        fileChunkMap
+      } = useStore(changePlanViewStoreStateSubject);
 
     const clientIpc = ClientPostMessageManager.getInstance();
     const chatHistory = getChangePlanViewState('chatHistory');
     const activeTab = getChangePlanViewState('activeTab');
+    const selectedFiles = getChangePlanViewState('selectedFiles');
 
     const transformRecommendationsForTreeView = (recommendations: any[]): any[] => {
         return recommendations.map((recommendation, index) => {
@@ -59,7 +67,6 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
         );
     };
 
-
     const handleRequestOpenFile = (filePath: string) => {
         clientIpc.sendToServer(ClientToServerChannel.RequestOpenFile, {
             filePath
@@ -67,11 +74,51 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     };
 
     const handleRequestFileCode = (filePath: string) => {
-        clientIpc.sendToServer(ClientToServerChannel.RequestFileCode, {
+        const fileChunkMap = getChangePlanViewState('fileChunkMap');
+        const updatedFileChunkMap = {
+            ...fileChunkMap,
+            [filePath]: {
+                isLoading: true,
+                fileContent: ''
+            }
+        };
+        setChangePlanViewState('fileChunkMap')(updatedFileChunkMap);
+        clientIpc.sendToServer(ClientToServerChannel.RequestStreamFileCode, {
             filePath,
-            chatHistory
+            chatHistory,
+            selectedFiles,
         });
     };
+
+    React.useEffect(() => {
+        clientIpc.onServerMessage(ServerToClientChannel.StreamFileCode, (data) => {
+            const { filePath, chunk } = data;
+            const fileChunkMap = getChangePlanViewState('fileChunkMap');
+            const localFilePath = Object.keys(fileChunkMap).find((key) => key.includes(filePath) || filePath.includes(key));
+            const updatedFileChunkMap = {
+                ...fileChunkMap,
+                [localFilePath]: {
+                    ...fileChunkMap[localFilePath],
+                    fileContent: (fileChunkMap[localFilePath]?.fileContent || '') + chunk
+                }
+            };
+            setChangePlanViewState('fileChunkMap')(updatedFileChunkMap);
+        });
+
+        clientIpc.onServerMessage(ServerToClientChannel.SendFileCode, (data) => {
+            const { filePath } = data;
+            const fileChunkMap = getChangePlanViewState('fileChunkMap');
+            const localFilePath = Object.keys(fileChunkMap).find((key) => key.includes(filePath) || filePath.includes(key));
+            const updatedFileChunkMap = {
+                ...fileChunkMap,
+                [localFilePath]: {
+                    ...fileChunkMap[localFilePath],
+                    isLoading: false
+                }
+            };
+            setChangePlanViewState('fileChunkMap')(updatedFileChunkMap);
+        });
+    }, []);
 
     return (
         <div className="json-container p-4">
@@ -83,18 +130,33 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                 data={transformCodePlanForTreeView(jsonData.code_plan)}
                 renderNodeContent={(node) => {
                     const isActive = node.filePath && activeTab && (node.filePath.includes(activeTab) || activeTab?.includes(node.filePath));
-                    return <div className={`${node.children ? 'font-medium' : 'font-normal'} p-2 hover:color-primary flex items-center`} >
-                        {node.filePath && <MdDescription
-                            size={18}
-                            className="mr-2 cursor-pointer hover:text-blue-500"
-                            onClick={() => handleRequestFileCode(node.filePath)}
-                        />}
+                    const isLoading = fileChunkMap[node.filePath]?.isLoading;
+                    const fileContent = fileChunkMap[node.filePath]?.fileContent; 
+                    return <div className={`${node.children ? 'font-medium' : 'font-normal'} p-2 hover:color-primary flex items-center relative`} >
+                        {node.filePath && <div className="flex items-center">
+                            {/* Display spinner when loading */}
+                            {isLoading && (
+                                <span className="loader mr-2"> 
+                                    <div className="spinner w-4 h-4 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
+                                </span>
+                            )}
+                            <MdDescription
+                                size={18}
+                                className={`mr-2 cursor-pointer ${isLoading ? 'text-gray-400' : 'hover:text-blue-500'} `}
+                                onClick={!isLoading ? () => handleRequestFileCode(node.filePath) : undefined}
+                            />
+                            <span onClick={() => handleRequestOpenFile(node.filePath)}
+                                className={`${isActive ? 'text-blue-600' : ''}`}> {node.name}</span>
+                            {/* Display character count when loading */}
+                            {isLoading && fileContent?.length ? (
+                                <span className="text-xs text-gray-500 ml-2">({fileContent?.length} ++)</span>
+                            ) : null}
+                        </div>}
                         {node.value ? <span className="ml-2 font-normal">
                             {renderDot()}
-                            {node.value}
+                            {JSON.stringify(node.value)}
                         </span>
-                            : <span onClick={() => handleRequestOpenFile(node.filePath)}
-                                className={`${isActive ? 'text-blue-600' : ''}`}> {node.name}</span>}
+                            : null} 
                     </div>;
                 }}
             />

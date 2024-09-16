@@ -104,7 +104,7 @@ ${fileContents[filePath]}
 
         for await (const chunk of response.stream) {
           responseText += chunk.text();
-          console.log(chunk.text());
+          // console.log(chunk.text());
           if (onChunk) {
             onChunk(chunk.text(), "gemini", this.currentModel);
           }

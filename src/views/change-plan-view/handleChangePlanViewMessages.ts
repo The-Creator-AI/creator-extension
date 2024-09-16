@@ -28,6 +28,10 @@ export function handleChangePlanViewMessages(
     handleFileCodeUpdate(serverIpc, data)
   );
 
+  serverIpc.onClientMessage(ClientToServerChannel.RequestStreamFileCode, (data) =>
+    handleFileCodeUpdate(serverIpc, data)
+  );
+
   serverIpc.onClientMessage(ClientToServerChannel.SendMessage, (data) =>
     handleSendMessage(serverIpc, data)
   );
