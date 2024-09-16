@@ -8,8 +8,9 @@ import { FileNode } from '../../types/file-node';
 
 const App = () => {
     const ref = useRef(null);
-    let graph = null;
+    const graph = useRef<G6.Graph | null>(null);
     const clientIpc = ClientPostMessageManager.getInstance();
+    console.log({ graph });
 
     useEffect(() => {
         // Request workspace files on component mount
@@ -17,7 +18,6 @@ const App = () => {
 
         // Listen for workspace files response
         clientIpc.onServerMessage(ServerToClientChannel.SendWorkspaceFiles, ({ files }) => {
-            console.log({ files });
             // since the data is hierarchical (with parent-child relationships), we need to flatten it
             const flatCB = (node: FileNode, acc: (FileNode & { id: string })[]) => {
                 acc.push({
@@ -27,25 +27,32 @@ const App = () => {
                 (node.children || []).forEach((child) => flatCB(child, acc));
                 return acc;
             };
-            const nodes = files.reduce((acc, file) => flatCB(file, acc), [] as (FileNode & { id: string })[]);
+            const nodes = files.reduce((acc, file) => flatCB(file, acc), [] as (FileNode & { id: string })[])
+            .filter((node, idx) => idx < 10);
                 
-            const edges = nodes.reduce((acc, file) => {
-                if (file.children) {
-                    file.children.forEach((child) => {
-                        acc.push({
-                            source: file.absolutePath,
-                            target: child.absolutePath,
-                        });
-                    });
-                }
-                return acc;
-            }, [] as { source: string; target: string }[]);
+            // const edges = nodes.reduce((acc, file) => {
+            //     if (file.children) {
+            //         file.children.forEach((child) => {
+            //             acc.push({
+            //                 source: file.absolutePath,
+            //                 target: child.absolutePath,
+            //             });
+            //         });
+            //     }
+            //     return acc;
+            // }, [] as { source: string; target: string }[]);
+            const edges = [];
 
-            if (!graph) {
-                graph = new G6.Graph({
+            console.log({
+                nodes,
+                edges
+            });
+            if (!graph.current) {
+                console.log({ graph });
+                graph.current = new G6.Graph({
                     container: ref.current,
-                    width: window.innerWidth,
-                    height: window.innerHeight,
+                    width: 300,
+                    height: 300,
                     // modes: {
                     //     default: ['drag-canvas', 'zoom-canvas', 'drag-node'],
                     // },
@@ -73,7 +80,7 @@ const App = () => {
                     // },
                 });
 
-                graph.on('node:click', (evt) => {
+                graph.current.on('node:click', (evt: any) => {
                     const node = evt.item;
                     const model = node.getModel();
                     clientIpc.sendToServer(ClientToServerChannel.SendSelectedEditor, {
@@ -87,14 +94,17 @@ const App = () => {
 
                 console.log({ graph });
 
-                graph.setData({ nodes, edges });
-                graph.render();
+                graph.current.setData({
+                    nodes: nodes.map(({ children, ...node }) => node),
+                    edges
+                });
+                graph.current.render();
             }
         });
 
         return () => {
-            if (graph) {
-                graph.destroy();
+            if (graph.current) {
+                graph.current.destroy();
             }
         };
     }, []);
