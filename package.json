@@ -1,6 +1,11 @@
 {
   "name": "creator-extension",
-  "publisher": "Pulkit Singh",
+  "publisher": "duke79",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/The-Creator-AI/the-Creator-AI"
+  },
   "displayName": "creator-extension",
   "description": "Coding assistant",
   "version": "0.0.1",
