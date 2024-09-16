@@ -8,7 +8,7 @@ export function activate(context: vscode.ExtensionContext) {
   globalContext = context;
 
   console.log(
-    'Congratulations, your extension "creator-extension" is now active!'
+    'Congratulations, your extension "the-creator-ai" is now active!'
   );
 
   registerCommands(context);

@@ -8,16 +8,16 @@ import {VIEW_TYPES} from '@/views/view-types';
 // Define an array of commands with their corresponding callback functions
 export const commands = [
   {
-    commandId: "creator-extension.helloWorld",
+    commandId: "the-creator-ai.helloWorld",
     callback: () => {
-      console.log("Hello World from creator-extension!");
+      console.log("Hello World from the-creator-ai!");
       vscode.window.showInformationMessage(
-        "Hello World from creator-extension!"
+        "Hello World from the-creator-ai!"
       );
     },
   },
   {
-    commandId: "creator-extension.clearChatHistory",
+    commandId: "the-creator-ai.clearChatHistory",
     callback: async () => {
       // Implement the logic to clear the chat history
       const activeChat = await ChatRepository.getActiveChat();
@@ -33,14 +33,14 @@ export const commands = [
     },
   },
   {
-    commandId: "creator-extension.resetClearChangePlanViewState",
+    commandId: "the-creator-ai.resetClearChangePlanViewState",
     callback: async () => {
       const persistentStoreRepository = Services.getPersistentStoreRepository();
       await persistentStoreRepository.clearChangePlanViewState();
     },
   },
   {
-    commandId: "creator-extension.chooseChangePlan",
+    commandId: "the-creator-ai.chooseChangePlan",
     callback: async () => {
       const persistentStoreRepository = Services.getPersistentStoreRepository();
       const store = persistentStoreRepository.getChangePlanViewState();
@@ -71,7 +71,7 @@ export const commands = [
     }
   },
   {
-    commandId: "creator-extension.newPlan",
+    commandId: "the-creator-ai.newPlan",
     callback: async () => {
       const serverIpc = serverIPCs[VIEW_TYPES.SIDEBAR.CHANGE_PLAN];
       remoteSetChangePlanViewState(serverIpc, "changeDescription", "");

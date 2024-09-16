@@ -1,4 +1,4 @@
-// creator-extension/src/sidebar/Sidebar.tsx
+// the-creator-ai/src/sidebar/Sidebar.tsx
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { ClientPostMessageManager } from '../../ipc/client-ipc';

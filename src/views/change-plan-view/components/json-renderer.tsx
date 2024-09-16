@@ -1,4 +1,4 @@
-// /Users/pulkitsingh/dev/The Creator AI/creator-extension/src/views/change-plan-view/components/json-renderer.tsx
+// /Users/pulkitsingh/dev/The Creator AI/the-creator-ai/src/views/change-plan-view/components/json-renderer.tsx
 
 import * as React from "react";
 import TreeView from "../../../components/tree-view/TreeView";
