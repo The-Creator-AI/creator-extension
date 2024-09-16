@@ -1,12 +1,12 @@
 {
   "name": "the-creator-ai",
-  "publisher": "duke79",
+  "publisher": "PulkitSingh",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/The-Creator-AI/the-Creator-AI"
   },
-  "displayName": "the-creator-ai",
+  "displayName": "The Creator AI",
   "description": "Coding assistant",
   "version": "0.0.1",
   "engines": {
