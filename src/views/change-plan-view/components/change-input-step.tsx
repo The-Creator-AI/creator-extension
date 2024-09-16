@@ -23,7 +23,7 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
                 disabled={isLoading}
                 data-testid="change-description-textarea"
                 onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-                    if (e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey)) {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey || e.altKey)) {
                         e.preventDefault();
                         handleSubmit();
                     }
