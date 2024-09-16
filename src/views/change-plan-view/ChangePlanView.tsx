@@ -13,7 +13,6 @@ import "./ChangePlanView.scss";
 import StepIndicators from "./components/step-indicators";
 import { setupChannelHandlers } from "./logic/setupChannelHandlers";
 import {
-  setNewEmptyChangePlan,
   setChangePlanViewState as setState,
 } from "./store/change-plan-view.logic";
 import {
@@ -47,10 +46,6 @@ const App = () => {
     setState("currentStep")(step);
   };
 
-  const handleReset = () => {
-    setNewEmptyChangePlan(); // Call the reset function to reset the store
-  };
-
   const renderLoader = () => (
     <div
       className="loader fixed inset-0 flex justify-center items-center bg-opacity-50 bg-gray-500 z-50" 
@@ -62,14 +57,6 @@ const App = () => {
 
   return (
     <div className="h-full fixed inset-0 flex flex-col justify-between">
-      <div className="flex justify-end p-2">
-        {/* Reset Icon */}
-        <FaUndo
-          className="text-gray-500 hover:text-blue-500 cursor-pointer"
-          onClick={handleReset}
-          data-testid="reset-icon"
-        />
-      </div>
       <StepIndicators
         changePlanStepsConfig={changePlanTabs}
         currentStep={currentTab}
