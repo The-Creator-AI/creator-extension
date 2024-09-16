@@ -53,6 +53,11 @@
         "command": "the-creator-ai.newPlan",
         "title": "Creator AI: New Plan",
         "icon": "$(sync)"
+      },
+      {
+        "command": "the-creator-ai.openGraphView",
+        "title": "Creator AI: Open Graph View",
+        "icon": "$(graph)"
       }
     ],
     "viewsContainers": {
@@ -70,6 +75,11 @@
           "type": "webview",
           "id": "viewType.sidebar.changePlan",
           "name": "Change Plan"
+        },
+        {
+          "type": "webview",
+          "id": "viewType.panel.graphView",
+          "name": "Graph View"
         }
       ]
     },
@@ -91,6 +101,12 @@
           "when": "view == viewType.sidebar.changePlan",
           "group": "navigation",
           "title": "New Plan"
+        },
+        {
+          "command": "the-creator-ai.openGraphView",
+          "when": "view == viewType.sidebar.graphView",
+          "group": "navigation",
+          "title": "Open Graph View"
         }
       ]
     }
@@ -143,6 +159,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
     "@anthropic-ai/tokenizer": "^0.0.4",
+    "@antv/g6": "^5.0.22",
     "@google/generative-ai": "^0.12.0",
     "@vscode/webview-ui-toolkit": "^1.4.0",
     "axios": "^1.7.5",

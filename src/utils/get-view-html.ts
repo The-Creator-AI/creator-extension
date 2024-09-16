@@ -4,10 +4,12 @@ export function getViewHtml({
   webview,
   nonce,
   scriptUri,
+  rootId,
 }: {
   webview: vscode.Webview;
   nonce: string;
   scriptUri: string;
+  rootId: string;
 }): string {
   return `<!DOCTYPE html>
             <html lang="en">
@@ -17,7 +19,7 @@ export function getViewHtml({
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
             </head>
             <body>
-                <div id="change-plan-view-root"></div>
+                <div id="${rootId}"></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
             </body>
             </html>`;

@@ -4,4 +4,7 @@ export const VIEW_TYPES = {
     FILE_EXPLORER: "viewType.sidebar.fileExplorer",
     CHANGE_PLAN: "viewType.sidebar.changePlan",
   },
+  PANEL: {
+    GRAPH_VIEW: "viewType.panel.graphView",
+  }
 };

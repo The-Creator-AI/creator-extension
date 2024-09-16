@@ -23,6 +23,7 @@
 			"@/*": ["src/*"]
 		},
 		"experimentalDecorators": true,
+		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true
 	},
 	"include": [

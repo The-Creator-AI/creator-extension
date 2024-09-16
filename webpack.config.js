@@ -1,37 +1,15 @@
-//@ts-check
-
-'use strict';
+// webpack.config.js
 
 const path = require('path');
 const CopyPlugin = require("copy-webpack-plugin");
 const webpack = require('webpack');
 
-//@ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
 
 /** @type WebpackConfig */
-const extensionConfig = {
-  target: 'node', // VS Code extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
-	mode: 'none', // this leaves the source code as close as possible to the original (when packaging we set this to 'production')
-
-  entry: {
-    extension: './src/extension.ts',
-    chatView: './src/views/chat-view/index.tsx',
-    changePlanView: './src/views/change-plan-view/ChangePlanView.tsx',
-    fileExplorerView: './src/views/file-explorer-view/index.tsx',
-  },  
-  output: {
-    // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
-    libraryTarget: 'commonjs2'
-  },
-  externals: {
-    vscode: 'commonjs vscode' // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
-    // modules added here also need to be added in the .vscodeignore file
-  },
+const baseConfig = {
+  mode: 'none',
   resolve: {
-    // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
     alias: {
       "@": path.resolve(__dirname, 'src'),
@@ -67,14 +45,10 @@ const extensionConfig = {
       {
         test: /\.s[ac]ss$/i,
         use: [
-          // Creates `style` nodes from JS strings
           "style-loader",
-          // Translates CSS into CommonJS
           "css-loader",
-          // Compiles Sass to CSS
           "sass-loader",
-          // PostCSS (needed for Tailwind)
-          "postcss-loader", 
+          "postcss-loader",
         ],
       },
     ]
@@ -87,11 +61,43 @@ const extensionConfig = {
     }),
     new webpack.ProvidePlugin({
       process: 'process/browser',
-  }),
+    }),
   ],
   devtool: 'nosources-source-map',
   infrastructureLogging: {
-    level: "log", // enables logging required for problem matchers
+    level: "log",
   },
 };
-module.exports = [ extensionConfig ];
+
+/** @type WebpackConfig */
+const extensionConfig = {
+  ...baseConfig,
+  target: 'node',
+  entry: './src/extension.ts',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'extension.js',
+    libraryTarget: 'commonjs2'
+  },
+  externals: {
+    vscode: 'commonjs vscode'
+  },
+};
+
+/** @type WebpackConfig */
+const viewsConfig = {
+  ...baseConfig,
+  target: 'web',
+  entry: {
+    chatView: './src/views/chat-view/index.tsx',
+    changePlanView: './src/views/change-plan-view/ChangePlanView.tsx',
+    fileExplorerView: './src/views/file-explorer-view/index.tsx',
+    graphView: './src/views/graph-view/index.tsx',
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+  },
+};
+
+module.exports = [extensionConfig, viewsConfig];

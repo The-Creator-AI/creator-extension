@@ -1,11 +1,13 @@
-import { getChangePlanViewHtml } from "./change-plan-view/getChangePlanViewHtml";
-import { handleChangePlanViewMessages } from "./change-plan-view/handleChangePlanViewMessages";
+import { VIEW_TYPES } from "./view-types";
 import { getChatViewHtml, handleChatViewMessages } from "./chat-view/chat-view";
 import {
   getFileExplorerViewHtml,
   handleFileExplorerViewMessages,
 } from "./file-explorer-view/file-explorer-view";
-import { VIEW_TYPES } from "./view-types";
+import { getChangePlanViewHtml } from "./change-plan-view/getChangePlanViewHtml";
+import { handleChangePlanViewMessages } from "./change-plan-view/handleChangePlanViewMessages";
+import { getGraphViewHtml } from "./graph-view/getGraphViewHtml";
+import { handleGraphViewMessages } from "./graph-view/graph-view";
 
 export const views = [
   {
@@ -22,5 +24,10 @@ export const views = [
     type: VIEW_TYPES.SIDEBAR.CHANGE_PLAN,
     getHtml: getChangePlanViewHtml,
     handleMessage: handleChangePlanViewMessages,
+  },
+  {
+    type: VIEW_TYPES.PANEL.GRAPH_VIEW,
+    getHtml: getGraphViewHtml,
+    handleMessage: handleGraphViewMessages,
   },
 ];

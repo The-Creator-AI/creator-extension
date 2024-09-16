@@ -79,4 +79,12 @@ export const commands = [
       remoteSetChangePlanViewState(serverIpc, "chatHistory", []);
     },
   },
+  {
+    commandId: "the-creator-ai.openGraphView",
+    callback: async () => {
+      // This callback will be executed when the command is invoked
+      console.log('Opening Graph View...');
+      // Add logic here to open your Graph View
+    },
+  },
 ];
