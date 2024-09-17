@@ -65,7 +65,6 @@ export const setupChannelHandlers = (
     keyPath: Key;
     value: KeyPathValue<Key, ChangePlanViewStore>;
   }) => {
-    console.log({ data });
     setState(data.keyPath)(data.value);
   };
 

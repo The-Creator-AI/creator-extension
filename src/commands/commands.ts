@@ -77,6 +77,7 @@ export const commands = [
       remoteSetChangePlanViewState(serverIpc, "changeDescription", "");
       remoteSetChangePlanViewState(serverIpc, "llmResponse", "");
       remoteSetChangePlanViewState(serverIpc, "chatHistory", []);
+      remoteSetChangePlanViewState(serverIpc, "isLoading", false);
     },
   },
   {
