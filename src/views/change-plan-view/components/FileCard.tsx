@@ -80,12 +80,12 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
     };
 
     return (
-        <div className="file-card bg-sidebar-bg border border-gray-300 rounded p-4 shadow-md mr-4 relative" style={{ minWidth: '300px' }}>
+        <div className="file-card bg-sidebar-bg border border-gray-700 rounded p-4 shadow-md mr-4 relative" style={{ minWidth: '300px' }}>
             {/* File Number Indicator */}
             <div className="absolute top-2 right-2 text-gray-500 text-sm">
                 {fileNumber} / {totalFiles}
             </div>
-
+            <p className="text-gray-700 text-xs mt-4 whitespace-nowrap overflow-auto">{filePath}</p>
             <div className="flex items-center mb-2">
                 <MdDescription
                     size={18}
@@ -106,10 +106,10 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
                     <span className="text-xs text-gray-500 whitespace-nowrap">({fileContent?.length} ++)</span>
                 ) : null}
             </div>
-            <p className="text-gray-700 mb-3">{operation}</p>
+            <p className="text-gray-600 mb-3">{operation}</p>
             <ul className="list-disc list-inside">
                 {recommendations.map((recommendation, index) => (
-                    <li key={index} className="text-gray-500">{recommendation}</li>
+                    <li key={index} className="text-gray-400">{recommendation}</li>
                 ))}
             </ul>
         </div>
