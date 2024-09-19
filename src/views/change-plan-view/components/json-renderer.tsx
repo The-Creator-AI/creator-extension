@@ -1,10 +1,16 @@
 import * as React from "react";
 import FileCard from './FileCard'; // Import the new FileCard component
 import { useState, useRef, useEffect } from 'react';
+import { useStore } from '@/store/useStore';
+import { changePlanViewStoreStateSubject } from '@/views/change-plan-view/store/change-plan-view.store';
+import { ClientPostMessageManager } from '@/ipc/client-ipc';
+import { ClientToServerChannel } from '@/ipc/channels.enum';
 
 const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     const [currentFileIndex, setCurrentFileIndex] = useState(0);
     const fileCardContainerRef = useRef<HTMLDivElement>(null);
+    const { activeTab } = useStore(changePlanViewStoreStateSubject);
+    const clientIpc = ClientPostMessageManager.getInstance();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'ArrowLeft' && currentFileIndex > 0) {
@@ -21,10 +27,31 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
         }
     }, [currentFileIndex]);
 
+    useEffect(() => {
+        const matchingCardIndex = jsonData.code_plan.findIndex(
+            (item: any) => item.filename && activeTab && activeTab.endsWith(item.filename)
+        );
+        if (matchingCardIndex !== -1) {
+            setCurrentFileIndex(matchingCardIndex);
+        }
+    }, [activeTab, jsonData.code_plan]);
+
+    const handleCardScroll = () => {
+        if (fileCardContainerRef.current) {
+            const cardWidth = fileCardContainerRef.current.children[0].clientWidth; // Assuming all cards have the same width
+            const visibleCardIndex = Math.round(fileCardContainerRef.current.scrollLeft / cardWidth);
+            setCurrentFileIndex(visibleCardIndex);
+            const filePath = jsonData.code_plan[visibleCardIndex].filename;
+            if (filePath) {
+                clientIpc.sendToServer(ClientToServerChannel.RequestOpenFile, { filePath });
+            }
+        }
+    };
+
     return jsonData ? (
-        <div className="json-container pt-2" onKeyDown={handleKeyDown} tabIndex={0}> {/* Added tabIndex to make the container focusable */}
-            <h3 className="text-lg font-bold mb-2 px-4">{jsonData.title}</h3>
-            <p className="text-gray-700 mb-4 px-4">{jsonData.description}</p>
+        <div className="json-container pt-2" onKeyDown={handleKeyDown} tabIndex={0} onScroll={handleCardScroll}>
+            <h3 className="flex justify-center text-xs font-bold mb-2 px-4">{jsonData.title}</h3>
+            <p className="flex justify-center text-gray-700 mb-4 px-4">{jsonData.description}</p>
             {/* Pagination Dots */}
             <div className="flex justify-center my-4">
                 {jsonData.code_plan.map((_: any, index: number) => (
@@ -44,8 +71,8 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                                 operation={item.operation}
                                 recommendations={item.recommendations}
                                 filePath={item.filename}
-                                fileNumber={index + 1} // Pass the file number
-                                totalFiles={jsonData.code_plan.length} // Pass the total file count
+                                fileNumber={index + 1}
+                                totalFiles={jsonData.code_plan.length}
                             />
                         );
                     }

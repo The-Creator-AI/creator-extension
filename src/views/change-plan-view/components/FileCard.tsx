@@ -91,7 +91,7 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
                     size={18}
                     className={`mr-2 cursor-pointer ${isLoading ? 'text-gray-400' : 'hover:text-blue-500'} `}
                 />
-                <h4 className="text-lg font-medium text-editor-fg" onClick={() => handleRequestOpenFile(filePath)}>{fileName}</h4>
+                <h4 className="text-base font-medium text-editor-fg" onClick={() => handleRequestOpenFile(filePath)}>{fileName}</h4>
                 {!isLoading ? <MdFileDownload
                     size={18}
                     className={`ml-2 cursor-pointer text-blue-500`}
@@ -109,7 +109,7 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
             <p className="text-gray-600 mb-3">{operation}</p>
             <ul className="list-disc list-inside">
                 {recommendations.map((recommendation, index) => (
-                    <li key={index} className="text-gray-400">{recommendation}</li>
+                    <li key={index} className="text-gray-400 text-xs mb-2">{recommendation}</li>
                 ))}
             </ul>
         </div>
