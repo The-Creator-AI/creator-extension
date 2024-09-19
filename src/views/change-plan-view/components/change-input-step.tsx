@@ -26,11 +26,12 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
 
     const handleSuggestionAccept = (suggestion: string) => {
         handleChange(
-            changeDescription.split(' ').slice(0, -1).join(' ') + ' '
+            changeDescription.split(' ').slice(0, -1).join(' ')
+            + (changeDescription.split(' ').length > 1 ? ' ' : '')
             + suggestion + ' ');
         setSelectedSuggestionIndex(null);
         setShowSuggestions(false);
-    }
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (showSuggestions) {
@@ -80,9 +81,9 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
         });
     }, []);
 
-
     return (
         <div className="flex flex-grow flex-col">
+            <div className="p-4 flex flex-col grow" />
             <div className="relative p-4 flex flex-col relative" data-testid="change-plan-input-step">
                 {showSuggestions && suggestions.length > 0 && (
                     <ul className="absolute bottom-full bg-sidebar-bg left-0 mb-1 border border-gray-300 rounded max-h-40 overflow-y-auto shadow-lg z-10 m-4"
@@ -111,13 +112,17 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
                     disabled={isLoading}
                     data-testid="change-description-textarea"
                     onKeyDown={handleKeyDown}
-                    minRows={2}
+                    minRows={3}
                     maxRows={10}
                     autoFocus
                 />
             </div>
             <BsSend
-                className="absolute right-7 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-blue-500"
+                className="fixed transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-blue-500"
+                style={{
+                    left: inputRef.current?.getClientRects()?.[0]?.right - 35,
+                    top: inputRef.current?.getClientRects()?.[0]?.bottom - 20,
+                }}
                 size={20}
                 onClick={handleSubmit}
                 data-testid="submit-change-description-button"

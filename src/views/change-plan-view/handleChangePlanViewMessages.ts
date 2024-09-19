@@ -201,28 +201,32 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.RequestSymbols,
     async ({ query }) => {
       try {
-        console.log('Requesting symbols for query:', query);
-        // const symbols: Record<string, string[]> = {};
-
-        // for (const filePath of selectedFiles) {
-        //   const document = await vscode.workspace.openTextDocument(filePath);
-        //   const symbolInformation = await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
-        //     'vscode.executeDocumentSymbolProvider',
-        //     document.uri
-        //   );
-
-        //   const symbolNames = (symbolInformation || []).map(symbol => symbol.name);
-        //   symbols[filePath] = symbolNames;
-        // }
-
         const symbolInformation = await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
           'vscode.executeWorkspaceSymbolProvider',
           query || ''
         );
+        const files = await vscode.workspace.findFiles(`**/${query}**`);
 
-        console.log('Retrieved symbols:', symbolInformation);
-
-        serverIpc.sendToClient(ServerToClientChannel.SendSymbols, { symbols: symbolInformation });
+        serverIpc.sendToClient(ServerToClientChannel.SendSymbols, {
+          symbols: [
+            ...files.map(file => ({
+              name: file.path?.split('/').pop(),
+              kind: vscode.SymbolKind.File,
+              location: file.path,
+              range: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0))
+            }))
+            ?.filter((symbol, index, self) => self.findIndex(s => s.name === symbol.name) === index)
+            ?.filter((_, index) => index < 3),
+            ...symbolInformation.map(symbol => ({
+              name: symbol.name,
+              kind: symbol.kind,
+              location: symbol.location.uri.path,
+              range: symbol.location.range
+            }))
+            ?.filter((symbol, index, self) => self.findIndex(s => s.name === symbol.name) === index)
+            ?.filter((_, index) => index < 5),
+          ]
+        });
       } catch (error) {
         console.error('Error retrieving symbols:', error);
         // Handle the error appropriately, e.g., send an error message to the client
