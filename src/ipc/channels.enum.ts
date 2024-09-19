@@ -12,10 +12,10 @@ export enum ClientToServerChannel {
   RequestCommitMessageSuggestions = "clientToServer.requestCommitMessageSuggestions",
   CommitStagedChanges = "clientToServer.commitStagedChanges",
   RequestStreamFileCode = "clientToServer.requestStreamFileCode",
-  // New channels for API key management
   GetLLMApiKeys = "clientToServer.getLLMApiKeys", 
   SetLLMApiKey = "clientToServer.setLLMApiKey", 
-  DeleteLLMApiKey = "clientToServer.deleteLLMApiKey" 
+  DeleteLLMApiKey = "clientToServer.deleteLLMApiKey",
+  RequestAutocompleteSuggestions = "request-autocomplete-suggestions",
 }
 
 export enum ServerToClientChannel {
@@ -25,9 +25,9 @@ export enum ServerToClientChannel {
   SendWorkspaceFiles = "serverToClient.sendWorkspaceFiles",
   SendFileCode = "serverToClient.sendFileCode",
   StreamMessage = "serverToClient.streamMessage",
-  SetChangePlanViewState = "serverToClient.setChangePlanViewState", // Fixed typo here
+  SetChangePlanViewState = "serverToClient.setChangePlanViewState",
   SendCommitMessageSuggestions = "serverToClient.sendCommitMessageSuggestions",
   StreamFileCode = "serverToClient.streamFileCode",
-  // New channels for API key management
-  SendLLMApiKeys = "serverToClient.sendLLMApiKeys"
+  SendLLMApiKeys = "serverToClient.sendLLMApiKeys",
+  SendAutocompleteSuggestions = "send-autocomplete-suggestions",
 }

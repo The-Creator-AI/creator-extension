@@ -112,5 +112,11 @@ export type ChannelBody<T extends ClientToServerChannel | ServerToClientChannel>
     : T extends ClientToServerChannel.DeleteLLMApiKey
     ? { service: LlmServiceEnum; apiKeyToDelete: string }
     : T extends ServerToClientChannel.SendLLMApiKeys
-    ? { apiKeys: Record<LlmServiceEnum, string[]> | undefined }
+    ? { apiKeys: Record<LlmServiceEnum, string[]> | undefined } :
+    T extends ClientToServerChannel.RequestAutocompleteSuggestions ? {
+      inputText: string;
+    } :
+    T extends ServerToClientChannel.SendAutocompleteSuggestions ? {
+      suggestions: string[];
+    } 
     : never;

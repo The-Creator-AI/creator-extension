@@ -14,6 +14,7 @@ import { handleSendMessage } from "@/views/change-plan-view/utils/handleSendMess
 import { handleStreamMessage } from "@/views/change-plan-view/utils/handleStreamMessage";
 import { handleWorkspaceFilesRequest } from "@/views/change-plan-view/utils/handleWorkspaceFilesRequest";
 import { gitCommit } from "./utils/gitCommit";
+import { ModelGrade } from "@/backend/types/llm-service.enum";
 
 // Function to handle messages for the change plan view
 export function handleChangePlanViewMessages(
@@ -145,11 +146,12 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.GetLLMApiKeys,
     async () => {
       try {
-        const apiKeys = await Services.getSettingsRepository()
-          .getLLMApiKeys();
-        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys });
+        const apiKeys = await Services.getSettingsRepository().getLLMApiKeys();
+        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, {
+          apiKeys,
+        });
       } catch (error) {
-        console.error('Error getting LLM API keys:', error);
+        console.error("Error getting LLM API keys:", error);
         // Handle the error appropriately, e.g., send an error message to the client
       }
     }
@@ -160,16 +162,17 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.SetLLMApiKey,
     async ({ service, apiKey }) => {
       try {
-        await Services.getSettingsRepository()
-          .setLLMApiKey(service, apiKey);
+        await Services.getSettingsRepository().setLLMApiKey(service, apiKey);
 
-        // After successfully setting the API key, you might want to re-fetch 
+        // After successfully setting the API key, you might want to re-fetch
         // the API keys and send them back to the client to update the UI.
-        const updatedApiKeys = await Services.getSettingsRepository()
-          .getLLMApiKeys();
-        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys: updatedApiKeys });
+        const updatedApiKeys =
+          await Services.getSettingsRepository().getLLMApiKeys();
+        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, {
+          apiKeys: updatedApiKeys,
+        });
       } catch (error) {
-        console.error('Error setting LLM API key:', error);
+        console.error("Error setting LLM API key:", error);
         // Handle the error appropriately, e.g., send an error message to the client
       }
     }
@@ -180,18 +183,70 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.DeleteLLMApiKey,
     async ({ service, apiKeyToDelete }) => {
       try {
-        await Services.getSettingsRepository()
-          .deleteLLMApiKey(service, apiKeyToDelete);
+        await Services.getSettingsRepository().deleteLLMApiKey(
+          service,
+          apiKeyToDelete
+        );
 
-        // After successfully deleting the API key, you might want to re-fetch 
+        // After successfully deleting the API key, you might want to re-fetch
         // the API keys and send them back to the client to update the UI.
-        const updatedApiKeys = await Services.getSettingsRepository()
-          .getLLMApiKeys();
-        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys: updatedApiKeys });
+        const updatedApiKeys =
+          await Services.getSettingsRepository().getLLMApiKeys();
+        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, {
+          apiKeys: updatedApiKeys,
+        });
       } catch (error) {
-        console.error('Error deleting LLM API key:', error);
+        console.error("Error deleting LLM API key:", error);
         // Handle the error appropriately, e.g., send an error message to the client
       }
+    }
+  );
+
+  // Handle request for autocomplete suggestions
+  serverIpc.onClientMessage(
+    ClientToServerChannel.RequestAutocompleteSuggestions,
+    async ({ inputText }) => {
+      // Send a message to the LLM service with the updated chat history.
+      const llmResponse = await Services.getLlmService().sendPrompt(
+        [
+          // ...getChangePlanViewState("chatHistory").filter(
+          //   (message) => message.user === "bot" || message.user === "user"
+          // ),
+          {
+            user: "instrutor",
+            message: `You are a text autocomplete agent. Give the result as a JSON with 'suggestions' as the key, for example -
+            
+            User: Give me a suggestion for "Hi how are you" 
+
+            **Response Example:**
+            \`\`\`json
+            {
+              "suggestions": [" doing?", " today?", " feeling?"]
+            }
+            \`\`\``,
+          },
+          {
+            user: "user",
+            message: `Give me suggestions for:\n${inputText}`,
+          }
+        ],
+        [],
+        () => {},
+        ModelGrade.ONE_STAR
+        // getChangePlanViewState("selectedFiles")
+      );
+
+      // Parse the LLM response using parseJsonResponse from parse-json.
+      const parsedResponse = parseJsonResponse(llmResponse.response);
+
+      // Extract suggestions from the parsed JSON.
+      const suggestions = parsedResponse?.suggestions;
+
+      // Send the suggestions to the client.
+      serverIpc.sendToClient(
+        ServerToClientChannel.SendAutocompleteSuggestions,
+        { suggestions }
+      );
     }
   );
 }

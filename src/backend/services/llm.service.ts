@@ -9,15 +9,11 @@ import { CreatorService } from "./creator.service";
 import { ChatMessage } from "../repositories/chat.respository";
 import { Inject, Injectable } from "injection-js";
 import { SettingsRepository } from "../repositories/settings.repository";
-import { LlmServiceEnum } from "../types/llm-service.enum";
+import { GeminiModel, LlmServiceEnum, ModelGrade, OpenAiModel } from "../types/llm-service.enum";
 
 @Injectable()
 export class LlmService {
-  private geminiProModel: string = "gemini-1.5-pro-exp-0827"; // Default model
-  private geminiFlashModel: string = "gemini-1.5-flash-latest";
-  private openaiModel: string = "gpt-3.5-turbo";
-
-  private currentModel: string = this.geminiProModel; // Track the current model being used
+  private currentModel: string = GeminiModel.GEMINI_PRO;
 
   constructor(
     @Inject(CreatorService) private readonly creatorService: CreatorService,
@@ -27,7 +23,8 @@ export class LlmService {
   async sendPrompt(
     chatHistory: ChatMessage[],
     selectedFiles: string[] = [],
-    onChunk?: (chunk: string, modelType: string, modelName: string) => void
+    onChunk?: (chunk: string, modelType: string, modelName: string) => void,
+    modelGrade?: ModelGrade
   ): Promise<{ response: string; modelType: string; modelName: string }> {
     const { type, apiKeys } = await this.getApiKey();
     console.log({ type, apiKeys, chatHistory, selectedFiles });
@@ -52,9 +49,9 @@ ${fileContents[filePath]}
     console.log(prompt);
 
     if (type === "gemini") {
-      return this.sendPromptToGemini(prompt, apiKeys, onChunk);
+      return this.sendPromptToGemini(prompt, apiKeys, onChunk, modelGrade);
     } else if (type === "openai") {
-      return this.sendPromptToOpenAI(prompt, apiKeys[0], onChunk); // Assuming only one OpenAI key is stored
+      return this.sendPromptToOpenAI(prompt, apiKeys[0], onChunk, modelGrade); // Assuming only one OpenAI key is stored
     } else {
       throw new Error(
         "No API key found. Please set either GEMINI_API_KEY or OPENAI_API_KEY environment variable."
@@ -65,7 +62,8 @@ ${fileContents[filePath]}
   private async sendPromptToGemini(
     prompt: string,
     apiKeys: string[],
-    onChunk?: (chunk: string, modelType: string, modelName: string) => void
+    onChunk?: (chunk: string, modelType: string, modelName: string) => void,
+    modelGrade?: ModelGrade
   ): Promise<{ response: string; modelType: string; modelName: string }> {
     let debounce = 0;
     let attempts = 0;
@@ -77,12 +75,13 @@ ${fileContents[filePath]}
       if (debounce > 0) {
         console.log(`Waiting for ${Math.floor(debounce / 1000)} seconds...`);
       }
-      console.log(`Using model: ${this.currentModel}`);
+      const modelToUse = modelGrade === ModelGrade.ONE_STAR ? GeminiModel.GEMINI_FLASH_8B : this.currentModel;
+      console.log(`Using model: ${modelToUse}`);
       await new Promise((resolve) => setTimeout(resolve, debounce));
       try {
         const genAI = new GoogleGenerativeAI(apiKeys[currentKeyIndex]);
         const gemini = genAI.getGenerativeModel({
-          model: this.currentModel,
+          model: modelToUse,
         }); // Use currentModel here
         const response = await gemini.generateContentStream({
           contents: [
@@ -119,23 +118,23 @@ ${fileContents[filePath]}
         debounce += 5000;
         if (
           e.status === 429 &&
-          this.currentModel === this.geminiProModel &&
+          this.currentModel === GeminiModel.GEMINI_PRO &&
           currentKeyIndex < apiKeys.length - 1 // Check if there are more keys to try
         ) {
           currentKeyIndex++; // Move to the next key
           console.log(
-            `${this.geminiProModel} limit reached for key ${
+            `${GeminiModel.GEMINI_PRO} limit reached for key ${
               apiKeys[currentKeyIndex - 1]
             }, trying with key ${apiKeys[currentKeyIndex]}`
           );
           continue;
         } else if (
           e.status === 429 &&
-          this.currentModel === this.geminiProModel
+          this.currentModel === GeminiModel.GEMINI_PRO
         ) {
-          this.currentModel = this.geminiFlashModel; // Update currentModel
+          this.currentModel = GeminiModel.GEMINI_FLASH; // Update currentModel
           console.log(
-            `${this.geminiProModel} limit reached for all keys, trying with ${this.geminiFlashModel}`
+            `${GeminiModel.GEMINI_PRO} limit reached for all keys, trying with ${GeminiModel.GEMINI_FLASH}`
           );
           currentKeyIndex = 0; // Reset key index for the Flash model
           continue;
@@ -156,13 +155,14 @@ ${fileContents[filePath]}
   private async sendPromptToOpenAI(
     prompt: string,
     apiKey: string,
-    onChunk?: (chunk: string, modelType: string, modelName: string) => void
+    onChunk?: (chunk: string, modelType: string, modelName: string) => void,
+    modelGrade?: ModelGrade
   ): Promise<{ response: string; modelType: string; modelName: string }> {
     const model = new openai.OpenAI({ apiKey });
 
-    this.currentModel = this.openaiModel;
+    this.currentModel = OpenAiModel.GPT_3_5_TURBO;
     const response = await model.completions.create({
-      model: this.openaiModel,
+      model: OpenAiModel.GPT_3_5_TURBO,
       prompt: prompt,
       stream: true,
     });
@@ -172,14 +172,14 @@ ${fileContents[filePath]}
       const chunk = part.choices[0]?.text || "";
       responseText += chunk;
       if (onChunk) {
-        onChunk(chunk, "openai", this.openaiModel);
+        onChunk(chunk, "openai", OpenAiModel.GPT_3_5_TURBO);
       }
     }
 
     return {
       response: responseText,
       modelType: "openai",
-      modelName: this.openaiModel,
+      modelName: OpenAiModel.GPT_3_5_TURBO,
     };
   }
 
