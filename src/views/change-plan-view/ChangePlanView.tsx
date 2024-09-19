@@ -2,7 +2,7 @@ import { useStore } from "@/store/useStore";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import * as ReactDOM from "react-dom/client";
-import { FaSpinner, FaUndo } from "react-icons/fa"; // Import spinner and reset icons
+import { FaSpinner } from "react-icons/fa"; // Import spinner icon
 import ErrorBoundary from "../../components/ErrorBoundary";
 import { FileNode } from "../../types/file-node";
 import {
@@ -48,15 +48,17 @@ const App = () => {
 
   const renderLoader = () => (
     <div
-      className="loader fixed inset-0 flex justify-center items-center bg-opacity-50 bg-gray-500 z-50" 
+      className="loader fixed inset-0 flex justify-center items-center bg-opacity-50 bg-[#202020] z-50"
       data-testid="loader"
     >
-      <FaSpinner className="spinner text-2xl animate-spin" />
+      <FaSpinner className="spinner text-2xl animate-spin text-white" />
     </div>
   );
 
   return (
-    <div className="h-full fixed inset-0 flex flex-col justify-between">
+    <div
+      className="h-full fixed inset-0 flex flex-col justify-between bg-editor-bg"
+    >
       <StepIndicators
         changePlanStepsConfig={changePlanTabs}
         currentStep={currentTab}

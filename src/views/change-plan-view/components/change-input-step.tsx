@@ -117,7 +117,7 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
                     autoFocus
                 />
             </div>
-            <BsSend
+            {inputRef.current && <BsSend
                 className="fixed transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-blue-500"
                 style={{
                     left: inputRef.current?.getClientRects()?.[0]?.right - 35,
@@ -126,7 +126,7 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
                 size={20}
                 onClick={handleSubmit}
                 data-testid="submit-change-description-button"
-            />
+            />}
         </div>
     );
 };
