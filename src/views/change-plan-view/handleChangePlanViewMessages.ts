@@ -14,6 +14,7 @@ import { handleSendMessage } from "@/views/change-plan-view/utils/handleSendMess
 import { handleStreamMessage } from "@/views/change-plan-view/utils/handleStreamMessage";
 import { handleWorkspaceFilesRequest } from "@/views/change-plan-view/utils/handleWorkspaceFilesRequest";
 import { gitCommit } from "./utils/gitCommit";
+import * as vscode from 'vscode';
 
 // Function to handle messages for the change plan view
 export function handleChangePlanViewMessages(
@@ -190,6 +191,44 @@ export function handleChangePlanViewMessages(
         serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys: updatedApiKeys });
       } catch (error) {
         console.error('Error deleting LLM API key:', error);
+        // Handle the error appropriately, e.g., send an error message to the client
+      }
+    }
+  );
+
+  // Handle symbol retrieval request
+  serverIpc.onClientMessage(
+    ClientToServerChannel.RequestSymbols,
+    async ({ query }) => {
+      try {
+        const symbolInformation = await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
+          'vscode.executeWorkspaceSymbolProvider',
+          query || ''
+        );
+        const files = await vscode.workspace.findFiles(`**/${query}**`);
+
+        serverIpc.sendToClient(ServerToClientChannel.SendSymbols, {
+          symbols: [
+            ...files.map(file => ({
+              name: file.path?.split('/').pop(),
+              kind: vscode.SymbolKind.File,
+              location: file.path,
+              range: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0))
+            }))
+            ?.filter((symbol, index, self) => self.findIndex(s => s.name === symbol.name) === index)
+            ?.filter((_, index) => index < 3),
+            ...symbolInformation.map(symbol => ({
+              name: symbol.name,
+              kind: symbol.kind,
+              location: symbol.location.uri.path,
+              range: symbol.location.range
+            }))
+            ?.filter((symbol, index, self) => self.findIndex(s => s.name === symbol.name) === index)
+            ?.filter((_, index) => index < 5),
+          ]
+        });
+      } catch (error) {
+        console.error('Error retrieving symbols:', error);
         // Handle the error appropriately, e.g., send an error message to the client
       }
     }
