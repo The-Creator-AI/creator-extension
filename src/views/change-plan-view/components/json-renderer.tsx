@@ -44,6 +44,8 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                                 operation={item.operation}
                                 recommendations={item.recommendations}
                                 filePath={item.filename}
+                                fileNumber={index + 1} // Pass the file number
+                                totalFiles={jsonData.code_plan.length} // Pass the total file count
                             />
                         );
                     }

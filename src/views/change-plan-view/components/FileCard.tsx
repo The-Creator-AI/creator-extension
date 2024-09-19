@@ -13,9 +13,11 @@ interface FileCardProps {
     operation: string;
     recommendations: string[];
     filePath: string;
+    fileNumber: number; // Added prop for file number
+    totalFiles: number; // Added prop for total file count
 }
 
-const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendations, filePath }) => {
+const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendations, filePath, fileNumber, totalFiles }) => { // Added fileNumber and totalFiles props
     const { fileChunkMap } = useStore(changePlanViewStoreStateSubject);
     const clientIpc = ClientPostMessageManager.getInstance();
     const chatHistory = getChangePlanViewState('chatHistory');
@@ -78,7 +80,12 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
     };
 
     return (
-        <div className="file-card bg-sidebar-bg border border-gray-300 rounded p-4 shadow-md mr-4" style={{ minWidth: '300px' }}>
+        <div className="file-card bg-sidebar-bg border border-gray-300 rounded p-4 shadow-md mr-4 relative" style={{ minWidth: '300px' }}>
+            {/* File Number Indicator */}
+            <div className="absolute top-2 right-2 text-gray-500 text-sm">
+                {fileNumber} / {totalFiles}
+            </div>
+
             <div className="flex items-center mb-2">
                 <MdDescription
                     size={18}
