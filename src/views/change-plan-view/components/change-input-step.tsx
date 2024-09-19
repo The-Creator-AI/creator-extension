@@ -24,6 +24,14 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
 
     const clientIpc = ClientPostMessageManager.getInstance();
 
+    const handleSuggestionAccept = (suggestion: string) => {
+        handleChange(
+            changeDescription.split(' ').slice(0, -1).join(' ') + ' '
+            + suggestion + ' ');
+        setSelectedSuggestionIndex(null);
+        setShowSuggestions(false);
+    }
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (showSuggestions) {
             if (e.key === 'ArrowUp') {
@@ -36,9 +44,7 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
                 if (selectedSuggestionIndex !== null) {
                     e.preventDefault();
                     const selectedSuggestion = suggestions[selectedSuggestionIndex];
-                    handleChange(changeDescription + selectedSuggestion + ' ');
-                    setSelectedSuggestionIndex(null);
-                    setShowSuggestions(false);
+                    handleSuggestionAccept(selectedSuggestion);
                 }
             } else if (e.key === 'Escape') {
                 setShowSuggestions(false);
@@ -52,69 +58,70 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
 
     React.useEffect(() => {
         const fetchSuggestions = () => {
-          clientIpc.sendToServer(ClientToServerChannel.RequestSymbols, {
-            query: changeDescription.split(' ').pop() || '',
-          });
+            if (changeDescription.split(' ').pop().startsWith('@')) {
+                clientIpc.sendToServer(ClientToServerChannel.RequestSymbols, {
+                    query: changeDescription.split(' ').pop().slice(1)
+                });
+            } else {
+                setShowSuggestions(false); // Hide suggestions if "@" is not the last character
+            }
         };
-      
-        const timeoutId = setTimeout(fetchSuggestions, 300); // Adjust delay as needed
-      
-        return () => clearTimeout(timeoutId);
-      }, [changeDescription, selectedFiles]);
 
-      React.useEffect(() => {
+        const timeoutId = setTimeout(fetchSuggestions, 300); // Adjust delay as needed
+
+        return () => clearTimeout(timeoutId);
+    }, [changeDescription, selectedFiles]);
+
+    React.useEffect(() => {
         clientIpc.onServerMessage(ServerToClientChannel.SendSymbols, (message) => {
-          const receivedSuggestions = (message.symbols || []).map((symbol: { name: string }) => symbol.name); // Adjust based on actual symbol structure
-          setSuggestions(receivedSuggestions);
-          setShowSuggestions(true);
+            const receivedSuggestions = (message.symbols || []).map((symbol: { name: string }) => symbol.name); // Adjust based on actual symbol structure
+            setSuggestions(receivedSuggestions);
+            setShowSuggestions(true);
         });
-      }, []);
-      
+    }, []);
+
 
     return (
         <div className="flex flex-grow flex-col">
-            <div className="p-4 flex flex-col grow" />
             <div className="relative p-4 flex flex-col relative" data-testid="change-plan-input-step">
-                    {showSuggestions && suggestions.length > 0 && (
-                        <ul className="absolute bottom-full bg-sidebar-bg left-0 mb-1 border border-gray-300 rounded max-h-40 overflow-y-auto shadow-lg z-10 m-4"
-                            style={{
-                                width: inputRef.current?.clientWidth,
-                            }}>
-                            {suggestions.map((suggestion, index) => (
-                                <li
-                                    key={index}
-                                    className={`p-2 cursor-pointer hover:bg-hover-bg ${index === selectedSuggestionIndex ? 'bg-hover-bg' : ''}`}
-                                    onClick={() => {
-                                        handleChange(changeDescription + suggestion + ' ');
-                                        setSelectedSuggestionIndex(null);
-                                        setShowSuggestions(false);
-                                    }}
-                                >
-                                    {suggestion}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                    <AutoResizingTextarea
-                        ref={inputRef}
-                        className="p-2 border border-gray-300 rounded font-normal mb-2 pr-10"
-                        placeholder={isUpdateRequest ? "Describe the changes you want to make to the plan..." : "Describe the code changes you want to plan..."}
-                        value={changeDescription}
-                        onChange={(e) => handleChange(e.target.value)}
-                        disabled={isLoading}
-                        data-testid="change-description-textarea"
-                        onKeyDown={handleKeyDown}
-                        minRows={2}
-                        maxRows={10}
-                        autoFocus
-                    />
-                </div>
-                <BsSend
-                    className="absolute right-7 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-blue-500"
-                    size={20}
-                    onClick={handleSubmit}
-                    data-testid="submit-change-description-button"
+                {showSuggestions && suggestions.length > 0 && (
+                    <ul className="absolute bottom-full bg-sidebar-bg left-0 mb-1 border border-gray-300 rounded max-h-40 overflow-y-auto shadow-lg z-10 m-4"
+                        style={{
+                            width: inputRef.current?.clientWidth,
+                        }}>
+                        {suggestions.map((suggestion, index) => (
+                            <li
+                                key={index}
+                                className={`p-2 cursor-pointer hover:bg-hover-bg ${index === selectedSuggestionIndex ? 'bg-hover-bg' : ''}`}
+                                onClick={() => {
+                                    handleSuggestionAccept(suggestion);
+                                }}
+                            >
+                                {suggestion}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+                <AutoResizingTextarea
+                    ref={inputRef}
+                    className="p-2 border border-gray-300 rounded font-normal mb-2 pr-10"
+                    placeholder={isUpdateRequest ? "Describe the changes you want to make to the plan..." : "Describe the code changes you want to plan..."}
+                    value={changeDescription}
+                    onChange={(e) => handleChange(e.target.value)}
+                    disabled={isLoading}
+                    data-testid="change-description-textarea"
+                    onKeyDown={handleKeyDown}
+                    minRows={2}
+                    maxRows={10}
+                    autoFocus
                 />
+            </div>
+            <BsSend
+                className="absolute right-7 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-blue-500"
+                size={20}
+                onClick={handleSubmit}
+                data-testid="submit-change-description-button"
+            />
         </div>
     );
 };
