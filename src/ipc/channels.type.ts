@@ -104,6 +104,7 @@ export type ChannelBody<T extends ClientToServerChannel | ServerToClientChannel>
     : T extends ClientToServerChannel.CommitStagedChanges
     ? {
         message: string;
+        description: string;
       }
     : T extends ClientToServerChannel.GetLLMApiKeys
     ? {}

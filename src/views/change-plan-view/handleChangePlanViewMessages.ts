@@ -114,6 +114,10 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.CommitStagedChanges,
     async (message) => {
       console.log("Committing staged changes with message:", message.message);
+      console.log(
+        "Committing staged changes with description:",
+        message.description
+      );
 
       // Set commitSuggestionsLoading to true before initiating the commit
       serverIpc.sendToClient(ServerToClientChannel.SetChangePlanViewState, {
@@ -123,7 +127,7 @@ export function handleChangePlanViewMessages(
 
       try {
         // Use the publicly available VS Code command to commit the staged changes with the provided message
-        await gitCommit(message.message);
+        await gitCommit(message.message, message.description);
       } catch (error) {
         // Handle any errors during the commit process
         console.error("Error committing changes:", error);
@@ -146,11 +150,12 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.GetLLMApiKeys,
     async () => {
       try {
-        const apiKeys = await Services.getSettingsRepository()
-          .getLLMApiKeys();
-        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys });
+        const apiKeys = await Services.getSettingsRepository().getLLMApiKeys();
+        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, {
+          apiKeys,
+        });
       } catch (error) {
-        console.error('Error getting LLM API keys:', error);
+        console.error("Error getting LLM API keys:", error);
         // Handle the error appropriately, e.g., send an error message to the client
       }
     }
@@ -161,16 +166,16 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.SetLLMApiKey,
     async ({ service, apiKey }) => {
       try {
-        await Services.getSettingsRepository()
-          .setLLMApiKey(service, apiKey);
+        await Services.getSettingsRepository().setLLMApiKey(service, apiKey);
 
-        // After successfully setting the API key, you might want to re-fetch 
+        // After successfully setting the API key, you might want to re-fetch
         // the API keys and send them back to the client to update the UI.
-        const updatedApiKeys = await Services.getSettingsRepository()
-          .getLLMApiKeys();
-        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys: updatedApiKeys });
+        const updatedApiKeys = await Services.getSettingsRepository().getLLMApiKeys();
+        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, {
+          apiKeys: updatedApiKeys,
+        });
       } catch (error) {
-        console.error('Error setting LLM API key:', error);
+        console.error("Error setting LLM API key:", error);
         // Handle the error appropriately, e.g., send an error message to the client
       }
     }
@@ -181,16 +186,19 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.DeleteLLMApiKey,
     async ({ service, apiKeyToDelete }) => {
       try {
-        await Services.getSettingsRepository()
-          .deleteLLMApiKey(service, apiKeyToDelete);
+        await Services.getSettingsRepository().deleteLLMApiKey(
+          service,
+          apiKeyToDelete
+        );
 
-        // After successfully deleting the API key, you might want to re-fetch 
+        // After successfully deleting the API key, you might want to re-fetch
         // the API keys and send them back to the client to update the UI.
-        const updatedApiKeys = await Services.getSettingsRepository()
-          .getLLMApiKeys();
-        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys: updatedApiKeys });
+        const updatedApiKeys = await Services.getSettingsRepository().getLLMApiKeys();
+        serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, {
+          apiKeys: updatedApiKeys,
+        });
       } catch (error) {
-        console.error('Error deleting LLM API key:', error);
+        console.error("Error deleting LLM API key:", error);
         // Handle the error appropriately, e.g., send an error message to the client
       }
     }
@@ -201,34 +209,46 @@ export function handleChangePlanViewMessages(
     ClientToServerChannel.RequestSymbols,
     async ({ query }) => {
       try {
-        const symbolInformation = await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
-          'vscode.executeWorkspaceSymbolProvider',
-          query || ''
-        );
+        const symbolInformation =
+          await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
+            "vscode.executeWorkspaceSymbolProvider",
+            query || ""
+          );
         const files = await vscode.workspace.findFiles(`**/${query}**`);
 
         serverIpc.sendToClient(ServerToClientChannel.SendSymbols, {
           symbols: [
-            ...files.map(file => ({
-              name: file.path?.split('/').pop(),
-              kind: vscode.SymbolKind.File,
-              location: file.path,
-              range: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0))
-            }))
-            ?.filter((symbol, index, self) => self.findIndex(s => s.name === symbol.name) === index)
-            ?.filter((_, index) => index < 3),
-            ...symbolInformation.map(symbol => ({
-              name: symbol.name,
-              kind: symbol.kind,
-              location: symbol.location.uri.path,
-              range: symbol.location.range
-            }))
-            ?.filter((symbol, index, self) => self.findIndex(s => s.name === symbol.name) === index)
-            ?.filter((_, index) => index < 5),
-          ]
+            ...files
+              .map((file) => ({
+                name: file.path?.split("/").pop(),
+                kind: vscode.SymbolKind.File,
+                location: file.path,
+                range: new vscode.Range(
+                  new vscode.Position(0, 0),
+                  new vscode.Position(0, 0)
+                ),
+              }))
+              ?.filter(
+                (symbol, index, self) =>
+                  self.findIndex((s) => s.name === symbol.name) === index
+              )
+              ?.filter((_, index) => index < 3),
+            ...symbolInformation
+              .map((symbol) => ({
+                name: symbol.name,
+                kind: symbol.kind,
+                location: symbol.location.uri.path,
+                range: symbol.location.range,
+              }))
+              ?.filter(
+                (symbol, index, self) =>
+                  self.findIndex((s) => s.name === symbol.name) === index
+              )
+              ?.filter((_, index) => index < 5),
+          ],
         });
       } catch (error) {
-        console.error('Error retrieving symbols:', error);
+        console.error("Error retrieving symbols:", error);
         // Handle the error appropriately, e.g., send an error message to the client
       }
     }
