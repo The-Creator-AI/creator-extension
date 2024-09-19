@@ -1,12 +1,12 @@
 import * as React from "react";
-import FileCard from './FileCard'; // Import the new FileCard component
+import FileCard from './components/file-card'; // Import the new FileCard component
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
 import { changePlanViewStoreStateSubject } from '@/views/change-plan-view/store/change-plan-view.store';
 import { ClientPostMessageManager } from '@/ipc/client-ipc';
 import { ClientToServerChannel } from '@/ipc/channels.enum';
 
-const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
+const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     const [currentFileIndex, setCurrentFileIndex] = useState(0);
     const fileCardContainerRef = useRef<HTMLDivElement>(null);
     const { activeTab } = useStore(changePlanViewStoreStateSubject);
@@ -83,4 +83,4 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     ) : null;
 };
 
-export default JsonResponse;
+export default FormattedPlanPreview;

@@ -2,9 +2,9 @@ import { useStore } from '@/store/useStore';
 import { changePlanViewStoreStateSubject } from '@/views/change-plan-view/store/change-plan-view.store';
 import * as React from "react";
 import { MdDescription, MdFileDownload } from 'react-icons/md';
-import { ClientToServerChannel } from '../../../ipc/channels.enum';
-import { ClientPostMessageManager } from '../../../ipc/client-ipc';
-import { getChangePlanViewState } from '../store/change-plan-view.store';
+import { ClientToServerChannel } from '../../../../../ipc/channels.enum';
+import { ClientPostMessageManager } from '../../../../../ipc/client-ipc';
+import { getChangePlanViewState } from '../../../store/change-plan-view.store';
 import { setChangePlanViewState } from '@/views/change-plan-view/store/change-plan-view.logic';
 import { ServerToClientChannel } from '@/ipc/channels.enum';
 
@@ -85,7 +85,7 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
             <div className="absolute top-2 right-2 text-gray-500 text-sm">
                 {fileNumber} / {totalFiles}
             </div>
-            <p className="text-gray-700 text-xs mt-4 whitespace-nowrap overflow-auto">{filePath}</p>
+            <p className="text-gray-700 text-xs mt-4 whitespace-nowrap overflow-auto" style={{ scrollbarWidth: 'none' }}>{filePath}</p>
             <div className="flex items-center mb-2">
                 <MdDescription
                     size={18}

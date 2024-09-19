@@ -1,18 +1,16 @@
-import * as React from "react";
 import FileTree from '@/components/file-tree/FileTree';
-import { ChangePlanSteps, ChangePlanStepsConfig } from '@/views/change-plan-view/change-plan-view.types';
-import ChangeInputStep from '@/views/change-plan-view/components/change-input-step';
-import LlmResponseStep from '@/views/change-plan-view/components/llm-response-step';
-import { setChangePlanViewState as setState } from '@/views/change-plan-view/store/change-plan-view.logic';
-import { getChangePlanViewState } from '@/views/change-plan-view/store/change-plan-view.store';
-import { handleSubmitPlanRequest } from '@/views/change-plan-view/logic/handleSubmitPlanRequest';
 import { ClientPostMessageManager } from "@/ipc/client-ipc";
 import { FileNode } from "@/types/file-node";
-import { handleFileClick } from "./logic/handleFileClick";
+import { ChangePlanSteps, ChangePlanStepsConfig } from '@/views/change-plan-view/change-plan-view.types';
+import PlanStep from '@/views/change-plan-view/components/plan-step/plan-step';
+import { setChangePlanViewState as setState } from '@/views/change-plan-view/store/change-plan-view.logic';
+import { getChangePlanViewState } from '@/views/change-plan-view/store/change-plan-view.store';
+import * as React from "react";
+import ApiKeyManagementStep from './components/api-key-management-step/ApiKeyManagementStep';
 import CommitStep from "./components/commit-step/CommitStep";
-import ApiKeyManagement from './components/api-key-management/ApiKeyManagement'; // Import the new ApiKeyManagement component
+import { handleFileClick } from "./logic/handleFileClick";
 
-export const getChangePlanTabs = (
+export const getChangePlanSteps = (
     {
         files,
         recentFiles,
@@ -30,14 +28,12 @@ export const getChangePlanTabs = (
     const clientIpc = ClientPostMessageManager.getInstance();
     const selectedFiles = getChangePlanViewState("selectedFiles");
     const llmResponse = getChangePlanViewState("llmResponse");
-    const changeDescription = getChangePlanViewState("changeDescription");
-    const isLoading = getChangePlanViewState("isLoading");
 
     return {
         [ChangePlanSteps.ApiKeyManagement]: { // Add the new API Keys tab
             indicatorText: "API Keys",
             renderStep: () => (
-                <ApiKeyManagement /> // Render the ApiKeyManagement component
+                <ApiKeyManagementStep /> // Render the ApiKeyManagement component
             )
         },
         [ChangePlanSteps.Context]: {
@@ -71,16 +67,7 @@ export const getChangePlanTabs = (
             indicatorText: "Plan",
             renderStep: () => (
                 <>
-                    <LlmResponseStep llmResponse={llmResponse} />
-                    <ChangeInputStep
-                        isUpdateRequest={!!(
-                            getChangePlanViewState("chatHistory").length > 0 && llmResponse
-                        )}
-                        changeDescription={changeDescription}
-                        isLoading={isLoading}
-                        handleChange={setState("changeDescription")}
-                        handleSubmit={() => handleSubmitPlanRequest(clientIpc, files)}
-                    />
+                    <PlanStep llmResponse={llmResponse} files={files} />
                 </>
             ),
         },

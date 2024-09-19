@@ -5,7 +5,7 @@ import { ClientPostMessageManager } from '@/ipc/client-ipc';
 import { ClientToServerChannel, ServerToClientChannel } from '@/ipc/channels.enum';
 import Modal from '@/components/Modal';
 
-const ApiKeyManagement: React.FC = () => {
+const ApiKeyManagementStep: React.FC = () => {
   const [apiKeys, setApiKeys] = useState<Record<LlmServiceEnum, string[]>>(
     Object.values(LlmServiceEnum).reduce((acc, service) => ({ ...acc, [service]: [] }), {} as any)
   );
@@ -147,4 +147,4 @@ const ApiKeyManagement: React.FC = () => {
   );
 };
 
-export default ApiKeyManagement;
+export default ApiKeyManagementStep;

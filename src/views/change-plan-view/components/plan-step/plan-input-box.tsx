@@ -1,26 +1,28 @@
 import * as React from 'react';
-import '../ChangePlanView.scss';
+import '../../change-plan.view.scss';
 import { BsSend } from 'react-icons/bs';
 import AutoResizingTextarea from '@/components/AutoResizingTextarea';
 import { ClientPostMessageManager } from '@/ipc/client-ipc';
 import { ClientToServerChannel, ServerToClientChannel } from '@/ipc/channels.enum';
 import { useStore } from '@/store/useStore';
-import { changePlanViewStoreStateSubject } from '@/views/change-plan-view/store/change-plan-view.store';
+import { changePlanViewStoreStateSubject, getChangePlanViewState } from '@/views/change-plan-view/store/change-plan-view.store';
+import { handleSubmitPlanRequest } from '../../logic/handleSubmitPlanRequest';
+import { FileNode } from '@/types/file-node';
 
-interface ChangeInputStepProps {
-    changeDescription: string;
-    isLoading: boolean;
+interface PlanStepInputProps {
     handleChange: (value: string) => void;
-    handleSubmit: () => void;
     isUpdateRequest?: boolean;
+    files: FileNode[];
 }
 
-const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, changeDescription, isLoading, handleChange, handleSubmit }) => {
+const PlanInputBox: React.FC<PlanStepInputProps> = ({ isUpdateRequest, handleChange, files }) => {
     const { selectedFiles } = useStore(changePlanViewStoreStateSubject);
     const [suggestions, setSuggestions] = React.useState<string[]>([]);
     const [selectedSuggestionIndex, setSelectedSuggestionIndex] = React.useState<number | null>(null);
     const [showSuggestions, setShowSuggestions] = React.useState(false);
     const inputRef = React.useRef<HTMLTextAreaElement>(null);
+    const changeDescription = getChangePlanViewState("changeDescription");
+    const isLoading = getChangePlanViewState("isLoading");
 
     const clientIpc = ClientPostMessageManager.getInstance();
 
@@ -31,6 +33,10 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
             + suggestion + ' ');
         setSelectedSuggestionIndex(null);
         setShowSuggestions(false);
+    };
+
+    const handleSubmit = () => {
+        handleSubmitPlanRequest(clientIpc, files);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -82,8 +88,7 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
     }, []);
 
     return (
-        <div className="flex flex-grow flex-col">
-            <div className="p-4 flex flex-col grow" />
+        <div className="flex flex-col absolute bottom-0 left-0 w-full">
             <div className="relative p-4 flex flex-col relative" data-testid="change-plan-input-step">
                 {showSuggestions && suggestions.length > 0 && (
                     <ul className="absolute bottom-full bg-sidebar-bg left-0 mb-1 border border-gray-300 rounded max-h-40 overflow-y-auto shadow-lg z-10 m-4"
@@ -131,4 +136,4 @@ const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, chan
     );
 };
 
-export default ChangeInputStep;
+export default PlanInputBox;
