@@ -55,6 +55,10 @@ const App = () => {
     </div>
   );
 
+  console.log({
+    changePlanTabs,
+    currentTab
+  })
   return (
     <div
       className="h-full fixed inset-0 flex flex-col justify-between bg-editor-bg"

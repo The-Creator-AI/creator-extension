@@ -36,10 +36,10 @@ const LlmResponseStep: React.FC<LlmResponseStepProps> = ({ llmResponse }) => {
 
     return (
         <div
-            className="p-4 overflow-y-auto"
+            className="overflow-y-auto"
             data-testid="change-plan-llm-response-step"
         >
-            <div className="p-4" data-testid="llm-response-container">
+            <div data-testid="llm-response-container">
                 {renderResponse()}
             </div>
         </div>
