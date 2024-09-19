@@ -6,31 +6,43 @@ import { ClientPostMessageManager } from '@/ipc/client-ipc';
 import { ClientToServerChannel, ServerToClientChannel } from '@/ipc/channels.enum';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import useDebounce from '@/utils/use-debounce';
+import { ChatMessage } from '@/backend/repositories/chat.respository';
+import {getChangePlanViewState} from '@/views/change-plan-view/store/change-plan-view.store';
 
 interface ChangeInputStepProps {
-    changeDescription: string;
-    isLoading: boolean;
     handleChange: (value: string) => void;
     handleSubmit: () => void;
     isUpdateRequest?: boolean;
 }
 
-const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ isUpdateRequest, changeDescription, isLoading, handleChange, handleSubmit }) => {
+const ChangeInputStep: React.FC<ChangeInputStepProps> = ({ 
+    isUpdateRequest, 
+    handleChange, 
+    handleSubmit,
+}) => {
     const clientIpc = ClientPostMessageManager.getInstance();
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [cursorPosition, setCursorPosition] = useState<number>(0);
     const [selectedIndex, setSelectedIndex] = useState<number>(-1);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
+    const selectedFiles = getChangePlanViewState("selectedFiles");
+    const chatHistory = getChangePlanViewState("chatHistory");
+    const changeDescription = getChangePlanViewState("changeDescription");
+    const isLoading = getChangePlanViewState("isLoading");
 
     const requestSuggestions = useDebounce(() => {
-        clientIpc.sendToServer(ClientToServerChannel.RequestAutocompleteSuggestions, { inputText: changeDescription });
+        clientIpc.sendToServer(ClientToServerChannel.RequestAutocompleteSuggestions, { 
+            inputText: changeDescription,
+            chatHistory,
+            selectedFiles,
+        });
     }, 200);
 
     useEffect(() => {
         const handleAutocompleteSuggestions = (message: { suggestions: string[] }) => {
             console.log('Received suggestions:', message.suggestions);
-            setSuggestions(message.suggestions);
+            setSuggestions(message.suggestions || []);
             setSelectedIndex(-1);
         };
 

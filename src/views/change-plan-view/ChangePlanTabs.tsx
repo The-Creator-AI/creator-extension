@@ -30,8 +30,6 @@ export const getChangePlanTabs = (
     const clientIpc = ClientPostMessageManager.getInstance();
     const selectedFiles = getChangePlanViewState("selectedFiles");
     const llmResponse = getChangePlanViewState("llmResponse");
-    const changeDescription = getChangePlanViewState("changeDescription");
-    const isLoading = getChangePlanViewState("isLoading");
 
     return {
         [ChangePlanSteps.ApiKeyManagement]: { // Add the new API Keys tab
@@ -76,8 +74,6 @@ export const getChangePlanTabs = (
                         isUpdateRequest={!!(
                             getChangePlanViewState("chatHistory").length > 0 && llmResponse
                         )}
-                        changeDescription={changeDescription}
-                        isLoading={isLoading}
                         handleChange={setState("changeDescription")}
                         handleSubmit={() => handleSubmitPlanRequest(clientIpc, files)}
                     />

@@ -209,9 +209,6 @@ export function handleChangePlanViewMessages(
       // Send a message to the LLM service with the updated chat history.
       const llmResponse = await Services.getLlmService().sendPrompt(
         [
-          // ...getChangePlanViewState("chatHistory").filter(
-          //   (message) => message.user === "bot" || message.user === "user"
-          // ),
           {
             user: "instrutor",
             message: `You are a text autocomplete agent. Give the result as a JSON with 'suggestions' as the key, for example -
@@ -223,7 +220,10 @@ export function handleChangePlanViewMessages(
             {
               "suggestions": [" doing?", " today?", " feeling?"]
             }
-            \`\`\``,
+            \`\`\`
+
+            Note: The user is more interested in keywords from the chat history, it could be file names, symbols, functions etc.
+            `,
           },
           {
             user: "user",
@@ -233,7 +233,6 @@ export function handleChangePlanViewMessages(
         [],
         () => {},
         ModelGrade.ONE_STAR
-        // getChangePlanViewState("selectedFiles")
       );
 
       // Parse the LLM response using parseJsonResponse from parse-json.
