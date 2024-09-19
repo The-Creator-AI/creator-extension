@@ -4,18 +4,20 @@ export enum ClientToServerChannel {
   RequestOpenEditors = "clientToServer.requestOpenEditors",
   SendSelectedEditor = "clientToServer.sendSelectedEditor",
   RequestWorkspaceFiles = "clientToServer.requestWorkspaceFiles",
-  RequestFileCode = "clientToServer.requestFileCode", 
+  RequestFileCode = "clientToServer.requestFileCode",
   RequestOpenFile = "clientToServer.requestOpenFile",
   SendStreamMessage = "clientToServer.sendStreamMessage",
-  PersistStore = "clientToServer.persistStore", 
-  FetchStore = "clientToServer.fetchStore", 
+  PersistStore = "clientToServer.persistStore",
+  FetchStore = "clientToServer.fetchStore",
   RequestCommitMessageSuggestions = "clientToServer.requestCommitMessageSuggestions",
   CommitStagedChanges = "clientToServer.commitStagedChanges",
   RequestStreamFileCode = "clientToServer.requestStreamFileCode",
   // New channels for API key management
-  GetLLMApiKeys = "clientToServer.getLLMApiKeys", 
-  SetLLMApiKey = "clientToServer.setLLMApiKey", 
-  DeleteLLMApiKey = "clientToServer.deleteLLMApiKey" 
+  GetLLMApiKeys = "clientToServer.getLLMApiKeys",
+  SetLLMApiKey = "clientToServer.setLLMApiKey",
+  DeleteLLMApiKey = "clientToServer.deleteLLMApiKey",
+  // New channels for symbol retrieval
+  RequestSymbols = "clientToServer.requestSymbols" 
 }
 
 export enum ServerToClientChannel {
@@ -29,5 +31,7 @@ export enum ServerToClientChannel {
   SendCommitMessageSuggestions = "serverToClient.sendCommitMessageSuggestions",
   StreamFileCode = "serverToClient.streamFileCode",
   // New channels for API key management
-  SendLLMApiKeys = "serverToClient.sendLLMApiKeys"
+  SendLLMApiKeys = "serverToClient.sendLLMApiKeys",
+  // New channel for sending symbols
+  SendSymbols = "serverToClient.sendSymbols" 
 }

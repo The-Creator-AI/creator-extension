@@ -14,6 +14,7 @@ import { handleSendMessage } from "@/views/change-plan-view/utils/handleSendMess
 import { handleStreamMessage } from "@/views/change-plan-view/utils/handleStreamMessage";
 import { handleWorkspaceFilesRequest } from "@/views/change-plan-view/utils/handleWorkspaceFilesRequest";
 import { gitCommit } from "./utils/gitCommit";
+import * as vscode from 'vscode';
 
 // Function to handle messages for the change plan view
 export function handleChangePlanViewMessages(
@@ -190,6 +191,40 @@ export function handleChangePlanViewMessages(
         serverIpc.sendToClient(ServerToClientChannel.SendLLMApiKeys, { apiKeys: updatedApiKeys });
       } catch (error) {
         console.error('Error deleting LLM API key:', error);
+        // Handle the error appropriately, e.g., send an error message to the client
+      }
+    }
+  );
+
+  // Handle symbol retrieval request
+  serverIpc.onClientMessage(
+    ClientToServerChannel.RequestSymbols,
+    async ({ query }) => {
+      try {
+        console.log('Requesting symbols for query:', query);
+        // const symbols: Record<string, string[]> = {};
+
+        // for (const filePath of selectedFiles) {
+        //   const document = await vscode.workspace.openTextDocument(filePath);
+        //   const symbolInformation = await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
+        //     'vscode.executeDocumentSymbolProvider',
+        //     document.uri
+        //   );
+
+        //   const symbolNames = (symbolInformation || []).map(symbol => symbol.name);
+        //   symbols[filePath] = symbolNames;
+        // }
+
+        const symbolInformation = await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
+          'vscode.executeWorkspaceSymbolProvider',
+          query || ''
+        );
+
+        console.log('Retrieved symbols:', symbolInformation);
+
+        serverIpc.sendToClient(ServerToClientChannel.SendSymbols, { symbols: symbolInformation });
+      } catch (error) {
+        console.error('Error retrieving symbols:', error);
         // Handle the error appropriately, e.g., send an error message to the client
       }
     }
