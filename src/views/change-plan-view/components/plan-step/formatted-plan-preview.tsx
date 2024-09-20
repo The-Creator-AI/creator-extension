@@ -36,20 +36,13 @@ const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
         }
     }, [activeTab, jsonData.code_plan]);
 
-    const handleCardScroll = () => {
-        if (fileCardContainerRef.current) {
-            const cardWidth = fileCardContainerRef.current.children[0].clientWidth; // Assuming all cards have the same width
-            const visibleCardIndex = Math.round(fileCardContainerRef.current.scrollLeft / cardWidth);
-            setCurrentFileIndex(visibleCardIndex);
-            const filePath = jsonData.code_plan[visibleCardIndex].filename;
-            if (filePath) {
-                clientIpc.sendToServer(ClientToServerChannel.RequestOpenFile, { filePath });
-            }
-        }
+
+    const handleDotClick = (index: number) => {
+        setCurrentFileIndex(index);
     };
 
     return jsonData ? (
-        <div className="formatted-plan-preview pt-2 flex flex-col flex-grow" onKeyDown={handleKeyDown} tabIndex={0} onScroll={handleCardScroll}>
+        <div className="formatted-plan-preview pt-2 flex flex-col flex-grow" onKeyDown={handleKeyDown} tabIndex={0}>
             <h3 className="flex justify-center text-xs font-bold mb-2 px-4 text-center">{jsonData.title}</h3>
             <p className="flex justify-center text-gray-700 mb-4 px-4 text-center">{jsonData.description}</p>
             {/* Pagination Dots */}
@@ -57,13 +50,14 @@ const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                 {jsonData.code_plan.map((_: any, index: number) => (
                     <div
                         key={index}
-                        className={`w-2 h-2 rounded-full mx-1 ${index === currentFileIndex ? 'bg-blue-500' : 'bg-gray-400'}`}
+                        onClick={() => handleDotClick(index)} // Add onClick handler for each dot
+                        className={`w-2 h-2 rounded-full mx-1 cursor-pointer ${index === currentFileIndex ? 'bg-blue-500' : 'bg-gray-400'}`}
                     />
                 ))}
             </div>
-            <div className="flex flex-grow overflow-x-auto scroll-smooth mx-4" ref={fileCardContainerRef}>
+            <div className="flex flex-grow overflow-x-hidden scroll-smooth mx-4">
                 {jsonData.code_plan.map((item: any, index: number) => {
-                    if (item.filename) {
+                    if (item.filename && index === currentFileIndex) { // Only render the card at the currentFileIndex
                         return (
                             <FileCard
                                 key={index}

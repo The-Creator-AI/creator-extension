@@ -7,6 +7,7 @@ import { ClientPostMessageManager } from '../../../../../ipc/client-ipc';
 import { getChangePlanViewState } from '../../../store/change-plan-view.store';
 import { setChangePlanViewState } from '@/views/change-plan-view/store/change-plan-view.logic';
 import { ServerToClientChannel } from '@/ipc/channels.enum';
+import Markdown from "markdown-to-jsx";
 
 interface FileCardProps {
     fileName: string;
@@ -80,7 +81,7 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
     };
 
     return (
-        <div className="file-card flex flex-grow flex-col bg-sidebar-bg border border-gray-700 rounded p-4 shadow-md mr-4 relative">
+        <div className="file-card flex flex-grow flex-col bg-sidebar-bg border border-gray-700 rounded p-4 shadow-md min-w-0 relative">
             {/* File Number Indicator */}
             <div className="absolute top-2 right-2 text-gray-500 text-sm">
                 {fileNumber} / {totalFiles}
@@ -109,7 +110,9 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
             <p className="text-gray-600 mb-3">{operation}</p>
             <ul className="list-disc list-inside">
                 {recommendations.map((recommendation, index) => (
-                    <li key={index} className="text-gray-400 text-xs mb-2">{recommendation}</li>
+                    <li key={index} className="text-gray-400 text-xs mb-2">
+                        <Markdown>{JSON.stringify(recommendation, null, 2)}</Markdown>
+                    </li>
                 ))}
             </ul>
         </div>
