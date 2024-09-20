@@ -8,7 +8,6 @@ import { ClientToServerChannel } from '@/ipc/channels.enum';
 
 const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     const [currentFileIndex, setCurrentFileIndex] = useState(0);
-    const fileCardContainerRef = useRef<HTMLDivElement>(null);
     const { activeTab } = useStore(changePlanViewStoreStateSubject);
     const clientIpc = ClientPostMessageManager.getInstance();
 
@@ -21,10 +20,9 @@ const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     };
 
     useEffect(() => {
-        if (fileCardContainerRef.current) {
-            const cardWidth = fileCardContainerRef.current.children[0].clientWidth; // Assuming all cards have the same width
-            fileCardContainerRef.current.scrollLeft = cardWidth * currentFileIndex;
-        }
+        clientIpc.sendToServer(ClientToServerChannel.RequestOpenFile, {
+            filePath: jsonData.code_plan[currentFileIndex].filename
+        });
     }, [currentFileIndex]);
 
     useEffect(() => {
@@ -55,7 +53,7 @@ const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                     />
                 ))}
             </div>
-            <div className="flex flex-grow overflow-x-hidden mx-4" ref={fileCardContainerRef}> 
+            <div className="flex flex-grow overflow-x-hidden mx-4"> 
                 {jsonData.code_plan.map((item: any, index: number) => {
                     if (item.filename && index === currentFileIndex) { // Only render the card at the currentFileIndex
                         return (
