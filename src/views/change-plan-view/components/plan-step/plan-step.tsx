@@ -41,10 +41,9 @@ const PlanStep: React.FC<PlanStepProps> = ({ llmResponse, files }) => {
 
     return (
         <div
-            className="overflow-y-auto"
-            data-testid="change-plan-llm-response-step"
+            className="plan-step flex flex-grow flex-col"
         >
-            <div data-testid="llm-response-container">
+            <div className="flex flex-grow flex-col">
                 {renderResponse()}
             </div>
             <PlanInputBox

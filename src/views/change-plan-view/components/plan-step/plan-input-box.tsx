@@ -88,7 +88,7 @@ const PlanInputBox: React.FC<PlanStepInputProps> = ({ isUpdateRequest, handleCha
     }, []);
 
     return (
-        <div className="flex flex-col absolute bottom-0 left-0 w-full">
+        <div className="flex flex-col">
             <div className="relative p-4 flex flex-col relative" data-testid="change-plan-input-step">
                 {showSuggestions && suggestions.length > 0 && (
                     <ul className="absolute bottom-full bg-sidebar-bg left-0 mb-1 border border-gray-300 rounded max-h-40 overflow-y-auto shadow-lg z-10 m-4"

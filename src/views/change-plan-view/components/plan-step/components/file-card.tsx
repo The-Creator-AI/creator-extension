@@ -80,7 +80,7 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
     };
 
     return (
-        <div className="file-card bg-sidebar-bg border border-gray-700 rounded p-4 shadow-md mr-4 relative" style={{ minWidth: '300px' }}>
+        <div className="file-card flex flex-grow flex-col bg-sidebar-bg border border-gray-700 rounded p-4 shadow-md mr-4 relative">
             {/* File Number Indicator */}
             <div className="absolute top-2 right-2 text-gray-500 text-sm">
                 {fileNumber} / {totalFiles}
@@ -103,7 +103,7 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
                     </span>
                 )}
                 {isLoading && fileContent?.length ? (
-                    <span className="text-xs text-gray-500 whitespace-nowrap">({fileContent?.length} ++)</span>
+                    <span className="text-xs text-gray-500 whitespace-nowrap overflow-x-auto">({fileContent?.length} ++)</span>
                 ) : null}
             </div>
             <p className="text-gray-600 mb-3">{operation}</p>
