@@ -81,18 +81,18 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
     };
 
     return (
-        <div className="file-card flex flex-grow flex-col bg-sidebar-bg border border-gray-700 rounded p-4 shadow-md min-w-0 relative">
+        <div className="file-card flex flex-grow flex-col bg-sidebar-bg border border-gray-700 rounded p-4 shadow-md min-w-0 relative overflow-hidden">
             {/* File Number Indicator */}
             <div className="absolute top-2 right-2 text-gray-500 text-sm">
                 {fileNumber} / {totalFiles}
             </div>
-            <p className="text-gray-700 text-xs mt-4 whitespace-nowrap overflow-auto" style={{ scrollbarWidth: 'none' }}>{filePath}</p>
+            <p className="text-gray-700 text-xs mt-4 whitespace-nowrap overflow-x-auto overflow-y-hidden" style={{ scrollbarWidth: 'none' }}>{filePath}</p>
             <div className="flex items-center mb-2">
                 <MdDescription
                     size={18}
                     className={`mr-2 cursor-pointer ${isLoading ? 'text-gray-400' : 'hover:text-blue-500'} `}
                 />
-                <h4 className="text-base font-medium text-editor-fg" onClick={() => handleRequestOpenFile(filePath)}>{fileName}</h4>
+                <h4 className="text-base font-medium text-editor-fg cursor-pointer" onClick={() => handleRequestOpenFile(filePath)}>{fileName}</h4>
                 {!isLoading ? <MdFileDownload
                     size={18}
                     className={`ml-2 cursor-pointer text-blue-500`}
@@ -108,7 +108,7 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
                 ) : null}
             </div>
             <p className="text-gray-600 mb-3">{operation}</p>
-            <ul className="list-disc list-inside">
+            <ul className="list-disc list-inside overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
                 {recommendations.map((recommendation, index) => (
                     <li key={index} className="text-gray-400 text-xs mb-2">
                         <Markdown>{JSON.stringify(recommendation, null, 2)}</Markdown>

@@ -42,9 +42,9 @@ const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     };
 
     return jsonData ? (
-        <div className="formatted-plan-preview pt-2 flex flex-col flex-grow" onKeyDown={handleKeyDown} tabIndex={0}>
+        <div className="formatted-plan-preview min-h-0 pt-2 flex flex-col flex-grow focus:outline-none" onKeyDown={handleKeyDown} tabIndex={0}>
             <h3 className="flex justify-center text-xs font-bold mb-2 px-4 text-center">{jsonData.title}</h3>
-            <p className="flex justify-center text-gray-700 mb-4 px-4 text-center">{jsonData.description}</p>
+            <p className="flex justify-center text-gray-700 px-4 text-center max-h-10 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>{jsonData.description}</p>
             {/* Pagination Dots */}
             <div className="flex justify-center my-4">
                 {jsonData.code_plan.map((_: any, index: number) => (
@@ -55,7 +55,7 @@ const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
                     />
                 ))}
             </div>
-            <div className="flex flex-grow overflow-x-hidden scroll-smooth mx-4">
+            <div className="flex flex-grow overflow-x-hidden mx-4" ref={fileCardContainerRef}> 
                 {jsonData.code_plan.map((item: any, index: number) => {
                     if (item.filename && index === currentFileIndex) { // Only render the card at the currentFileIndex
                         return (

@@ -41,9 +41,9 @@ const PlanStep: React.FC<PlanStepProps> = ({ llmResponse, files }) => {
 
     return (
         <div
-            className="plan-step flex flex-grow flex-col"
+            className="plan-step flex flex-grow flex-col min-h-0"
         >
-            <div className="flex flex-grow flex-col">
+            <div className="flex flex-grow flex-col min-h-0">
                 {renderResponse()}
             </div>
             <PlanInputBox
