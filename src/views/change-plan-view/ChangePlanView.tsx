@@ -17,8 +17,8 @@ import {
 } from "./store/change-plan-view.logic";
 import {
   changePlanViewStoreStateSubject,
-  getChangePlanViewState
 } from "./store/change-plan-view.store";
+import {Log} from '@/utils/firebaseLogger';
 
 const App = () => {
   const {
@@ -37,6 +37,10 @@ const App = () => {
     setActiveFile,
   });
 
+  // Initialize Firebase
+  useEffect(() => {
+    Log.sidebarOpened();
+  }, []);
 
   useEffect(() => {
     setupChannelHandlers(setFiles);

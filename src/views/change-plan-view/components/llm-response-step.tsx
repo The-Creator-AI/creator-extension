@@ -4,6 +4,7 @@ import Markdown from "markdown-to-jsx";
 import "../ChangePlanView.scss";
 import JsonResponse from "./json-renderer";
 import { parseJsonResponse } from "../../../utils/parse-json";
+import {Log} from '@/utils/firebaseLogger';
 
 interface LlmResponseStepProps {
     llmResponse: string;
@@ -21,6 +22,7 @@ const LlmResponseStep: React.FC<LlmResponseStepProps> = ({ llmResponse }) => {
         } else {
             setResponseType('markdown');
         }
+        Log.planFetched();
     }, [llmResponse]);
 
     const renderResponse = () => {

@@ -10,6 +10,7 @@ import { useState } from 'react';
 import {useStore} from '@/store/useStore';
 import {changePlanViewStoreStateSubject} from '@/views/change-plan-view/store/change-plan-view.store';
 import { setChangePlanViewState } from "../store/change-plan-view.logic";
+import { Log } from "@/utils/firebaseLogger";
 
 const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     if (!jsonData) {
@@ -74,6 +75,7 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
     };
 
     const handleRequestFileCode = (filePath: string) => {
+        Log.fileCodeRequested();
         const fileChunkMap = getChangePlanViewState('fileChunkMap');
         const updatedFileChunkMap = {
             ...fileChunkMap,
@@ -106,6 +108,7 @@ const JsonResponse: React.FC<{ jsonData: any }> = ({ jsonData }) => {
         });
 
         clientIpc.onServerMessage(ServerToClientChannel.SendFileCode, (data) => {
+            Log.fileCodeGenerated();
             console.log({ data });
             const { filePath } = data;
             const fileChunkMap = getChangePlanViewState('fileChunkMap');
