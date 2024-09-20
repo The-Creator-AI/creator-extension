@@ -43,14 +43,18 @@ export class CreatorService {
       }
       processedPaths.add(filePath);
 
-      if (fs.statSync(filePath).isDirectory()) {
-        fs.readdirSync(filePath).forEach(file => readContentRecursive(path.join(filePath, file)));
-      } else {
-        try {
-          fileContents[filePath] = fs.readFileSync(filePath, 'utf8');
-        } catch (error) {
-          console.error(`Error reading file ${filePath}: ${error}`);
+      try {
+        if (fs.statSync(filePath).isDirectory()) {
+          fs.readdirSync(filePath).forEach(file => readContentRecursive(path.join(filePath, file)));
+        } else {
+          try {
+            fileContents[filePath] = fs.readFileSync(filePath, 'utf8');
+          } catch (error) {
+            console.error(`Error reading file ${filePath}: ${error}`);
+          }
         }
+      } catch (error) {
+        console.error(`Error reading file ${filePath}: ${error}`);
       }
     };
 

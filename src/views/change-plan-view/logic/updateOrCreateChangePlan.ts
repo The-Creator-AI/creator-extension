@@ -5,6 +5,10 @@ import { setChangePlanViewState } from "@/views/change-plan-view/store/change-pl
 export const updateOrCreateChangePlan = (llmResponse: string) => {
   try {
     const planJson = parseJsonResponse(llmResponse);
+    if (!planJson) {
+      return;
+    }
+
     const planTitle = planJson.title;
     const planDescription = planJson.description;
 
