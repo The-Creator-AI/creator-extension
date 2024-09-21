@@ -29,8 +29,14 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
     React.useEffect(() => {
         clientIpc.onServerMessage(ServerToClientChannel.StreamFileCode, (data) => {
             const { filePath, chunk } = data;
+            console.log({ filePath, chunk });
             const fileChunkMap = getChangePlanViewState('fileChunkMap');
             const localFilePath = Object.keys(fileChunkMap).find((key) => key.includes(filePath) || filePath.includes(key));
+
+            if (!fileChunkMap[localFilePath]?.isLoading) {
+                return;
+            }
+
             const updatedFileChunkMap = {
                 ...fileChunkMap,
                 [localFilePath]: {
@@ -42,14 +48,15 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, operation, recommendation
         });
 
         clientIpc.onServerMessage(ServerToClientChannel.SendFileCode, (data) => {
-            console.log({ data });
-            const { filePath } = data;
+            const { filePath, fileContent } = data;
+            console.log({ filePath, fileContent });
             const fileChunkMap = getChangePlanViewState('fileChunkMap');
             const localFilePath = Object.keys(fileChunkMap).find((key) => key.includes(filePath) || filePath.includes(key));
             const updatedFileChunkMap = {
                 ...fileChunkMap,
                 [localFilePath]: {
                     ...fileChunkMap[localFilePath],
+                    fileContent,
                     isLoading: false
                 }
             };
