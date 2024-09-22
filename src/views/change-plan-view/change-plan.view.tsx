@@ -8,15 +8,15 @@ import { FileNode } from "../../types/file-node";
 import {
   ChangePlanSteps
 } from "./change-plan-view.types";
-import { getChangePlanTabs } from "./ChangePlanTabs";
-import "./ChangePlanView.scss";
+import { getChangePlanSteps } from "./ChangePlanSteps";
+import "./change-plan.view.scss";
 import StepIndicators from "./components/step-indicators";
 import { setupChannelHandlers } from "./logic/setupChannelHandlers";
 import {
   setChangePlanViewState as setState,
 } from "./store/change-plan-view.logic";
 import {
-  changePlanViewStoreStateSubject,
+  changePlanViewStoreStateSubject
 } from "./store/change-plan-view.store";
 import {Log} from '@/utils/firebaseLogger';
 
@@ -29,7 +29,7 @@ const App = () => {
   const [recentFiles, setRecentFiles] = useState<string[]>([]);
   const [activeFile, setActiveFile] = useState<string>();
 
-  const changePlanTabs = getChangePlanTabs({
+  const changePlanSteps = getChangePlanSteps({
     files,
     recentFiles,
     activeFile,
@@ -59,18 +59,22 @@ const App = () => {
     </div>
   );
 
+  console.log({
+    changePlanSteps,
+    currentTab
+  })
   return (
     <div
       className="h-full fixed inset-0 flex flex-col justify-between bg-editor-bg"
     >
       <StepIndicators
-        changePlanStepsConfig={changePlanTabs}
+        changePlanStepsConfig={changePlanSteps}
         currentStep={currentTab}
         handleStepClick={handleStepClick}
       />
       <div className="flex flex-grow flex-col overflow-hidden">
         {/* Dropdown removed */}
-        {changePlanTabs[currentTab].renderStep()}
+        {changePlanSteps[currentTab].renderStep()}
       </div>
       {isLoading && renderLoader()} {/* Conditionally render the loader */}
     </div>

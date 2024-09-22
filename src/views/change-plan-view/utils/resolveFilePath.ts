@@ -35,12 +35,15 @@ export async function resolveFilePath(
     return resolvedPath;
   } else {
     // File not found, ask the user to confirm or modify the path for creating an empty file
+    // TODO: What if there are multiple workspace folders?
     const workspacePath = vscode.workspace.workspaceFolders![0].uri.fsPath;
-    const newFilePath = await vscode.window.showInputBox({
+    let newFilePath = await vscode.window.showInputBox({
       prompt:
         "The file is not found. Please confirm or modify the file path to create an empty file.",
       value: originalFilePath,
     });
+    const isAbsolute = path.isAbsolute(newFilePath);
+    newFilePath = isAbsolute ? newFilePath : path.join(workspacePath, newFilePath);
 
     if (newFilePath) {
       const dirPath = path.dirname(newFilePath);
@@ -49,6 +52,8 @@ export async function resolveFilePath(
       if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
       }
+
+      console.log("Creating new file at", newFilePath);
 
       // Create empty file
       fs.writeFileSync(newFilePath, "");

@@ -1,5 +1,8 @@
 export const parseJsonResponse = (response: string): any | null => {
   try {
+    if (!response) {
+      return null;
+    }
     const jsonStart = response.indexOf("```json");
     const jsonEnd = response.lastIndexOf("```") + 1;
 
