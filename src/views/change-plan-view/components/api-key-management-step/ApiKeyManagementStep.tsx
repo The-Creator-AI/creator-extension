@@ -2,10 +2,10 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { LlmServiceEnum } from '@/backend/types/llm-service.enum';
 import { ClientPostMessageManager } from '@/ipc/client-ipc';
-import { ClientToServerChannel, ServerToClientChannel } from '@/ipc/channels.enum'; 
+import { ClientToServerChannel, ServerToClientChannel } from '@/ipc/channels.enum';
 import Modal from '@/components/Modal';
 
-const ApiKeyManagement: React.FC = () => {
+const ApiKeyManagementStep: React.FC = () => {
   const [apiKeys, setApiKeys] = useState<Record<LlmServiceEnum, string[]>>(
     Object.values(LlmServiceEnum).reduce((acc, service) => ({ ...acc, [service]: [] }), {} as any)
   );
@@ -29,7 +29,7 @@ const ApiKeyManagement: React.FC = () => {
     };
 
     clientIpc.onServerMessage(ServerToClientChannel.SendLLMApiKeys, handleSendLLMApiKeys);
-  }, []); 
+  }, []);
 
   const handleAddApiKey = async () => {
     if (newApiKey.trim() === '' || !selectedService) {
@@ -56,22 +56,22 @@ const ApiKeyManagement: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">API Key Management</h2>
+      <h2 className="text-xl font-bold mb-4 text-editor-fg">API Key Management</h2>
       <button
-            onClick={handleOpenModal}
-            className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mb-4"
-          >
-            Add API Key
+        onClick={handleOpenModal}
+        className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-button-bg hover:bg-button-bg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-button-bg mb-4"
+      >
+        Add API Key
       </button>
       {/* Display existing keys or a message if no keys are present */}
       {Object.keys(apiKeys).some((service) => apiKeys[service as LlmServiceEnum].length > 0) ? (
         Object.entries(apiKeys).map(([service, keys]) => (
           <div key={service} className="mb-6">
-            <h3 className="text-lg font-medium text-gray-900">{service}</h3>
+            <h3 className="text-lg font-medium text-editor-fg">{service}</h3>
             <ul className="list-disc pl-5">
               {keys.map((apiKey, index) => (
                 <li key={index} className="flex items-center justify-between py-2">
-                  <span className="truncate">{apiKey}</span>
+                  <span className="truncate text-editor-fg">{apiKey}</span>
                   <button
                     onClick={() => handleDeleteApiKey(service as LlmServiceEnum, apiKey)}
                     className="text-red-500 hover:text-red-700"
@@ -92,7 +92,7 @@ const ApiKeyManagement: React.FC = () => {
       {/* Modal for adding new API keys */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <div className="p-6">
-          <h3 className="text-lg font-bold mb-4">Add New API Key</h3>
+          <h3 className="text-lg font-bold mb-4 text-editor-fg">Add New API Key</h3>
           <div className="mb-4">
             <label htmlFor="serviceSelect" className="block text-sm font-medium text-gray-700">
               Select Service:
@@ -101,7 +101,7 @@ const ApiKeyManagement: React.FC = () => {
               id="serviceSelect"
               value={selectedService || ''}
               onChange={(e) => setSelectedService(e.target.value as LlmServiceEnum)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-inherit"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-settings-input-bg"
             >
               <option value="">Select a service</option>
               {Object.values(LlmServiceEnum).map((service) => (
@@ -120,7 +120,7 @@ const ApiKeyManagement: React.FC = () => {
                 type="password" // Make the input field a password field
                 name="apiKeyInput"
                 id="apiKeyInput"
-                className="focus:ring-indigo-500 focus:border-indigo-500 flex-grow block w-full min-w-0 rounded-none rounded-l-md sm:text-sm border-gray-300 p-2 bg-inherit"
+                className="focus:ring-indigo-500 focus:border-indigo-500 flex-grow block w-full min-w-0 rounded-none rounded-l-md sm:text-sm border-gray-300 p-2 bg-settings-input-bg"
                 placeholder="Enter your API key"
                 value={newApiKey}
                 onChange={(e) => setNewApiKey(e.target.value)}
@@ -128,14 +128,14 @@ const ApiKeyManagement: React.FC = () => {
               />
               <button
                 onClick={handleAddApiKey}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-button-bg hover:bg-button-bg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-button-bg"
                 disabled={!selectedService || newApiKey.trim() === ''}
               >
                 Add
               </button>
             </div>
           </div>
-          <button 
+          <button
             onClick={handleCloseModal}
             className="mt-4 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
@@ -147,4 +147,4 @@ const ApiKeyManagement: React.FC = () => {
   );
 };
 
-export default ApiKeyManagement;
+export default ApiKeyManagementStep;

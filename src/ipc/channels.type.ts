@@ -104,6 +104,7 @@ export type ChannelBody<T extends ClientToServerChannel | ServerToClientChannel>
     : T extends ClientToServerChannel.CommitStagedChanges
     ? {
         message: string;
+        description: string;
       }
     : T extends ClientToServerChannel.GetLLMApiKeys
     ? {}
@@ -113,4 +114,12 @@ export type ChannelBody<T extends ClientToServerChannel | ServerToClientChannel>
     ? { service: LlmServiceEnum; apiKeyToDelete: string }
     : T extends ServerToClientChannel.SendLLMApiKeys
     ? { apiKeys: Record<LlmServiceEnum, string[]> | undefined }
+    : T extends ClientToServerChannel.RequestSymbols
+    ? {
+        query?: string;
+      }
+    : T extends ServerToClientChannel.SendSymbols
+    ? {
+        symbols: any;
+      }
     : never;

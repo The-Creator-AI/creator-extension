@@ -10,11 +10,13 @@ import { ChangePlanViewStore } from "./change-plan-view.state-type";
 import { changePlanViewStoreStateSubject } from "./change-plan-view.store";
 
 export const setNewEmptyChangePlan = () => {
-  const newValue = {
+  const newValue: ChangePlanViewStore = {
     ...changePlanViewStoreStateSubject.getValue(),
     changeDescription: "",
     llmResponse: "",
     chatHistory: [],
+    fileChunkMap: {},
+    isLoading: false,
   };
   changePlanViewStoreStateSubject._next(
     newValue,

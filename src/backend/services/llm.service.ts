@@ -21,7 +21,8 @@ export class LlmService {
 
   constructor(
     @Inject(CreatorService) private readonly creatorService: CreatorService,
-    @Inject(SettingsRepository) private readonly settingsRepository: SettingsRepository
+    @Inject(SettingsRepository)
+    private readonly settingsRepository: SettingsRepository
   ) {}
 
   async sendPrompt(
@@ -117,40 +118,45 @@ ${fileContents[filePath]}
         };
       } catch (e: any) {
         debounce += 5000;
-        if (
-          e.status === 429 &&
-          this.currentModel === this.geminiProModel &&
-          currentKeyIndex < apiKeys.length - 1 // Check if there are more keys to try
-        ) {
-          currentKeyIndex++; // Move to the next key
-          console.log(
-            `${this.geminiProModel} limit reached for key ${
-              apiKeys[currentKeyIndex - 1]
-            }, trying with key ${apiKeys[currentKeyIndex]}`
+        // Handle specific errors based on error type and status
+        if (e.status === 429 && this.currentModel === this.geminiProModel) {
+          if (currentKeyIndex < apiKeys.length - 1) {
+            // Pro model rate limit reached, try with the next key
+            currentKeyIndex++;
+            console.log(
+              `${this.geminiProModel} limit reached for key ${
+                apiKeys[currentKeyIndex - 1]
+              }, trying with key ${apiKeys[currentKeyIndex]}`
+            );
+            continue; // Retry with the next key
+          } else {
+            // All keys for Pro model exhausted, switch to Flash model
+            this.currentModel = this.geminiFlashModel;
+            currentKeyIndex = 0; // Reset key index for Flash model
+            console.log(
+              `${this.geminiProModel} limit reached for all keys, trying with ${this.geminiFlashModel}`
+            );
+            continue; // Retry with Flash model
+          }
+        } else {
+          // For other errors, log the error and potentially throw or handle differently
+          console.error(
+            `Error during LLM request (attempt ${attempts}):`,
+            e
           );
-          continue;
-        } else if (
-          e.status === 429 &&
-          this.currentModel === this.geminiProModel
-        ) {
-          this.currentModel = this.geminiFlashModel; // Update currentModel
-          console.log(
-            `${this.geminiProModel} limit reached for all keys, trying with ${this.geminiFlashModel}`
-          );
-          currentKeyIndex = 0; // Reset key index for the Flash model
-          continue;
+          // You might want to throw the error here or handle it differently based on your needs
+          // throw new Error("Could not get a response from Gemini after multiple attempts.");
         }
-        console.log(e);
-        // Handle other errors, e.g., throw an error, return a default message, etc.
       }
     }
+    // If all attempts fail, throw an error
     throw new Error(
       "Could not get a response from Gemini after multiple attempts."
     );
   }
 
   getModelName(): string {
-    return this.currentModel; // Access currentModel here
+    return this.currentModel;
   }
 
   private async sendPromptToOpenAI(
