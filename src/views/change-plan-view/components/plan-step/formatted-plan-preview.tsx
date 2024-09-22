@@ -21,13 +21,13 @@ const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
 
     useEffect(() => {
         clientIpc.sendToServer(ClientToServerChannel.RequestOpenFile, {
-            filePath: jsonData.code_plan[currentFileIndex].filename
+            filePath: jsonData.code_plan[currentFileIndex]?.filename
         });
     }, [currentFileIndex]);
 
     useEffect(() => {
         const matchingCardIndex = jsonData.code_plan.findIndex(
-            (item: any) => item.filename && activeTab && activeTab.endsWith(item.filename)
+            (item: any) => item?.filename && activeTab && activeTab.endsWith(item.filename)
         );
         if (matchingCardIndex !== -1) {
             setCurrentFileIndex(matchingCardIndex);
@@ -55,7 +55,7 @@ const FormattedPlanPreview: React.FC<{ jsonData: any }> = ({ jsonData }) => {
             </div>
             <div className="flex flex-grow overflow-x-hidden mx-4"> 
                 {jsonData.code_plan.map((item: any, index: number) => {
-                    if (item.filename && index === currentFileIndex) { // Only render the card at the currentFileIndex
+                    if (item?.filename && index === currentFileIndex) { // Only render the card at the currentFileIndex
                         return (
                             <FileCard
                                 key={index}
