@@ -15,7 +15,7 @@ export class Log {
   static logEvent(event: FirebaseEvents, params?: Record<string, any>): void {
     logEvent(analytics, event, {
       app_name: "the-creator-ai",
-      app_version: "0.0.3",
+      app_version: "0.1.0",
       ...params,
     });
   }
