@@ -8,7 +8,7 @@
   },
   "displayName": "The Creator AI",
   "description": "Coding assistant",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -37,10 +37,6 @@
         "title": "Creator AI: Hello World"
       },
       {
-        "command": "the-creator-ai.clearChatHistory",
-        "title": "Creator AI: Clear Chat History"
-      },
-      {
         "command": "the-creator-ai.resetClearChangePlanViewState",
         "title": "Creator AI: Clear Change Plan View State"
       },
@@ -53,6 +49,10 @@
         "command": "the-creator-ai.newPlan",
         "title": "Creator AI: New Plan",
         "icon": "$(sync)"
+      },
+      {
+        "command": "the-creator-ai.clearHistory",
+        "title": "Creator AI: Clear History"
       }
     ],
     "viewsContainers": {
@@ -75,11 +75,6 @@
     },
     "menus": {
       "view/title": [
-        {
-          "command": "the-creator-ai.clearChatHistory",
-          "when": "view == viewType.sidebar.chat",
-          "group": "navigation"
-        },
         {
           "command": "the-creator-ai.chooseChangePlan",
           "when": "view == viewType.sidebar.changePlan",

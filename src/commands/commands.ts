@@ -17,22 +17,6 @@ export const commands = [
     },
   },
   {
-    commandId: "the-creator-ai.clearChatHistory",
-    callback: async () => {
-      // Implement the logic to clear the chat history
-      const activeChat = await ChatRepository.getActiveChat();
-      if (activeChat) {
-        activeChat.messages = []; // Clear the messages array
-        await ChatRepository.updateChat(activeChat);
-
-        // Refresh the chat view
-        // You might need to access the webviewView instance and call webviewView.webview.postMessage
-        // to trigger an update in the chat view's content
-        // (This would typically be done in the chat-view.ts file where you have access to the webviewView)
-      }
-    },
-  },
-  {
     commandId: "the-creator-ai.resetClearChangePlanViewState",
     callback: async () => {
       const persistentStoreRepository = Services.getPersistentStoreRepository();
@@ -81,4 +65,11 @@ export const commands = [
       remoteSetChangePlanViewState(serverIpc, "isLoading", false);
     },
   },
+  {
+    commandId: "the-creator-ai.clearHistory",
+    callback: async () => {
+      const persistentStoreRepository = Services.getPersistentStoreRepository();
+      await persistentStoreRepository.clearChangePlanViewState();
+    },
+  }
 ];
