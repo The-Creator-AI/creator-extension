@@ -3,7 +3,7 @@
 * [ ] Reflection (ADHD :)): Historical plans (with requirements & file change plans) can serve as a powerful knowledge base for future plans
 * [ ] Test cases: Test cases can also serve as knowledge base?
 * [ ] Refactoring: Will help a lot in future
-  * [ ] Reflection will build up during the refactoring
+  * [ ] Reflection will build up during the refactoring?
 * [ ] KTs (for better context & knowledge base)
   * [ ] Code walkthrough videos?
   * [ ] Product demos with code walkthrough?
