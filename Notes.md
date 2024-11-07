@@ -11,3 +11,5 @@
 * [ ] Suggest changes to file after getting code
 * [ ] Fix the crash
 * [ ] Don't show file path chooser when it can be figured out
+* [ ] Suggestion by user to add/remove files in the plan, no direct changes - just suggestions (details to be added by AI)
+
