@@ -1,5 +1,6 @@
 ### TODO
 
+* [ ] Popular: Benchmarks? Case studies (vidoes)?
 * [ ] Reflection (ADHD :)): Historical plans (with requirements & file change plans) can serve as a powerful knowledge base for future plans
 * [ ] Test cases: Test cases can also serve as knowledge base?
 * [ ] Refactoring: Will help a lot in future
