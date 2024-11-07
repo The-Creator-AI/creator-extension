@@ -2,6 +2,7 @@
 
 * [ ] Popular: Benchmarks? Case studies (vidoes)?
 * [ ] Reflection (ADHD :)): Historical plans (with requirements & file change plans) can serve as a powerful knowledge base for future plans
+  * [ ] Can even help keep the plans concise, since more context, hence can get away with being less verbose & precise?
 * [ ] Test cases: Test cases can also serve as knowledge base?
 * [ ] Refactoring: Will help a lot in future
   * [ ] Reflection will build up during the refactoring?
