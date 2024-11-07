@@ -1,5 +1,6 @@
 ### TODO
 
+* [ ] Nudge shortcuts: That pushes to pay attention to specific things and then suggest improvise
 * [ ] Popular: Benchmarks? Case studies (vidoes)?
 * [ ] Reflection (ADHD :)): Historical plans (with requirements & file change plans) can serve as a powerful knowledge base for future plans
   * [ ] Can even help keep the plans concise, since more context, hence can get away with being less verbose & precise?
