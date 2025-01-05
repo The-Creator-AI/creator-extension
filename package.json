@@ -57,12 +57,12 @@
       {
         "command": "the-creator-ai.exportChangePlan",
         "title": "Creator AI: Export Change Plan",
-        "icon": "$(cloud-download)"
+        "icon": "$(cloud-upload)"
       },
       {
         "command": "the-creator-ai.importChangePlan",
         "title": "Creator AI: Import Change Plan",
-        "icon": "$(cloud-upload)"
+        "icon": "$(cloud-download)"
       }
     ],
     "viewsContainers": {

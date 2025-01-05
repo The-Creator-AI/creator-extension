@@ -1,8 +1,9 @@
-import { Injectable } from 'injection-js';
-import * as vscode from 'vscode';
+import { Services } from '@/backend/services/services';
+import { initialState } from '@/views/change-plan-view/store/change-plan-view.initial-state';
 import { setChangePlanViewState } from '@/views/change-plan-view/store/change-plan-view.logic';
 import { ChangePlan } from '@/views/change-plan-view/store/change-plan-view.state-type';
-import { getChangePlanViewState } from '@/views/change-plan-view/store/change-plan-view.store';
+import { Injectable } from 'injection-js';
+import * as vscode from 'vscode';
 
 @Injectable()
 export class ChangePlanImportService {
@@ -22,12 +23,17 @@ export class ChangePlanImportService {
         const fileContent = await vscode.workspace.fs.readFile(fileUri[0]);
         const plansJson: ChangePlan[] = JSON.parse(Buffer.from(fileContent).toString('utf-8'));
 
+        console.log({ fileContent, plansJson });
+
         if (!Array.isArray(plansJson)) {
           vscode.window.showErrorMessage('Invalid change plans format. Expected an array of plans.');
           return;
         }
 
-        const currentPlans = getChangePlanViewState('changePlans');
+        const persistentStoreRepository =
+          Services.getPersistentStoreRepository();
+        const store = persistentStoreRepository.getChangePlanViewState();
+        const currentPlans = store?.changePlans || [];
         const updatedPlans = [...currentPlans];
 
         for (const plan of plansJson) {
@@ -49,7 +55,10 @@ export class ChangePlanImportService {
           }
         }
 
-        setChangePlanViewState('changePlans')(updatedPlans);
+        persistentStoreRepository.setChangePlanViewState({
+          ...initialState,
+          changePlans: updatedPlans,
+        });
         vscode.window.showInformationMessage(`Change plans imported successfully.`);
       } catch (error) {
         vscode.window.showErrorMessage(`Failed to import change plans: ${error}`);

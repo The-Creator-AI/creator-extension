@@ -1,13 +1,14 @@
 import { Injectable } from 'injection-js';
 import * as vscode from 'vscode';
-import { getChangePlanViewState } from '@/views/change-plan-view/store/change-plan-view.store';
-import { ChangePlan } from '@/views/change-plan-view/store/change-plan-view.state-type';
 import { Services } from './services';
 
 @Injectable()
 export class ChangePlanExportService {
   async exportAllChangePlans(): Promise<void> {
-    const changePlans = getChangePlanViewState('changePlans');
+    const persistentStoreRepository = Services.getPersistentStoreRepository();
+    const store = persistentStoreRepository.getChangePlanViewState();
+    const changePlans = store?.changePlans || [];
+
     const jsonString = JSON.stringify(changePlans, null, 2);
     Services.getLoggerService().log(jsonString);
 
