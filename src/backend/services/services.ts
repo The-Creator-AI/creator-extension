@@ -7,6 +7,7 @@ import { ChatRepository } from "../repositories/chat.respository";
 import { PersistentStoreRepository } from "../repositories/persistent-store.repository";
 import { ChangePlanExportService } from "./change-plan-export.service";
 import { ChangePlanImportService } from "./change-plan-import.service";
+import { LoggerService } from "./logger.service";
 
 export class Services {
   static injector: ReflectiveInjector;
@@ -20,6 +21,7 @@ export class Services {
       LlmService,
       ChangePlanExportService,
       ChangePlanImportService,
+      LoggerService,
     ]);
   }
 
@@ -45,5 +47,9 @@ export class Services {
 
   static getChangePlanImportService(): ChangePlanImportService {
     return Services.injector.get(ChangePlanImportService);
+  }
+
+  static getLoggerService(): LoggerService {
+    return Services.injector.get(LoggerService);
   }
 }
