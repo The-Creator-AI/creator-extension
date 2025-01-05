@@ -13,11 +13,12 @@ import { LlmServiceEnum } from "../types/llm-service.enum";
 
 @Injectable()
 export class LlmService {
-  private geminiProModel: string = "gemini-1.5-pro-exp-0827"; // Default model
+  private geminiProModel: string = "gemini-1.5-pro-exp-0827";
   private geminiFlashModel: string = "gemini-1.5-flash-latest";
+  private geminiFlash2Model: string = "models/gemini-2.0-flash-exp";
   private openaiModel: string = "gpt-3.5-turbo";
 
-  private currentModel: string = this.geminiProModel; // Track the current model being used
+  private currentModel: string = this.geminiFlash2Model;
 
   constructor(
     @Inject(CreatorService) private readonly creatorService: CreatorService,
