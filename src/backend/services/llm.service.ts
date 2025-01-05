@@ -10,6 +10,9 @@ import { ChatMessage } from "../repositories/chat.respository";
 import { Inject, Injectable } from "injection-js";
 import { SettingsRepository } from "../repositories/settings.repository";
 import { LlmServiceEnum } from "../types/llm-service.enum";
+import { PersistentStoreRepository } from "../repositories/persistent-store.repository";
+import { ChangePlan } from "@/views/change-plan-view/store/change-plan-view.state-type";
+import { StorageKeysEnum } from "../types/storage-keys.enum";
 
 @Injectable()
 export class LlmService {
@@ -23,7 +26,9 @@ export class LlmService {
   constructor(
     @Inject(CreatorService) private readonly creatorService: CreatorService,
     @Inject(SettingsRepository)
-    private readonly settingsRepository: SettingsRepository
+    private readonly settingsRepository: SettingsRepository,
+    @Inject(PersistentStoreRepository)
+    private readonly persistentStoreRepository: PersistentStoreRepository
   ) {}
 
   async sendPrompt(
@@ -33,6 +38,9 @@ export class LlmService {
   ): Promise<{ response: string; modelType: string; modelName: string }> {
     const { type, apiKeys } = await this.getApiKey();
     console.log({ type, apiKeys, chatHistory, selectedFiles });
+
+    // Fetch past change plans
+    const pastChangePlans = await this.getPastChangePlans();
 
     // Read selected files content
     const fileContents =
@@ -46,6 +54,16 @@ File: ${filePath}
 ${fileContents[filePath]}
 \`\`\`\n\n`;
     }
+
+    // Append past change plans to prompt
+    if (pastChangePlans?.length) {
+      prompt += `\n\nPast Change Plans:\n\`\`\`json\n${JSON.stringify(
+        pastChangePlans.map((plan) => plan.planJson),
+        null,
+        2
+      )}\n\`\`\`\n\n`;
+    }
+
     chatHistory.forEach((message) => {
       prompt += `${message.user}: ${message.message}\n`;
     });
@@ -141,10 +159,7 @@ ${fileContents[filePath]}
           }
         } else {
           // For other errors, log the error and potentially throw or handle differently
-          console.error(
-            `Error during LLM request (attempt ${attempts}):`,
-            e
-          );
+          console.error(`Error during LLM request (attempt ${attempts}):`, e);
           // You might want to throw the error here or handle it differently based on your needs
           // throw new Error("Could not get a response from Gemini after multiple attempts.");
         }
@@ -203,6 +218,16 @@ ${fileContents[filePath]}
     } else {
       await this.getApiKeyFromUser();
       return await this.getApiKey();
+    }
+  }
+
+  private async getPastChangePlans(): Promise<ChangePlan[] | undefined> {
+    try {
+      return this.persistentStoreRepository.getChangePlanViewState()
+        ?.changePlans;
+    } catch (error) {
+      console.error("Error retrieving past change plans:", error);
+      return undefined;
     }
   }
 
