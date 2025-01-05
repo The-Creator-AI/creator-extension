@@ -8,7 +8,7 @@
   },
   "displayName": "The Creator AI",
   "description": "Coding assistant",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -53,6 +53,16 @@
       {
         "command": "the-creator-ai.clearHistory",
         "title": "Creator AI: Clear History"
+      },
+      {
+        "command": "the-creator-ai.exportChangePlan",
+        "title": "Creator AI: Export Change Plan",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "the-creator-ai.importChangePlan",
+        "title": "Creator AI: Import Change Plan",
+        "icon": "$(cloud-upload)"
       }
     ],
     "viewsContainers": {
@@ -86,6 +96,18 @@
           "when": "view == viewType.sidebar.changePlan",
           "group": "navigation",
           "title": "New Plan"
+        },
+        {
+          "command": "the-creator-ai.exportChangePlan",
+          "when": "view == viewType.sidebar.changePlan",
+          "group": "navigation",
+           "title": "Export Plan"
+        },
+        {
+          "command": "the-creator-ai.importChangePlan",
+          "when": "view == viewType.sidebar.changePlan",
+          "group": "navigation",
+           "title": "Import Plan"
         }
       ]
     }

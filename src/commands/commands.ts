@@ -3,7 +3,8 @@ import { ChatRepository } from "../backend/repositories/chat.respository";
 import { Services } from "../backend/services/services";
 import * as vscode from "vscode";
 import { serverIPCs } from "@/views/register-views";
-import {VIEW_TYPES} from '@/views/view-types';
+import { VIEW_TYPES } from "@/views/view-types";
+import { ChangePlan } from "@/views/change-plan-view/store/change-plan-view.state-type";
 
 // Define an array of commands with their corresponding callback functions
 export const commands = [
@@ -19,40 +20,62 @@ export const commands = [
   {
     commandId: "the-creator-ai.resetClearChangePlanViewState",
     callback: async () => {
-      const persistentStoreRepository = Services.getPersistentStoreRepository();
+      const persistentStoreRepository =
+        Services.getPersistentStoreRepository();
       await persistentStoreRepository.clearChangePlanViewState();
     },
   },
   {
     commandId: "the-creator-ai.chooseChangePlan",
     callback: async () => {
-      const persistentStoreRepository = Services.getPersistentStoreRepository();
+      const persistentStoreRepository =
+        Services.getPersistentStoreRepository();
       const store = persistentStoreRepository.getChangePlanViewState();
       const changePlans = store?.changePlans || [];
-  
+
       // Sort change plans by last updated date (descending)
-      changePlans.sort((a, b) => b.lastUpdatedAt - a.lastUpdatedAt);
-  
+      changePlans.sort((a: ChangePlan, b: ChangePlan) => b.lastUpdatedAt - a.lastUpdatedAt);
+
       // Show quick pick with plan titles
-      const selectedPlanTitle = await vscode.window.showQuickPick(changePlans.map(plan => {
-        return {
-          label: plan.planTitle,
-          description: new Date(plan.lastUpdatedAt).toLocaleString()
-        };
-      }));
-  
+      const selectedPlanTitle = await vscode.window.showQuickPick(
+        changePlans.map((plan: ChangePlan) => {
+          return {
+            label: plan.planTitle,
+            description: new Date(plan.lastUpdatedAt).toLocaleString(),
+          };
+        })
+      );
+
       if (selectedPlanTitle) {
         // Update state with selected plan
-        const selectedPlan = changePlans.find(plan => plan.planTitle === selectedPlanTitle.label);
+        const selectedPlan = changePlans.find(
+          (plan: ChangePlan) => plan.planTitle === selectedPlanTitle.label
+        );
         if (selectedPlan) {
           const serverIpc = serverIPCs[VIEW_TYPES.SIDEBAR.CHANGE_PLAN];
-          remoteSetChangePlanViewState(serverIpc, "changeDescription", selectedPlan.planDescription);
-          remoteSetChangePlanViewState(serverIpc, "llmResponse", selectedPlan.llmResponse);
-          remoteSetChangePlanViewState(serverIpc, "selectedFiles", selectedPlan.selectedFiles);
-          remoteSetChangePlanViewState(serverIpc, "chatHistory", selectedPlan.chatHistory);
+          remoteSetChangePlanViewState(
+            serverIpc,
+            "changeDescription",
+            selectedPlan.planDescription
+          );
+          remoteSetChangePlanViewState(
+            serverIpc,
+            "llmResponse",
+            selectedPlan.llmResponse
+          );
+          remoteSetChangePlanViewState(
+            serverIpc,
+            "selectedFiles",
+            selectedPlan.selectedFiles
+          );
+          remoteSetChangePlanViewState(
+            serverIpc,
+            "chatHistory",
+            selectedPlan.chatHistory
+          );
         }
       }
-    }
+    },
   },
   {
     commandId: "the-creator-ai.newPlan",
@@ -68,8 +91,23 @@ export const commands = [
   {
     commandId: "the-creator-ai.clearHistory",
     callback: async () => {
-      const persistentStoreRepository = Services.getPersistentStoreRepository();
+      const persistentStoreRepository =
+        Services.getPersistentStoreRepository();
       await persistentStoreRepository.clearChangePlanViewState();
     },
-  }
+  },
+  {
+    commandId: "the-creator-ai.exportChangePlan",
+    callback: async () => {
+      const changePlanExportService = Services.getChangePlanExportService();
+      await changePlanExportService.exportAllChangePlans();
+    },
+  },
+  {
+    commandId: "the-creator-ai.importChangePlan",
+    callback: async () => {
+      const changePlanImportService = Services.getChangePlanImportService();
+      await changePlanImportService.importAllChangePlans();
+    },
+  },
 ];

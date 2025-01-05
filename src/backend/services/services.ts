@@ -5,6 +5,8 @@ import { LlmService } from "./llm.service";
 import { SettingsRepository } from "../repositories/settings.repository";
 import { ChatRepository } from "../repositories/chat.respository";
 import { PersistentStoreRepository } from "../repositories/persistent-store.repository";
+import { ChangePlanExportService } from "./change-plan-export.service";
+import { ChangePlanImportService } from "./change-plan-import.service";
 
 export class Services {
   static injector: ReflectiveInjector;
@@ -16,6 +18,8 @@ export class Services {
       PersistentStoreRepository,
       CreatorService,
       LlmService,
+      ChangePlanExportService,
+      ChangePlanImportService,
     ]);
   }
 
@@ -33,5 +37,13 @@ export class Services {
 
   static getSettingsRepository(): SettingsRepository {
     return Services.injector.get(SettingsRepository);
+  }
+
+  static getChangePlanExportService(): ChangePlanExportService {
+    return Services.injector.get(ChangePlanExportService);
+  }
+
+  static getChangePlanImportService(): ChangePlanImportService {
+    return Services.injector.get(ChangePlanImportService);
   }
 }
